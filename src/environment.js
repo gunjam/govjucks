@@ -1,7 +1,7 @@
 'use strict';
 
 const asap = require('asap');
-const waterfall = require('a-sync-waterfall');
+const waterfall = require('fastfall')();
 const lib = require('./lib');
 const compiler = require('./compiler');
 const filters = require('./filters');
@@ -329,8 +329,8 @@ class Environment extends EmitterObj {
     return tmpl.render(ctx, cb);
   }
 
-  waterfall(tasks, callback, forceAsync) {
-    return waterfall(tasks, callback, forceAsync);
+  waterfall(tasks, callback) {
+    return waterfall(tasks, callback);
   }
 }
 
