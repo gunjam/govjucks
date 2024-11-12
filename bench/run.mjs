@@ -1,19 +1,20 @@
 'use strict';
 
-var fs = require('fs');
-var bench = require('bench');
-var nunjucks = require('nunjucks');
-var govjucks = require('../index');
+import fs from 'node:fs';
+import { join } from 'node:path';
+import { summary, bench, run } from 'mitata';
+import nunjucks from 'nunjucks';
+import govjucks from '../index.js';
 
-var src = fs.readFileSync('case.html', 'utf-8');
+const src = fs.readFileSync(join(import.meta.dirname, 'case.html'), 'utf-8');
 
-var oldEnv = new nunjucks.Environment(null);
-var oldTmpl = new nunjucks.Template(src, oldEnv, null, null, true);
+const oldEnv = new nunjucks.Environment(null);
+const oldTmpl = new nunjucks.Template(src, oldEnv, null, null, true);
 
-var env = new govjucks.Environment(null);
-var tmpl = new govjucks.Template(src, env, null, null, true);
+const env = new govjucks.Environment(null);
+const tmpl = new govjucks.Template(src, env, null, null, true);
 
-var ctx = {
+const ctx = {
     items: [
         {
             current: true,
@@ -66,17 +67,14 @@ var ctx = {
     ]
 };
 
-exports.time = 1000;
-exports.compareCount = 8;
+summary(() => {
+  bench('nunjucks', () => {
+    oldTmpl.render(ctx);
+  })
 
-exports.compare = {
-    'nunjucks': function() {
-        oldTmpl.render(ctx);
-    },
+  bench('govjucks', () => {
+    tmpl.render(ctx);
+  })
+})
 
-    'govjucks': function(done) {
-        tmpl.render(ctx, done);
-    }
-};
-
-bench.runMain();
+run()
