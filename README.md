@@ -25,10 +25,6 @@ To use the file watcher built-in to Govjucks, Chokidar must be installed separat
 
 See [here](https://mozilla.github.io/govjucks/).
 
-## Browser Support
-
-Supported in all modern browsers. For IE8 support, use [es5-shim](https://github.com/es-shims/es5-shim).
-
 ## Tests
 
 Run the tests with `npm test`.
