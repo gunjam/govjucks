@@ -91,11 +91,12 @@ function makeMacro (argNames, kwargNames, func) {
 
       // Positional arguments that should be passed in as
       // keyword arguments (essentially default values)
-      macroArgs.slice(args.length, argCount).forEach((val, i) => {
+      const pArgs = macroArgs.slice(args.length, argCount);
+      for (let i = 0, len = pArgs.length; i < len; i++) {
         if (i < kwargNames.length) {
-          kwargs[kwargNames[i]] = val;
+          kwargs[kwargNames[i]] = pArgs[i];
         }
-      });
+      }
       args.push(kwargs);
     } else if (argCount < argNames.length) {
       args = macroArgs.slice(0, argCount);

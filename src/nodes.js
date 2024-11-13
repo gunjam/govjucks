@@ -17,7 +17,9 @@ class Node extends Obj {
     this.lineno = lineno;
     this.colno = colno;
 
-    this.fields.forEach((field, i) => {
+    for (let i = 0, len = this.fields.length; i < len; i++) {
+      const field = this.fields[i];
+
       // The first two args are line/col numbers, so offset by 2
       let val = arguments[i + 2];
 
@@ -28,25 +30,29 @@ class Node extends Obj {
       }
 
       this[field] = val;
-    });
+    }
   }
 
   findAll (type, results) {
     results = results || [];
 
     if (this instanceof NodeList) {
-      this.children.forEach(child => traverseAndCheck(child, type, results));
+      for (const child of this.children) {
+        traverseAndCheck(child, type, results);
+      }
     } else {
-      this.fields.forEach(field => traverseAndCheck(this[field], type, results));
+      for (const field of this.fields) {
+        traverseAndCheck(this[field], type, results);
+      }
     }
 
     return results;
   }
 
   iterFields (func) {
-    this.fields.forEach((field) => {
+    for (const field of this.fields) {
       func(this[field], field);
-    });
+    }
   }
 }
 
@@ -150,13 +156,15 @@ const CallExtensionAsync = CallExtension.extend('CallExtensionAsync');
 function print (str, indent, inline) {
   const lines = str.split('\n');
 
-  lines.forEach((line, i) => {
+  for (let i = 0, len = lines.length; i < len; i++) {
+    const line = lines[i];
+
     if (line && ((inline && i > 0) || !inline)) {
       process.stdout.write((' ').repeat(indent));
     }
     const nl = (i === lines.length - 1) ? '' : '\n';
     process.stdout.write(`${line}${nl}`);
-  });
+  }
 }
 
 // Print the AST in a nicely formatted tree format for debuggin
@@ -167,9 +175,9 @@ function printNodes (node, indent) {
 
   if (node instanceof NodeList) {
     print('\n');
-    node.children.forEach((n) => {
+    for (const n of node.children) {
       printNodes(n, indent + 2);
-    });
+    }
   } else if (node instanceof CallExtension) {
     print(`${node.extName}.${node.prop}\n`);
 
@@ -178,9 +186,9 @@ function printNodes (node, indent) {
     }
 
     if (node.contentArgs) {
-      node.contentArgs.forEach((n) => {
+      for (const n of node.contentArgs) {
         printNodes(n, indent + 2);
-      });
+      }
     }
   } else {
     const nodes = [];
@@ -201,10 +209,10 @@ function printNodes (node, indent) {
       print('\n');
     }
 
-    nodes.forEach(([fieldName, n]) => {
+    for (const [fieldName, n] of nodes) {
       print(`[${fieldName}] =>`, indent + 2);
       printNodes(n, indent + 4);
-    });
+    }
   }
 }
 

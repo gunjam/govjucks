@@ -64,7 +64,9 @@ class Compiler extends Obj {
   }
 
   _emitLines (...lines) {
-    lines.forEach((line) => this._emitLine(line));
+    for (const line of lines) {
+      this._emitLine(line);
+    }
   }
 
   _emitFuncBegin (node, name) {
@@ -126,9 +128,9 @@ class Compiler extends Obj {
   }
 
   _compileChildren (node, frame) {
-    node.children.forEach((child) => {
+    for (const child of node.children) {
       this.compile(child, frame);
-    });
+    }
   }
 
   _compileAggregate (node, frame, startChar, endChar) {
@@ -136,13 +138,13 @@ class Compiler extends Obj {
       this._emit(startChar);
     }
 
-    node.children.forEach((child, i) => {
+    for (let i = 0, len = node.children.length; i < len; i++) {
       if (i > 0) {
         this._emit(',');
       }
 
-      this.compile(child, frame);
-    });
+      this.compile(node.children[i], frame);
+    }
 
     if (endChar) {
       this._emit(endChar);
@@ -196,6 +198,8 @@ class Compiler extends Obj {
     const args = node.args;
     const contentArgs = node.contentArgs;
     const autoescape = typeof node.autoescape === 'boolean' ? node.autoescape : true;
+    const childrenCount = args.children.length;
+    const contentArgsCount = contentArgs.length;
 
     if (!async) {
       this._emit(`${this.buffer} += runtime.suppressValue(`);
@@ -214,23 +218,25 @@ class Compiler extends Obj {
           'use `parser.parseSignature`');
       }
 
-      args.children.forEach((arg, i) => {
+      for (let i = 0; i < childrenCount; i++) {
         // Tag arguments are passed normally to the call. Note
         // that keyword arguments are turned into a single js
         // object as the last argument, if they exist.
-        this._compileExpression(arg, frame);
+        this._compileExpression(args.children[i], frame);
 
-        if (i !== args.children.length - 1 || contentArgs.length) {
+        if (i !== childrenCount - 1 || contentArgsCount > 0) {
           this._emit(',');
         }
-      });
+      }
     }
 
-    if (contentArgs.length) {
-      contentArgs.forEach((arg, i) => {
+    if (contentArgsCount > 0) {
+      for (let i = 0; i < contentArgsCount; i++) {
         if (i > 0) {
           this._emit(',');
         }
+
+        const arg = contentArgs[i];
 
         if (arg) {
           this._emitLine('function(cb) {');
@@ -248,7 +254,7 @@ class Compiler extends Obj {
         } else {
           this._emit('null');
         }
-      });
+      }
     }
 
     if (async) {
@@ -442,10 +448,10 @@ class Compiler extends Obj {
   compileCompare (node, frame) {
     this.compile(node.expr, frame);
 
-    node.ops.forEach((op) => {
+    for (const op of node.ops) {
       this._emit(` ${compareOps[op.type]} `);
       this.compile(op.expr, frame);
-    });
+    }
   }
 
   compileLookupVal (node, frame) {
@@ -527,7 +533,7 @@ class Compiler extends Obj {
 
     // Lookup the variable names for each identifier and create
     // new ones if necessary
-    node.targets.forEach((target) => {
+    for (const target of node.targets) {
       const name = target.value;
       let id = frame.lookup(name);
 
@@ -540,7 +546,7 @@ class Compiler extends Obj {
       }
 
       ids.push(id);
-    });
+    }
 
     if (node.value) {
       this._emit(ids.join(' = ') + ' = ');
@@ -552,9 +558,9 @@ class Compiler extends Obj {
       this._emitLine(';');
     }
 
-    node.targets.forEach((target, i) => {
+    for (let i = 0, len = node.targets.length; i < len; i++) {
+      const { value: name } = node.targets[i];
       const id = ids[i];
-      const name = target.value;
 
       // We are running this for every var, but it's very
       // uncommon to assign to multiple vars anyway
@@ -569,23 +575,23 @@ class Compiler extends Obj {
         this._emitLine(`context.addExport("${name}", ${id});`);
         this._emitLine('}');
       }
-    });
+    }
   }
 
   compileSwitch (node, frame) {
     this._emit('switch (');
     this.compile(node.expr, frame);
     this._emit(') {');
-    node.cases.forEach((c, i) => {
+    for (const { cond, body } of node.cases) {
       this._emit('case ');
-      this.compile(c.cond, frame);
+      this.compile(cond, frame);
       this._emit(': ');
-      this.compile(c.body, frame);
+      this.compile(body, frame);
       // preserve fall-throughs
-      if (c.body.children.length) {
+      if (body.children.length) {
         this._emitLine('break;');
       }
-    });
+    }
     if (node.default) {
       this._emit('default:');
       this.compile(node.default, frame);
@@ -642,9 +648,9 @@ class Compiler extends Obj {
       { name: 'length', val: len },
     ];
 
-    bindings.forEach((b) => {
-      this._emitLine(`frame.set("loop.${b.name}", ${b.val});`);
-    });
+    for (const { name, val } of bindings) {
+      this._emitLine(`frame.set("loop.${name}", ${val});`);
+    }
   }
 
   compileFor (node, frame) {
@@ -679,12 +685,13 @@ class Compiler extends Obj {
       this._emitLine(`for(${i}=0; ${i} < ${arr}.length; ${i}++) {`);
 
       // Bind each declared var
-      node.name.children.forEach((child, u) => {
+      for (let u = 0, len = node.name.children.length; u < len; u++) {
+        const child = node.name.children[u];
         const tid = this._tmpid();
         this._emitLine(`var ${tid} = ${arr}[${i}][${u}];`);
         this._emitLine(`frame.set("${child}", ${arr}[${i}][${u}]);`);
-        frame.set(node.name.children[u].value, tid);
-      });
+        frame.set(child.value, tid);
+      }
 
       this._emitLoopBindings(node, arr, i, len);
       this._withScopedSyntax(() => {
@@ -765,17 +772,17 @@ class Compiler extends Obj {
       const arrayLen = node.name.children.length;
       this._emit(`runtime.${asyncMethod}(${arr}, ${arrayLen}, function(`);
 
-      node.name.children.forEach((name) => {
+      for (const name of node.name.children) {
         this._emit(`${name.value},`);
-      });
+      }
 
       this._emit(i + ',' + len + ',next) {');
 
-      node.name.children.forEach((name) => {
+      for (const name of node.name.children) {
         const id = name.value;
         frame.set(id, id);
         this._emitLine(`frame.set("${id}", ${id});`);
-      });
+      }
     } else {
       const id = node.name.value;
       this._emitLine(`runtime.${asyncMethod}(${arr}, 1, function(${id}, ${i}, ${len},next) {`);
@@ -831,14 +838,16 @@ class Compiler extends Obj {
     const keepFrame = (frame !== undefined);
 
     // Type check the definition of the args
-    node.args.children.forEach((arg, i) => {
+    for (let i = 0, len = node.args.children.length; i < len; i++) {
+      const arg = node.args.children[i];
+
       if (i === node.args.children.length - 1 && arg instanceof nodes.Dict) {
         kwargs = arg;
       } else {
         this.assertType(arg, nodes.Symbol);
         args.push(arg);
       }
-    });
+    }
 
     const realNames = [...args.map((n) => `l_${n.value}`), 'kwargs'];
 
@@ -870,21 +879,21 @@ class Compiler extends Obj {
     // Expose the arguments to the template. Don't need to use
     // random names because the function
     // will create a new run-time scope for us
-    args.forEach((arg) => {
+    for (const arg of args) {
       this._emitLine(`frame.set("${arg.value}", l_${arg.value});`);
       currFrame.set(arg.value, `l_${arg.value}`);
-    });
+    }
 
     // Expose the keyword arguments
     if (kwargs) {
-      kwargs.children.forEach((pair) => {
+      for (const pair of kwargs.children) {
         const name = pair.key.value;
         this._emit(`frame.set("${name}", `);
         this._emit(`Object.prototype.hasOwnProperty.call(kwargs, "${name}")`);
         this._emit(` ? kwargs["${name}"] : `);
         this._compileExpression(pair.value, currFrame);
         this._emit(');');
-      });
+      }
     }
 
     const bufferId = this._pushBuffer();
@@ -965,7 +974,7 @@ class Compiler extends Obj {
       this._makeCallback(importedId));
     this._addScopeLevel();
 
-    node.names.children.forEach((nameNode) => {
+    for (const nameNode of node.names.children) {
       let name;
       let alias;
       const id = this._tmpid();
@@ -991,7 +1000,7 @@ class Compiler extends Obj {
       } else {
         this._emitLine(`context.setVariable("${alias}", ${id});`);
       }
-    });
+    }
   }
 
   compileBlock (node) {
@@ -1093,7 +1102,7 @@ class Compiler extends Obj {
 
   compileOutput (node, frame) {
     const children = node.children;
-    children.forEach(child => {
+    for (const child of children) {
       // TemplateData is a special case because it is never
       // autoescaped, so simply output it for optimization
       if (child instanceof nodes.TemplateData) {
@@ -1113,7 +1122,7 @@ class Compiler extends Obj {
         }
         this._emit(', env.opts.autoescape);\n');
       }
-    });
+    }
   }
 
   compileRoot (node, frame) {
@@ -1139,7 +1148,7 @@ class Compiler extends Obj {
 
     const blocks = node.findAll(nodes.Block);
 
-    blocks.forEach((block, i) => {
+    for (const block of blocks) {
       const name = block.name.value;
 
       if (blockNames.indexOf(name) !== -1) {
@@ -1153,14 +1162,14 @@ class Compiler extends Obj {
       this._emitLine('var frame = frame.push(true);');
       this.compile(block.body, tmpFrame);
       this._emitFuncEnd();
-    });
+    }
 
     this._emitLine('return {');
 
-    blocks.forEach((block, i) => {
+    for (const block of blocks) {
       const blockName = `b_${block.name.value}`;
       this._emitLine(`${blockName}: ${blockName},`);
-    });
+    }
 
     this._emitLine('root: root\n};');
   }

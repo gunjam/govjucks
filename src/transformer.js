@@ -58,9 +58,9 @@ function walk (ast, func, depthFirst) {
 
     if (propsT !== props) {
       ast = new nodes[ast.typename](ast.lineno, ast.colno);
-      propsT.forEach((prop, i) => {
-        ast[ast.fields[i]] = prop;
-      });
+      for (let i = 0, len = propsT.length; i < len; i++) {
+        ast[ast.fields[i]] = propsT[i];
+      }
     }
   }
 
