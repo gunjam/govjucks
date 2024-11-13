@@ -54,7 +54,7 @@ function precompile (input, opts) {
   const templates = [];
 
   function addTemplates (dir) {
-    fs.readdirSync(dir).forEach((file) => {
+    for (const file of fs.readdirSync(dir)) {
       const filepath = path.join(dir, file);
       let subpath = filepath.substr(path.join(input, '/').length);
       const stat = fs.statSync(filepath);
@@ -67,7 +67,7 @@ function precompile (input, opts) {
       } else if (match(subpath, opts.include)) {
         templates.push(filepath);
       }
-    });
+    }
   }
 
   if (pathStats.isFile()) {

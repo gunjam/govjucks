@@ -24,9 +24,9 @@ function parentWrap (parent, prop) {
 function extendClass (cls, name, props) {
   props = props || {};
 
-  Object.keys(props).forEach(k => {
+  for (const k of Object.keys(props)) {
     props[k] = parentWrap(cls.prototype[k], props[k]);
-  });
+  }
 
   class subclass extends cls {
     get typename () {

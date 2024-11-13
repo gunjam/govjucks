@@ -91,12 +91,17 @@ class Environment extends EmitterObj {
     this.extensions = {};
     this.extensionsList = [];
 
-    Object.entries(filters).forEach(([name, filter]) => this.addFilter(name, filter));
-    Object.entries(tests).forEach(([name, test]) => this.addTest(name, test));
+    for (const [name, filter] of Object.entries(filters)) {
+      this.addFilter(name, filter);
+    }
+
+    for (const [name, test] of Object.entries(tests)) {
+      this.addTest(name, test);
+    }
   }
 
   _initLoaders () {
-    this.loaders.forEach((loader) => {
+    for (const loader of this.loaders) {
       // Caching and cache busting
       loader.cache = {};
       if (typeof loader.on === 'function') {
@@ -108,13 +113,13 @@ class Environment extends EmitterObj {
           this.emit('load', name, source, loader);
         });
       }
-    });
+    }
   }
 
   invalidateCache () {
-    this.loaders.forEach((loader) => {
+    for (const loader of this.loaders) {
       loader.cache = {};
-    });
+    }
   }
 
   addExtension (name, extension) {
@@ -345,9 +350,9 @@ class Context extends Obj {
     this.blocks = {};
     this.exported = [];
 
-    Object.keys(blocks).forEach(name => {
+    for (const name of Object.keys(blocks)) {
       this.addBlock(name, blocks[name]);
-    });
+    }
   }
 
   lookup (name) {
@@ -400,9 +405,9 @@ class Context extends Obj {
 
   getExported () {
     const exported = {};
-    this.exported.forEach((name) => {
+    for (const name of this.exported) {
       exported[name] = this.ctx[name];
-    });
+    }
     return exported;
   }
 }
@@ -573,11 +578,11 @@ class Template extends Obj {
   _getBlocks (props) {
     const blocks = {};
 
-    Object.keys(props).forEach((k) => {
+    for (const k of Object.keys(props)) {
       if (k.slice(0, 2) === 'b_') {
         blocks[k.slice(2)] = props[k];
       }
-    });
+    }
 
     return blocks;
   }

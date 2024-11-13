@@ -326,9 +326,9 @@ module.exports.indexOf = indexOf;
 
 function extend (obj1, obj2) {
   obj1 = obj1 || {};
-  Object.keys(obj2).forEach(k => {
+  for (const k of Object.keys(obj2)) {
     obj1[k] = obj2[k];
-  });
+  }
   return obj1;
 }
 
