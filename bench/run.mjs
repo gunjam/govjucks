@@ -1,5 +1,3 @@
-'use strict';
-
 import fs from 'node:fs';
 import { join } from 'node:path';
 import { summary, bench, run } from 'mitata';
@@ -15,66 +13,66 @@ const env = new govjucks.Environment(null);
 const tmpl = new govjucks.Template(src, env, null, null, true);
 
 const ctx = {
-    items: [
-        {
-            current: true,
-            name: 'James'
-        },
-        {
-            name: 'Foo',
-            url: 'http://example.com'
-        },
-        {
-            name: 'Foo',
-            url: 'http://example.com'
-        },
-        {
-            name: 'Foo',
-            url: 'http://example.com'
-        },
-        {
-            name: 'Foo',
-            url: 'http://example.com'
-        },
-        {
-            name: 'Foo',
-            url: 'http://example.com'
-        },
-        {
-            name: 'Foo',
-            url: 'http://example.com'
-        },
-        {
-            name: 'Foo',
-            url: 'http://example.com'
-        },
-        {
-            name: 'Foo',
-            url: 'http://example.com'
-        },
-        {
-            name: 'Foo',
-            url: 'http://example.com'
-        },
-        {
-            name: 'Foo',
-            url: 'http://example.com'
-        },
-        {
-            name: 'Foo',
-            url: 'http://example.com'
-        }
-    ]
+  items: [
+    {
+      current: true,
+      name: 'James'
+    },
+    {
+      name: 'Foo',
+      url: 'http://example.com'
+    },
+    {
+      name: 'Foo',
+      url: 'http://example.com'
+    },
+    {
+      name: 'Foo',
+      url: 'http://example.com'
+    },
+    {
+      name: 'Foo',
+      url: 'http://example.com'
+    },
+    {
+      name: 'Foo',
+      url: 'http://example.com'
+    },
+    {
+      name: 'Foo',
+      url: 'http://example.com'
+    },
+    {
+      name: 'Foo',
+      url: 'http://example.com'
+    },
+    {
+      name: 'Foo',
+      url: 'http://example.com'
+    },
+    {
+      name: 'Foo',
+      url: 'http://example.com'
+    },
+    {
+      name: 'Foo',
+      url: 'http://example.com'
+    },
+    {
+      name: 'Foo',
+      url: 'http://example.com'
+    }
+  ]
 };
 
 summary(() => {
   bench('nunjucks', () => {
     oldTmpl.render(ctx);
-  })
+  });
 
   bench('govjucks', () => {
     tmpl.render(ctx);
-  })
-})
+  });
+});
 
-run()
+run();

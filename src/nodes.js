@@ -1,8 +1,8 @@
 'use strict';
 
-const {Obj} = require('./object');
+const { Obj } = require('./object');
 
-function traverseAndCheck(obj, type, results) {
+function traverseAndCheck (obj, type, results) {
   if (obj instanceof type) {
     results.push(obj);
   }
@@ -13,13 +13,13 @@ function traverseAndCheck(obj, type, results) {
 }
 
 class Node extends Obj {
-  init(lineno, colno, ...args) {
+  init (lineno, colno, ...args) {
     this.lineno = lineno;
     this.colno = colno;
 
     this.fields.forEach((field, i) => {
       // The first two args are line/col numbers, so offset by 2
-      var val = arguments[i + 2];
+      let val = arguments[i + 2];
 
       // Fields should never be undefined, but null. It makes
       // testing easier to normalize values.
@@ -31,7 +31,7 @@ class Node extends Obj {
     });
   }
 
-  findAll(type, results) {
+  findAll (type, results) {
     results = results || [];
 
     if (this instanceof NodeList) {
@@ -43,7 +43,7 @@ class Node extends Obj {
     return results;
   }
 
-  iterFields(func) {
+  iterFields (func) {
     this.fields.forEach((field) => {
       func(this[field], field);
     });
@@ -52,22 +52,22 @@ class Node extends Obj {
 
 // Abstract nodes
 class Value extends Node {
-  get typename() { return 'Value'; }
-  get fields() {
+  get typename () { return 'Value'; }
+  get fields () {
     return ['value'];
   }
 }
 
 // Concrete nodes
 class NodeList extends Node {
-  get typename() { return 'NodeList'; }
-  get fields() { return ['children']; }
+  get typename () { return 'NodeList'; }
+  get fields () { return ['children']; }
 
-  init(lineno, colno, nodes) {
+  init (lineno, colno, nodes) {
     super.init(lineno, colno, nodes || []);
   }
 
-  addChild(node) {
+  addChild (node) {
     this.children.push(node);
   }
 }
@@ -91,10 +91,10 @@ const Caller = Macro.extend('Caller');
 const Import = Node.extend('Import', { fields: ['template', 'target', 'withContext'] });
 
 class FromImport extends Node {
-  get typename() { return 'FromImport'; }
-  get fields() { return ['template', 'names', 'withContext']; }
+  get typename () { return 'FromImport'; }
+  get fields () { return ['template', 'names', 'withContext']; }
 
-  init(lineno, colno, template, names, withContext) {
+  init (lineno, colno, template, names, withContext) {
     super.init(lineno, colno, template, names || new NodeList(), withContext);
   }
 }
@@ -134,7 +134,7 @@ const Pos = UnaryOp.extend('Pos');
 const Compare = Node.extend('Compare', { fields: ['expr', 'ops'] });
 const CompareOperand = Node.extend('CompareOperand', { fields: ['expr', 'type'] });
 const CallExtension = Node.extend('CallExtension', {
-  init(ext, prop, args, contentArgs) {
+  init (ext, prop, args, contentArgs) {
     this.parent();
     this.extName = ext.__name || ext;
     this.prop = prop;
@@ -147,8 +147,8 @@ const CallExtension = Node.extend('CallExtension', {
 const CallExtensionAsync = CallExtension.extend('CallExtensionAsync');
 
 // This is hacky, but this is just a debugging function anyway
-function print(str, indent, inline) {
-  var lines = str.split('\n');
+function print (str, indent, inline) {
+  const lines = str.split('\n');
 
   lines.forEach((line, i) => {
     if (line && ((inline && i > 0) || !inline)) {
@@ -160,7 +160,7 @@ function print(str, indent, inline) {
 }
 
 // Print the AST in a nicely formatted tree format for debuggin
-function printNodes(node, indent) {
+function printNodes (node, indent) {
   indent = indent || 0;
 
   print(node.typename + ': ', indent);
@@ -183,7 +183,7 @@ function printNodes(node, indent) {
       });
     }
   } else {
-    let nodes = [];
+    const nodes = [];
     let props = null;
 
     node.iterFields((val, fieldName) => {
@@ -209,62 +209,62 @@ function printNodes(node, indent) {
 }
 
 module.exports = {
-  Node: Node,
-  Root: Root,
-  NodeList: NodeList,
-  Value: Value,
-  Literal: Literal,
-  Symbol: Symbol,
-  Group: Group,
+  Node,
+  Root,
+  NodeList,
+  Value,
+  Literal,
+  Symbol,
+  Group,
   Array: ArrayNode,
-  Pair: Pair,
-  Dict: Dict,
-  Output: Output,
-  Capture: Capture,
-  TemplateData: TemplateData,
-  If: If,
-  IfAsync: IfAsync,
-  InlineIf: InlineIf,
-  For: For,
-  AsyncEach: AsyncEach,
-  AsyncAll: AsyncAll,
-  Macro: Macro,
-  Caller: Caller,
-  Import: Import,
-  FromImport: FromImport,
-  FunCall: FunCall,
-  Filter: Filter,
-  FilterAsync: FilterAsync,
-  KeywordArgs: KeywordArgs,
-  Block: Block,
-  Super: Super,
-  Extends: Extends,
-  Include: Include,
-  Set: Set,
-  Switch: Switch,
-  Case: Case,
-  LookupVal: LookupVal,
-  BinOp: BinOp,
-  In: In,
-  Is: Is,
-  Or: Or,
-  And: And,
-  Not: Not,
-  Add: Add,
-  Concat: Concat,
-  Sub: Sub,
-  Mul: Mul,
-  Div: Div,
-  FloorDiv: FloorDiv,
-  Mod: Mod,
-  Pow: Pow,
-  Neg: Neg,
-  Pos: Pos,
-  Compare: Compare,
-  CompareOperand: CompareOperand,
+  Pair,
+  Dict,
+  Output,
+  Capture,
+  TemplateData,
+  If,
+  IfAsync,
+  InlineIf,
+  For,
+  AsyncEach,
+  AsyncAll,
+  Macro,
+  Caller,
+  Import,
+  FromImport,
+  FunCall,
+  Filter,
+  FilterAsync,
+  KeywordArgs,
+  Block,
+  Super,
+  Extends,
+  Include,
+  Set,
+  Switch,
+  Case,
+  LookupVal,
+  BinOp,
+  In,
+  Is,
+  Or,
+  And,
+  Not,
+  Add,
+  Concat,
+  Sub,
+  Mul,
+  Div,
+  FloorDiv,
+  Mod,
+  Pow,
+  Neg,
+  Pos,
+  Compare,
+  CompareOperand,
 
-  CallExtension: CallExtension,
-  CallExtensionAsync: CallExtensionAsync,
+  CallExtension,
+  CallExtensionAsync,
 
-  printNodes: printNodes
+  printNodes
 };

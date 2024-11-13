@@ -1,5 +1,3 @@
-/* eslint-disable vars-on-top */
-
 'use strict';
 
 const assert = require('node:assert/strict');
@@ -20,7 +18,7 @@ beforeEach(() => {
   doneHandler = null;
 });
 
-function equal(str, ctx, opts, str2, env) {
+function equal (str, ctx, opts, str2, env) {
   if (typeof ctx === 'string') {
     env = opts;
     str2 = ctx;
@@ -37,7 +35,7 @@ function equal(str, ctx, opts, str2, env) {
   assert.equal(res, str2);
 }
 
-function jinjaEqual(str, ctx, str2, env) {
+function jinjaEqual (str, ctx, str2, env) {
   const jinjaUninstalls = [govjucks.installJinjaCompat()];
   try {
     return equal(str, ctx, str2, env);
@@ -48,7 +46,7 @@ function jinjaEqual(str, ctx, str2, env) {
   }
 }
 
-function finish(done) {
+function finish (done) {
   if (numAsyncs > 0) {
     doneHandler = done;
   } else {
@@ -56,20 +54,19 @@ function finish(done) {
   }
 }
 
-function normEOL(str) {
+function normEOL (str) {
   if (!str) {
     return str;
   }
   return str.replace(/\r\n|\r/g, '\n');
 }
 
-function randomTemplateName() {
+function randomTemplateName () {
   const rand = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
   return rand + '.njk';
 }
 
-// eslint-disable-next-line consistent-return
-function render(str, ctx, opts, env, cb) {
+function render (str, ctx, opts, env, cb) {
   if (typeof ctx === 'function') {
     cb = ctx;
     ctx = null;
@@ -126,7 +123,7 @@ function render(str, ctx, opts, env, cb) {
   let tmplName;
   if (isSlim) {
     tmplName = randomTemplateName();
-    let precompileJs = precompileString(str, {
+    const precompileJs = precompileString(str, {
       name: tmplName,
       asFunction: true,
       env: e
@@ -139,7 +136,7 @@ function render(str, ctx, opts, env, cb) {
   let t;
 
   if (isSlim) {
-    let tmplSource = loader.getSource(tmplName);
+    const tmplSource = loader.getSource(tmplName);
     t = new Template(tmplSource.src, e, tmplSource.path);
   } else {
     t = new Template(str, e);
@@ -149,7 +146,7 @@ function render(str, ctx, opts, env, cb) {
     return t.render(ctx);
   } else {
     numAsyncs++;
-    t.render(ctx, function(err, res) {
+    t.render(ctx, function (err, res) {
       if (err && !opts.noThrow) {
         throw err;
       }

@@ -2,19 +2,19 @@
 
 const fs = require('fs');
 const path = require('path');
-const {_prettifyError} = require('./lib');
+const { _prettifyError } = require('./lib');
 const compiler = require('./compiler');
-const {Environment} = require('./environment');
+const { Environment } = require('./environment');
 const precompileGlobal = require('./precompile-global');
 
-function match(filename, patterns) {
+function match (filename, patterns) {
   if (!Array.isArray(patterns)) {
     return false;
   }
   return patterns.some((pattern) => filename.match(pattern));
 }
 
-function precompileString(str, opts) {
+function precompileString (str, opts) {
   opts = opts || {};
   opts.isString = true;
   const env = opts.env || new Environment([]);
@@ -26,7 +26,7 @@ function precompileString(str, opts) {
   return wrapper([_precompile(str, opts.name, env)], opts);
 }
 
-function precompile(input, opts) {
+function precompile (input, opts) {
   // The following options are available:
   //
   // * name: name of the template (auto-generated when compiling a directory)
@@ -53,7 +53,7 @@ function precompile(input, opts) {
   const precompiled = [];
   const templates = [];
 
-  function addTemplates(dir) {
+  function addTemplates (dir) {
     fs.readdirSync(dir).forEach((file) => {
       const filepath = path.join(dir, file);
       let subpath = filepath.substr(path.join(input, '/').length);
@@ -92,7 +92,7 @@ function precompile(input, opts) {
         if (opts.force) {
           // Don't stop generating the output if we're
           // forcing compilation.
-          console.error(e); // eslint-disable-line no-console
+          console.error(e);
         } else {
           throw e;
         }
@@ -103,7 +103,7 @@ function precompile(input, opts) {
   return wrapper(precompiled, opts);
 }
 
-function _precompile(str, name, env) {
+function _precompile (str, name, env) {
   env = env || new Environment([]);
 
   const asyncFilters = env.asyncFilters;
@@ -123,12 +123,12 @@ function _precompile(str, name, env) {
   }
 
   return {
-    name: name,
-    template: template
+    name,
+    template
   };
 }
 
 module.exports = {
-  precompile: precompile,
-  precompileString: precompileString
+  precompile,
+  precompileString
 };

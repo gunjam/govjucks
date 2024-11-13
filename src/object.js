@@ -4,11 +4,11 @@
 const EventEmitter = require('events');
 const lib = require('./lib');
 
-function parentWrap(parent, prop) {
+function parentWrap (parent, prop) {
   if (typeof parent !== 'function' || typeof prop !== 'function') {
     return prop;
   }
-  return function wrap() {
+  return function wrap () {
     // Save the current parent method
     const tmp = this.parent;
 
@@ -21,7 +21,7 @@ function parentWrap(parent, prop) {
   };
 }
 
-function extendClass(cls, name, props) {
+function extendClass (cls, name, props) {
   props = props || {};
 
   lib.keys(props).forEach(k => {
@@ -29,7 +29,7 @@ function extendClass(cls, name, props) {
   });
 
   class subclass extends cls {
-    get typename() {
+    get typename () {
       return name;
     }
   }
@@ -40,18 +40,18 @@ function extendClass(cls, name, props) {
 }
 
 class Obj {
-  constructor(...args) {
+  constructor (...args) {
     // Unfortunately necessary for backwards compatibility
     this.init(...args);
   }
 
-  init() {}
+  init () {}
 
-  get typename() {
+  get typename () {
     return this.constructor.name;
   }
 
-  static extend(name, props) {
+  static extend (name, props) {
     if (typeof name === 'object') {
       props = name;
       name = 'anonymous';
@@ -61,19 +61,19 @@ class Obj {
 }
 
 class EmitterObj extends EventEmitter {
-  constructor(...args) {
+  constructor (...args) {
     super();
     // Unfortunately necessary for backwards compatibility
     this.init(...args);
   }
 
-  init() {}
+  init () {}
 
-  get typename() {
+  get typename () {
     return this.constructor.name;
   }
 
-  static extend(name, props) {
+  static extend (name, props) {
     if (typeof name === 'object') {
       props = name;
       name = 'anonymous';

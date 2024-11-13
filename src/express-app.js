@@ -1,7 +1,7 @@
 const path = require('path');
 
-module.exports = function express(env, app) {
-  function GovjucksView(name, opts) {
+module.exports = function express (env, app) {
+  function GovjucksView (name, opts) {
     this.name = name;
     this.path = name;
     this.defaultEngine = opts.defaultEngine;
@@ -14,7 +14,7 @@ module.exports = function express(env, app) {
     }
   }
 
-  GovjucksView.prototype.render = function render(opts, cb) {
+  GovjucksView.prototype.render = function render (opts, cb) {
     env.render(this.name, opts, cb);
   };
 

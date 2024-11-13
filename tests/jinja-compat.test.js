@@ -4,12 +4,12 @@ const { describe, it } = require('node:test');
 const { jinjaEqual: equal, finish } = require('./util');
 
 describe('jinja-compat', () => {
-  let arr = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+  const arr = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
   it('should support array slices with start and stop', (t, done) => {
     equal('{% for i in arr[1:4] %}{{ i }}{% endfor %}',
       {
-        arr: arr
+        arr
       },
       'bcd');
     finish(done);
@@ -18,7 +18,7 @@ describe('jinja-compat', () => {
     equal('{% for i in arr[n:n+3] %}{{ i }}{% endfor %}',
       {
         n: 1,
-        arr: arr
+        arr
       },
       'bcd');
     finish(done);
@@ -26,7 +26,7 @@ describe('jinja-compat', () => {
   it('should support array slices with start', (t, done) => {
     equal('{% for i in arr[3:] %}{{ i }}{% endfor %}',
       {
-        arr: arr
+        arr
       },
       'defgh');
     finish(done);
@@ -34,7 +34,7 @@ describe('jinja-compat', () => {
   it('should support array slices with negative start', (t, done) => {
     equal('{% for i in arr[-3:] %}{{ i }}{% endfor %}',
       {
-        arr: arr
+        arr
       },
       'fgh');
     finish(done);
@@ -42,7 +42,7 @@ describe('jinja-compat', () => {
   it('should support array slices with stop', (t, done) => {
     equal('{% for i in arr[:4] %}{{ i }}{% endfor %}',
       {
-        arr: arr
+        arr
       },
       'abcd');
     finish(done);
@@ -50,7 +50,7 @@ describe('jinja-compat', () => {
   it('should support array slices with negative stop', (t, done) => {
     equal('{% for i in arr[:-3] %}{{ i }}{% endfor %}',
       {
-        arr: arr
+        arr
       },
       'abcde');
     finish(done);
@@ -58,7 +58,7 @@ describe('jinja-compat', () => {
   it('should support array slices with step', (t, done) => {
     equal('{% for i in arr[::2] %}{{ i }}{% endfor %}',
       {
-        arr: arr
+        arr
       },
       'aceg');
     finish(done);
@@ -66,7 +66,7 @@ describe('jinja-compat', () => {
   it('should support array slices with negative step', (t, done) => {
     equal('{% for i in arr[::-1] %}{{ i }}{% endfor %}',
       {
-        arr: arr
+        arr
       },
       'hgfedcba');
     finish(done);
@@ -74,7 +74,7 @@ describe('jinja-compat', () => {
   it('should support array slices with start and negative step', (t, done) => {
     equal('{% for i in arr[4::-1] %}{{ i }}{% endfor %}',
       {
-        arr: arr
+        arr
       },
       'edcba');
     finish(done);
@@ -82,7 +82,7 @@ describe('jinja-compat', () => {
   it('should support array slices with negative start and negative step', (t, done) => {
     equal('{% for i in arr[-5::-1] %}{{ i }}{% endfor %}',
       {
-        arr: arr
+        arr
       },
       'dcba');
     finish(done);
@@ -90,7 +90,7 @@ describe('jinja-compat', () => {
   it('should support array slices with stop and negative step', (t, done) => {
     equal('{% for i in arr[:3:-1] %}{{ i }}{% endfor %}',
       {
-        arr: arr
+        arr
       },
       'hgfe');
     finish(done);
@@ -98,7 +98,7 @@ describe('jinja-compat', () => {
   it('should support array slices with start and step', (t, done) => {
     equal('{% for i in arr[1::2] %}{{ i }}{% endfor %}',
       {
-        arr: arr
+        arr
       },
       'bdfh');
     finish(done);
@@ -106,7 +106,7 @@ describe('jinja-compat', () => {
   it('should support array slices with start, stop, and step', (t, done) => {
     equal('{% for i in arr[1:7:2] %}{{ i }}{% endfor %}',
       {
-        arr: arr
+        arr
       },
       'bdf');
     finish(done);

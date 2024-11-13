@@ -1,16 +1,16 @@
 'use strict';
 
-var nodes = require('./nodes');
-var lib = require('./lib');
+const nodes = require('./nodes');
+const lib = require('./lib');
 
-var sym = 0;
-function gensym() {
+let sym = 0;
+function gensym () {
   return 'hole_' + sym++;
 }
 
 // copy-on-write version of map
-function mapCOW(arr, func) {
-  var res = null;
+function mapCOW (arr, func) {
+  let res = null;
   for (let i = 0; i < arr.length; i++) {
     const item = func(arr[i]);
 
@@ -26,7 +26,7 @@ function mapCOW(arr, func) {
   return res || arr;
 }
 
-function walk(ast, func, depthFirst) {
+function walk (ast, func, depthFirst) {
   if (!(ast instanceof nodes.Node)) {
     return ast;
   }
@@ -67,14 +67,14 @@ function walk(ast, func, depthFirst) {
   return depthFirst ? (func(ast) || ast) : ast;
 }
 
-function depthWalk(ast, func) {
+function depthWalk (ast, func) {
   return walk(ast, func, true);
 }
 
-function _liftFilters(node, asyncFilters, prop) {
-  var children = [];
+function _liftFilters (node, asyncFilters, prop) {
+  const children = [];
 
-  var walked = depthWalk(prop ? node[prop] : node, (descNode) => {
+  const walked = depthWalk(prop ? node[prop] : node, (descNode) => {
     let symbol;
     if (descNode instanceof nodes.Block) {
       return descNode;
@@ -113,7 +113,7 @@ function _liftFilters(node, asyncFilters, prop) {
   }
 }
 
-function liftFilters(ast, asyncFilters) {
+function liftFilters (ast, asyncFilters) {
   return depthWalk(ast, (node) => {
     if (node instanceof nodes.Output) {
       return _liftFilters(node, asyncFilters);
@@ -131,7 +131,7 @@ function liftFilters(ast, asyncFilters) {
   });
 }
 
-function liftSuper(ast) {
+function liftSuper (ast) {
   return walk(ast, (blockNode) => {
     if (!(blockNode instanceof nodes.Block)) {
       return;
@@ -140,7 +140,7 @@ function liftSuper(ast) {
     let hasSuper = false;
     const symbol = gensym();
 
-    blockNode.body = walk(blockNode.body, (node) => { // eslint-disable-line consistent-return
+    blockNode.body = walk(blockNode.body, (node) => {
       if (node instanceof nodes.FunCall && node.name.value === 'super') {
         hasSuper = true;
         return new nodes.Symbol(node.lineno, node.colno, symbol);
@@ -155,7 +155,7 @@ function liftSuper(ast) {
   });
 }
 
-function convertStatements(ast) {
+function convertStatements (ast) {
   return depthWalk(ast, (node) => {
     if (!(node instanceof nodes.If) && !(node instanceof nodes.For)) {
       return undefined;
@@ -199,11 +199,11 @@ function convertStatements(ast) {
   });
 }
 
-function cps(ast, asyncFilters) {
+function cps (ast, asyncFilters) {
   return convertStatements(liftSuper(liftFilters(ast, asyncFilters)));
 }
 
-function transform(ast, asyncFilters) {
+function transform (ast, asyncFilters) {
   return cps(ast, asyncFilters || []);
 }
 
@@ -213,5 +213,5 @@ function transform(ast, asyncFilters) {
 // nodes.printNodes(ast);
 
 module.exports = {
-  transform: transform
+  transform
 };

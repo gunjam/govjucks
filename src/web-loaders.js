@@ -1,10 +1,10 @@
 'use strict';
 
 const Loader = require('./loader');
-const {PrecompiledLoader} = require('./precompiled-loader.js');
+const { PrecompiledLoader } = require('./precompiled-loader.js');
 
 class WebLoader extends Loader {
-  constructor(baseURL, opts) {
+  constructor (baseURL, opts) {
     super();
     this.baseURL = baseURL || '.';
     opts = opts || {};
@@ -23,13 +23,13 @@ class WebLoader extends Loader {
     this.async = !!opts.async;
   }
 
-  resolve(from, to) {
+  resolve (from, to) {
     throw new Error('relative templates not support in the browser yet');
   }
 
-  getSource(name, cb) {
-    var useCache = this.useCache;
-    var result;
+  getSource (name, cb) {
+    const useCache = this.useCache;
+    let result;
     this.fetch(this.baseURL + '/' + name, (err, src) => {
       if (err) {
         if (cb) {
@@ -41,7 +41,7 @@ class WebLoader extends Loader {
         }
       } else {
         result = {
-          src: src,
+          src,
           path: name,
           noCache: !useCache
         };
@@ -58,12 +58,13 @@ class WebLoader extends Loader {
     return result;
   }
 
-  fetch(url, cb) {
+  fetch (url, cb) {
     // Only in the browser please
     if (typeof window === 'undefined') {
       throw new Error('WebLoader can only by used in a browser');
     }
 
+    /* global XMLHttpRequest */
     const ajax = new XMLHttpRequest();
     let loading = true;
 
@@ -90,6 +91,6 @@ class WebLoader extends Loader {
 }
 
 module.exports = {
-  WebLoader: WebLoader,
-  PrecompiledLoader: PrecompiledLoader
+  WebLoader,
+  PrecompiledLoader
 };

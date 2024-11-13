@@ -43,7 +43,7 @@ describe('filter', () => {
       lib.repeat(' ', 38));
 
     equal('{{ str | center }}',
-      {str: r.markSafe('fooo')},
+      { str: r.markSafe('fooo') },
       lib.repeat(' ', 38) + 'fooo' + lib.repeat(' ', 38));
 
     equal('{{ undefined | center }}',
@@ -210,7 +210,7 @@ describe('filter', () => {
   });
 
   it('forceescape', (t, done) => {
-    equal('{{ str | forceescape }}', { str: r.markSafe('<html>')}, '&lt;html&gt;');
+    equal('{{ str | forceescape }}', { str: r.markSafe('<html>') }, '&lt;html&gt;');
     equal('{{ "<html>" | safe | forceescape }}', '&lt;html&gt;');
     finish(done);
   });
@@ -512,40 +512,40 @@ describe('filter', () => {
       }, '2');
     });
     it('should output the length of an array created with "new Array" with user-defined properties', () => {
-      var arr = new Array(0, 1); // eslint-disable-line no-array-constructor
+      const arr = new Array(0, 1); // eslint-disable-line no-array-constructor
       arr.key = 'value';
       equal('{{ arr | length }}', {
-        arr: arr
+        arr
       }, '2');
     });
     it('should output the length of a Map', () => {
       /* global Map */
-      var map;
+      let map;
       if (typeof Map === 'undefined') {
         this.skip();
       } else {
         map = new Map([['key1', 'value1'], ['key2', 'value2']]);
         map.set('key3', 'value3');
         equal('{{ map | length }}', {
-          map: map
+          map
         }, '3');
       }
     });
     it('should output the length of a Set', () => {
       /* global Set */
-      var set;
+      let set;
       if (typeof Set === 'undefined') {
         this.skip();
       } else {
         set = new Set(['value1']);
         set.add('value2');
-        equal('{{ set | length }}', { set: set }, '2');
+        equal('{{ set | length }}', { set }, '2');
       }
     });
   });
 
   it('list', (t, done) => {
-    var person = {
+    const person = {
       name: 'Joe',
       age: 83
     };
@@ -553,7 +553,7 @@ describe('filter', () => {
       'f,o,o,b,a,r,');
     equal('{% for pair in person | list %}{{ pair.key }}: {{ pair.value }} - {% endfor %}',
       {
-        person: person
+        person
       }, 'name: Joe - age: 83 - ');
     equal('{% for i in [1, 2] | list %}{{ i }}{% endfor %}', '12');
     finish(done);
@@ -590,7 +590,7 @@ describe('filter', () => {
   it('random', (t, done) => {
     let i;
     for (i = 0; i < 100; i++) {
-      render('{{ [1,2,3,4,5,6,7,8,9] | random }}', (err, res) => {
+      render('{{ [1,2,3,4,5,6,7,8,9] | random }}', (_, res) => {
         const val = parseInt(res, 10);
         assert.ok(val >= 1);
         assert.ok(val <= 9);
@@ -601,7 +601,7 @@ describe('filter', () => {
   });
 
   it('reject', (t, done) => {
-    var context = {
+    const context = {
       numbers: [0, 1, 2, 3, 4, 5]
     };
 
@@ -617,7 +617,7 @@ describe('filter', () => {
   });
 
   it('rejectattr', (t, done) => {
-    var foods = [{
+    const foods = [{
       tasty: true
     }, {
       tasty: false
@@ -625,13 +625,13 @@ describe('filter', () => {
       tasty: true
     }];
     equal('{{ foods | rejectattr("tasty") | length }}', {
-      foods: foods
+      foods
     }, '1');
     finish(done);
   });
 
   it('select', (t, done) => {
-    var context = {
+    const context = {
       numbers: [0, 1, 2, 3, 4, 5]
     };
 
@@ -647,7 +647,7 @@ describe('filter', () => {
   });
 
   it('selectattr', (t, done) => {
-    var foods = [{
+    const foods = [{
       tasty: true
     }, {
       tasty: false
@@ -655,7 +655,7 @@ describe('filter', () => {
       tasty: true
     }];
     equal('{{ foods | selectattr("tasty") | length }}', {
-      foods: foods
+      foods
     }, '2');
     finish(done);
   });
@@ -686,7 +686,6 @@ describe('filter', () => {
     equal('{{ "aaabbbbbccc" | replace("d", "y", 4) }}', 'aaabbbbbccc');
     equal('{{ "aaabbcccbbb" | replace("b", "y", 4) }}', 'aaayycccyyb');
 
-
     // Bad initial inputs
     equal('{{ undefined | replace("b", "y", 4) }}', '');
     equal('{{ null | replace("b", "y", 4) }}', '');
@@ -699,7 +698,7 @@ describe('filter', () => {
     equal('{{ "<img src=" | replace("<img", "<img alt=val") | safe }}',
       '<img alt=val src=');
     equal('{{ "<img src=\\"http://www.example.com\\" />" | replace("<img", "replacement text") | safe }}',
-      'replacement text src=\"http://www.example.com\" />');
+      'replacement text src="http://www.example.com" />');
 
     // Regex
     equal('{{ "aabbbb" | replace(r/ab{2}/, "z") }}', 'azbb');
@@ -727,7 +726,7 @@ describe('filter', () => {
   });
 
   it('slice', (t, done) => {
-    var tmpl = '{% for items in arr | slice(3) %}' +
+    const tmpl = '{% for items in arr | slice(3) %}' +
       '--' +
       '{% for item in items %}' +
       '{{ item }}' +
@@ -774,9 +773,9 @@ describe('filter', () => {
     equal('{{ items | sum("value", 10) }}',
       {
         items: [
-          {value: 1},
-          {value: 2},
-          {value: 3}
+          { value: 1 },
+          { value: 2 },
+          { value: 3 }
         ]
       },
       '16');
@@ -800,9 +799,9 @@ describe('filter', () => {
     equal('{% for item in items | sort(false, false, "name") %}{{ item.name }}{% endfor %}',
       {
         items: [
-          {name: 'james'},
-          {name: 'fred'},
-          {name: 'john'}
+          { name: 'james' },
+          { name: 'fred' },
+          { name: 'john' }
         ]
       },
       'fredjamesjohn');
@@ -815,9 +814,9 @@ describe('filter', () => {
       nestedAttributeSortTemplate,
       {
         items: [
-          {name: 'james', meta: {age: 25}},
-          {name: 'fred', meta: {age: 18}},
-          {name: 'john', meta: {age: 19}}
+          { name: 'james', meta: { age: 25 } },
+          { name: 'fred', meta: { age: 18 } },
+          { name: 'john', meta: { age: 19 } }
         ]
       },
       'fredjohnjames'
@@ -828,9 +827,9 @@ describe('filter', () => {
         nestedAttributeSortTemplate,
         {
           items: [
-            {name: 'james', meta: {age: 25}},
-            {name: 'fred', meta: {age: 18}},
-            {name: 'john', meta: {title: 'Developer'}}
+            { name: 'james', meta: { age: 25 } },
+            { name: 'fred', meta: { age: 18 } },
+            { name: 'john', meta: { title: 'Developer' } }
           ]
         },
         {
@@ -946,12 +945,12 @@ describe('filter', () => {
   });
 
   it('urlencode - object without prototype', (t, done) => {
-    var obj = Object.create(null);
+    const obj = Object.create(null);
     obj['1'] = 2;
     obj['&1'] = '&2';
 
     equal('{{ obj | urlencode | safe }}', {
-      obj: obj
+      obj
     }, '1=2&%261=%262');
     finish(done);
   });

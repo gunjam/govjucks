@@ -3,9 +3,9 @@
 const parser = require('./parser');
 const transformer = require('./transformer');
 const nodes = require('./nodes');
-const {TemplateError} = require('./lib');
-const {Frame} = require('./runtime');
-const {Obj} = require('./object');
+const { TemplateError } = require('./lib');
+const { Frame } = require('./runtime');
+const { Obj } = require('./object');
 
 // These are all the same for now, but shouldn't be passed straight
 // through
@@ -21,7 +21,7 @@ const compareOps = {
 };
 
 class Compiler extends Obj {
-  init(templateName, throwOnUndefined) {
+  init (templateName, throwOnUndefined) {
     this.templateName = templateName;
     this.codebuf = [];
     this.lastId = 0;
@@ -32,7 +32,7 @@ class Compiler extends Obj {
     this.throwOnUndefined = throwOnUndefined;
   }
 
-  fail(msg, lineno, colno) {
+  fail (msg, lineno, colno) {
     if (lineno !== undefined) {
       lineno += 1;
     }
@@ -43,7 +43,7 @@ class Compiler extends Obj {
     throw new TemplateError(msg, lineno, colno);
   }
 
-  _pushBuffer() {
+  _pushBuffer () {
     const id = this._tmpid();
     this.bufferStack.push(this.buffer);
     this.buffer = id;
@@ -51,23 +51,23 @@ class Compiler extends Obj {
     return id;
   }
 
-  _popBuffer() {
+  _popBuffer () {
     this.buffer = this.bufferStack.pop();
   }
 
-  _emit(code) {
+  _emit (code) {
     this.codebuf.push(code);
   }
 
-  _emitLine(code) {
+  _emitLine (code) {
     this._emit(code + '\n');
   }
 
-  _emitLines(...lines) {
+  _emitLines (...lines) {
     lines.forEach((line) => this._emitLine(line));
   }
 
-  _emitFuncBegin(node, name) {
+  _emitFuncBegin (node, name) {
     this.buffer = 'output';
     this._scopeClosers = '';
     this._emitLine(`function ${name}(env, context, frame, runtime, cb) {`);
@@ -77,7 +77,7 @@ class Compiler extends Obj {
     this._emitLine('try {');
   }
 
-  _emitFuncEnd(noReturn) {
+  _emitFuncEnd (noReturn) {
     if (!noReturn) {
       this._emitLine('cb(null, ' + this.buffer + ');');
     }
@@ -90,17 +90,17 @@ class Compiler extends Obj {
     this.buffer = null;
   }
 
-  _addScopeLevel() {
+  _addScopeLevel () {
     this._scopeClosers += '})';
   }
 
-  _closeScopeLevels() {
+  _closeScopeLevels () {
     this._emitLine(this._scopeClosers + ';');
     this._scopeClosers = '';
   }
 
-  _withScopedSyntax(func) {
-    var _scopeClosers = this._scopeClosers;
+  _withScopedSyntax (func) {
+    const _scopeClosers = this._scopeClosers;
     this._scopeClosers = '';
 
     func.call(this);
@@ -109,29 +109,29 @@ class Compiler extends Obj {
     this._scopeClosers = _scopeClosers;
   }
 
-  _makeCallback(res) {
-    var err = this._tmpid();
+  _makeCallback (res) {
+    const err = this._tmpid();
 
     return 'function(' + err + (res ? ',' + res : '') + ') {\n' +
       'if(' + err + ') { cb(' + err + '); return; }';
   }
 
-  _tmpid() {
+  _tmpid () {
     this.lastId++;
     return 't_' + this.lastId;
   }
 
-  _templateName() {
+  _templateName () {
     return this.templateName == null ? 'undefined' : JSON.stringify(this.templateName);
   }
 
-  _compileChildren(node, frame) {
+  _compileChildren (node, frame) {
     node.children.forEach((child) => {
       this.compile(child, frame);
     });
   }
 
-  _compileAggregate(node, frame, startChar, endChar) {
+  _compileAggregate (node, frame, startChar, endChar) {
     if (startChar) {
       this._emit(startChar);
     }
@@ -149,7 +149,7 @@ class Compiler extends Obj {
     }
   }
 
-  _compileExpression(node, frame) {
+  _compileExpression (node, frame) {
     // TODO: I'm not really sure if this type check is worth it or
     // not.
     this.assertType(
@@ -186,16 +186,16 @@ class Compiler extends Obj {
     this.compile(node, frame);
   }
 
-  assertType(node, ...types) {
+  assertType (node, ...types) {
     if (!types.some(t => node instanceof t)) {
       this.fail(`assertType: invalid type: ${node.typename}`, node.lineno, node.colno);
     }
   }
 
-  compileCallExtension(node, frame, async) {
-    var args = node.args;
-    var contentArgs = node.contentArgs;
-    var autoescape = typeof node.autoescape === 'boolean' ? node.autoescape : true;
+  compileCallExtension (node, frame, async) {
+    const args = node.args;
+    const contentArgs = node.contentArgs;
+    const autoescape = typeof node.autoescape === 'boolean' ? node.autoescape : true;
 
     if (!async) {
       this._emit(`${this.buffer} += runtime.suppressValue(`);
@@ -263,15 +263,15 @@ class Compiler extends Obj {
     }
   }
 
-  compileCallExtensionAsync(node, frame) {
+  compileCallExtensionAsync (node, frame) {
     this.compileCallExtension(node, frame, true);
   }
 
-  compileNodeList(node, frame) {
+  compileNodeList (node, frame) {
     this._compileChildren(node, frame);
   }
 
-  compileLiteral(node) {
+  compileLiteral (node) {
     if (typeof node.value === 'string') {
       let val = node.value.replace(/\\/g, '\\\\');
       val = val.replace(/"/g, '\\"');
@@ -287,9 +287,9 @@ class Compiler extends Obj {
     }
   }
 
-  compileSymbol(node, frame) {
-    var name = node.value;
-    var v = frame.lookup(name);
+  compileSymbol (node, frame) {
+    const name = node.value;
+    const v = frame.lookup(name);
 
     if (v) {
       this._emit(v);
@@ -299,21 +299,21 @@ class Compiler extends Obj {
     }
   }
 
-  compileGroup(node, frame) {
+  compileGroup (node, frame) {
     this._compileAggregate(node, frame, '(', ')');
   }
 
-  compileArray(node, frame) {
+  compileArray (node, frame) {
     this._compileAggregate(node, frame, '[', ']');
   }
 
-  compileDict(node, frame) {
+  compileDict (node, frame) {
     this._compileAggregate(node, frame, '{', '}');
   }
 
-  compilePair(node, frame) {
-    var key = node.key;
-    var val = node.value;
+  compilePair (node, frame) {
+    let key = node.key;
+    const val = node.value;
 
     if (key instanceof nodes.Symbol) {
       key = new nodes.Literal(key.lineno, key.colno, key.value);
@@ -329,7 +329,7 @@ class Compiler extends Obj {
     this._compileExpression(val, frame);
   }
 
-  compileInlineIf(node, frame) {
+  compileInlineIf (node, frame) {
     this._emit('(');
     this.compile(node.cond, frame);
     this._emit('?');
@@ -343,7 +343,7 @@ class Compiler extends Obj {
     this._emit(')');
   }
 
-  compileIn(node, frame) {
+  compileIn (node, frame) {
     this._emit('runtime.inOperator(');
     this.compile(node.left, frame);
     this._emit(',');
@@ -351,10 +351,10 @@ class Compiler extends Obj {
     this._emit(')');
   }
 
-  compileIs(node, frame) {
+  compileIs (node, frame) {
     // first, we need to try to get the name of the test function, if it's a
     // callable (i.e., has args) and not a symbol.
-    var right = node.right.name
+    const right = node.right.name
       ? node.right.name.value
       // otherwise go with the symbol value
       : node.right.value;
@@ -368,7 +368,7 @@ class Compiler extends Obj {
     this._emit(') === true');
   }
 
-  _binOpEmitter(node, frame, str) {
+  _binOpEmitter (node, frame, str) {
     this.compile(node.left, frame);
     this._emit(str);
     this.compile(node.right, frame);
@@ -376,44 +376,44 @@ class Compiler extends Obj {
 
   // ensure concatenation instead of addition
   // by adding empty string in between
-  compileOr(node, frame) {
+  compileOr (node, frame) {
     return this._binOpEmitter(node, frame, ' || ');
   }
 
-  compileAnd(node, frame) {
+  compileAnd (node, frame) {
     return this._binOpEmitter(node, frame, ' && ');
   }
 
-  compileAdd(node, frame) {
+  compileAdd (node, frame) {
     return this._binOpEmitter(node, frame, ' + ');
   }
 
-  compileConcat(node, frame) {
+  compileConcat (node, frame) {
     return this._binOpEmitter(node, frame, ' + "" + ');
   }
 
-  compileSub(node, frame) {
+  compileSub (node, frame) {
     return this._binOpEmitter(node, frame, ' - ');
   }
 
-  compileMul(node, frame) {
+  compileMul (node, frame) {
     return this._binOpEmitter(node, frame, ' * ');
   }
 
-  compileDiv(node, frame) {
+  compileDiv (node, frame) {
     return this._binOpEmitter(node, frame, ' / ');
   }
 
-  compileMod(node, frame) {
+  compileMod (node, frame) {
     return this._binOpEmitter(node, frame, ' % ');
   }
 
-  compileNot(node, frame) {
+  compileNot (node, frame) {
     this._emit('!');
     this.compile(node.target, frame);
   }
 
-  compileFloorDiv(node, frame) {
+  compileFloorDiv (node, frame) {
     this._emit('Math.floor(');
     this.compile(node.left, frame);
     this._emit(' / ');
@@ -421,7 +421,7 @@ class Compiler extends Obj {
     this._emit(')');
   }
 
-  compilePow(node, frame) {
+  compilePow (node, frame) {
     this._emit('Math.pow(');
     this.compile(node.left, frame);
     this._emit(', ');
@@ -429,17 +429,17 @@ class Compiler extends Obj {
     this._emit(')');
   }
 
-  compileNeg(node, frame) {
+  compileNeg (node, frame) {
     this._emit('-');
     this.compile(node.target, frame);
   }
 
-  compilePos(node, frame) {
+  compilePos (node, frame) {
     this._emit('+');
     this.compile(node.target, frame);
   }
 
-  compileCompare(node, frame) {
+  compileCompare (node, frame) {
     this.compile(node.expr, frame);
 
     node.ops.forEach((op) => {
@@ -448,7 +448,7 @@ class Compiler extends Obj {
     });
   }
 
-  compileLookupVal(node, frame) {
+  compileLookupVal (node, frame) {
     this._emit('runtime.memberLookup((');
     this._compileExpression(node.target, frame);
     this._emit('),');
@@ -456,7 +456,7 @@ class Compiler extends Obj {
     this._emit(')');
   }
 
-  _getNodeName(node) {
+  _getNodeName (node) {
     switch (node.typename) {
       case 'Symbol':
         return node.value;
@@ -472,7 +472,7 @@ class Compiler extends Obj {
     }
   }
 
-  compileFunCall(node, frame) {
+  compileFunCall (node, frame) {
     // Keep track of line/col info at runtime by settings
     // variables within an expression. An expression in javascript
     // like (x, y, z) returns the last value, and x and y can be
@@ -493,17 +493,17 @@ class Compiler extends Obj {
     this._emit(')');
   }
 
-  compileFilter(node, frame) {
-    var name = node.name;
+  compileFilter (node, frame) {
+    const name = node.name;
     this.assertType(name, nodes.Symbol);
     this._emit('env.getFilter("' + name.value + '").call(context, ');
     this._compileAggregate(node.args, frame);
     this._emit(')');
   }
 
-  compileFilterAsync(node, frame) {
-    var name = node.name;
-    var symbol = node.symbol.value;
+  compileFilterAsync (node, frame) {
+    const name = node.name;
+    const symbol = node.symbol.value;
 
     this.assertType(name, nodes.Symbol);
 
@@ -516,20 +516,20 @@ class Compiler extends Obj {
     this._addScopeLevel();
   }
 
-  compileKeywordArgs(node, frame) {
+  compileKeywordArgs (node, frame) {
     this._emit('runtime.makeKeywordArgs(');
     this.compileDict(node, frame);
     this._emit(')');
   }
 
-  compileSet(node, frame) {
-    var ids = [];
+  compileSet (node, frame) {
+    const ids = [];
 
     // Lookup the variable names for each identifier and create
     // new ones if necessary
     node.targets.forEach((target) => {
-      var name = target.value;
-      var id = frame.lookup(name);
+      const name = target.value;
+      let id = frame.lookup(name);
 
       if (id === null || id === undefined) {
         id = this._tmpid();
@@ -553,8 +553,8 @@ class Compiler extends Obj {
     }
 
     node.targets.forEach((target, i) => {
-      var id = ids[i];
-      var name = target.value;
+      const id = ids[i];
+      const name = target.value;
 
       // We are running this for every var, but it's very
       // uncommon to assign to multiple vars anyway
@@ -572,7 +572,7 @@ class Compiler extends Obj {
     });
   }
 
-  compileSwitch(node, frame) {
+  compileSwitch (node, frame) {
     this._emit('switch (');
     this.compile(node.expr, frame);
     this._emit(') {');
@@ -593,7 +593,7 @@ class Compiler extends Obj {
     this._emit('}');
   }
 
-  compileIf(node, frame, async) {
+  compileIf (node, frame, async) {
     this._emit('if(');
     this._compileExpression(node.cond, frame);
     this._emitLine(') {');
@@ -624,22 +624,22 @@ class Compiler extends Obj {
     this._emitLine('}');
   }
 
-  compileIfAsync(node, frame) {
+  compileIfAsync (node, frame) {
     this._emit('(function(cb) {');
     this.compileIf(node, frame, true);
     this._emit('})(' + this._makeCallback());
     this._addScopeLevel();
   }
 
-  _emitLoopBindings(node, arr, i, len) {
+  _emitLoopBindings (node, arr, i, len) {
     const bindings = [
-      {name: 'index', val: `${i} + 1`},
-      {name: 'index0', val: i},
-      {name: 'revindex', val: `${len} - ${i}`},
-      {name: 'revindex0', val: `${len} - ${i} - 1`},
-      {name: 'first', val: `${i} === 0`},
-      {name: 'last', val: `${i} === ${len} - 1`},
-      {name: 'length', val: len},
+      { name: 'index', val: `${i} + 1` },
+      { name: 'index0', val: i },
+      { name: 'revindex', val: `${len} - ${i}` },
+      { name: 'revindex0', val: `${len} - ${i} - 1` },
+      { name: 'first', val: `${i} === 0` },
+      { name: 'last', val: `${i} === ${len} - 1` },
+      { name: 'length', val: len },
     ];
 
     bindings.forEach((b) => {
@@ -647,7 +647,7 @@ class Compiler extends Obj {
     });
   }
 
-  compileFor(node, frame) {
+  compileFor (node, frame) {
     // Some of this code is ugly, but it keeps the generated code
     // as fast as possible. ForAsync also shares some of this, but
     // not much.
@@ -680,7 +680,7 @@ class Compiler extends Obj {
 
       // Bind each declared var
       node.name.children.forEach((child, u) => {
-        var tid = this._tmpid();
+        const tid = this._tmpid();
         this._emitLine(`var ${tid} = ${arr}[${i}][${u}];`);
         this._emitLine(`frame.set("${child}", ${arr}[${i}][${u}]);`);
         frame.set(node.name.children[u].value, tid);
@@ -744,15 +744,15 @@ class Compiler extends Obj {
     this._emitLine('frame = frame.pop();');
   }
 
-  _compileAsyncLoop(node, frame, parallel) {
+  _compileAsyncLoop (node, frame, parallel) {
     // This shares some code with the For tag, but not enough to
     // worry about. This iterates across an object asynchronously,
     // but not in parallel.
 
-    var i = this._tmpid();
-    var len = this._tmpid();
-    var arr = this._tmpid();
-    var asyncMethod = parallel ? 'asyncAll' : 'asyncEach';
+    const i = this._tmpid();
+    const len = this._tmpid();
+    const arr = this._tmpid();
+    const asyncMethod = parallel ? 'asyncAll' : 'asyncEach';
     frame = frame.push();
 
     this._emitLine('frame = frame.push();');
@@ -816,19 +816,19 @@ class Compiler extends Obj {
     this._emitLine('frame = frame.pop();');
   }
 
-  compileAsyncEach(node, frame) {
+  compileAsyncEach (node, frame) {
     this._compileAsyncLoop(node, frame);
   }
 
-  compileAsyncAll(node, frame) {
+  compileAsyncAll (node, frame) {
     this._compileAsyncLoop(node, frame, true);
   }
 
-  _compileMacro(node, frame) {
-    var args = [];
-    var kwargs = null;
-    var funcId = 'macro_' + this._tmpid();
-    var keepFrame = (frame !== undefined);
+  _compileMacro (node, frame) {
+    const args = [];
+    let kwargs = null;
+    const funcId = 'macro_' + this._tmpid();
+    const keepFrame = (frame !== undefined);
 
     // Type check the definition of the args
     node.args.children.forEach((arg, i) => {
@@ -901,11 +901,11 @@ class Compiler extends Obj {
     return funcId;
   }
 
-  compileMacro(node, frame) {
-    var funcId = this._compileMacro(node);
+  compileMacro (node, frame) {
+    const funcId = this._compileMacro(node);
 
     // Expose the macro to the templates
-    var name = node.name.value;
+    const name = node.name.value;
     frame.set(name, funcId);
 
     if (frame.parent) {
@@ -918,14 +918,14 @@ class Compiler extends Obj {
     }
   }
 
-  compileCaller(node, frame) {
+  compileCaller (node, frame) {
     // basically an anonymous "macro expression"
     this._emit('(function (){');
     const funcId = this._compileMacro(node, frame);
     this._emit(`return ${funcId};})()`);
   }
 
-  _compileGetTemplate(node, frame, eagerCompile, ignoreMissing) {
+  _compileGetTemplate (node, frame, eagerCompile, ignoreMissing) {
     const parentTemplateId = this._tmpid();
     const parentName = this._templateName();
     const cb = this._makeCallback(parentTemplateId);
@@ -937,7 +937,7 @@ class Compiler extends Obj {
     return parentTemplateId;
   }
 
-  compileImport(node, frame) {
+  compileImport (node, frame) {
     const target = node.target.value;
     const id = this._compileGetTemplate(node, frame, false, false);
     this._addScopeLevel();
@@ -956,7 +956,7 @@ class Compiler extends Obj {
     }
   }
 
-  compileFromImport(node, frame) {
+  compileFromImport (node, frame) {
     const importedId = this._compileGetTemplate(node, frame, false, false);
     this._addScopeLevel();
 
@@ -966,9 +966,9 @@ class Compiler extends Obj {
     this._addScopeLevel();
 
     node.names.children.forEach((nameNode) => {
-      var name;
-      var alias;
-      var id = this._tmpid();
+      let name;
+      let alias;
+      const id = this._tmpid();
 
       if (nameNode instanceof nodes.Pair) {
         name = nameNode.key.value;
@@ -994,8 +994,8 @@ class Compiler extends Obj {
     });
   }
 
-  compileBlock(node) {
-    var id = this._tmpid();
+  compileBlock (node) {
+    const id = this._tmpid();
 
     // If we are executing outside a block (creating a top-level
     // block), we really don't want to execute its code because it
@@ -1019,9 +1019,9 @@ class Compiler extends Obj {
     this._addScopeLevel();
   }
 
-  compileSuper(node, frame) {
-    var name = node.blockName.value;
-    var id = node.symbol.value;
+  compileSuper (node, frame) {
+    const name = node.blockName.value;
+    const id = node.symbol.value;
 
     const cb = this._makeCallback(id);
     this._emitLine(`context.getSuper(env, "${name}", b_${name}, frame, runtime, ${cb}`);
@@ -1030,8 +1030,8 @@ class Compiler extends Obj {
     frame.set(id, id);
   }
 
-  compileExtends(node, frame) {
-    var k = this._tmpid();
+  compileExtends (node, frame) {
+    const k = this._tmpid();
 
     const parentTemplateId = this._compileGetTemplate(node, frame, true, false);
 
@@ -1047,7 +1047,7 @@ class Compiler extends Obj {
     this._addScopeLevel();
   }
 
-  compileInclude(node, frame) {
+  compileInclude (node, frame) {
     this._emitLine('var tasks = [];');
     this._emitLine('tasks.push(');
     this._emitLine('function(callback) {');
@@ -1071,14 +1071,14 @@ class Compiler extends Obj {
     this._addScopeLevel();
   }
 
-  compileTemplateData(node, frame) {
+  compileTemplateData (node, frame) {
     this.compileLiteral(node, frame);
   }
 
-  compileCapture(node, frame) {
+  compileCapture (node, frame) {
     // we need to temporarily override the current buffer id as 'output'
     // so the set block writes to the capture output instead of the buffer
-    var buffer = this.buffer;
+    const buffer = this.buffer;
     this.buffer = 'output';
     this._emitLine('(function() {');
     this._emitLine('var output = "";');
@@ -1091,7 +1091,7 @@ class Compiler extends Obj {
     this.buffer = buffer;
   }
 
-  compileOutput(node, frame) {
+  compileOutput (node, frame) {
     const children = node.children;
     children.forEach(child => {
       // TemplateData is a special case because it is never
@@ -1116,7 +1116,7 @@ class Compiler extends Obj {
     });
   }
 
-  compileRoot(node, frame) {
+  compileRoot (node, frame) {
     if (frame) {
       this.fail('compileRoot: root node can\'t have frame');
     }
@@ -1165,8 +1165,8 @@ class Compiler extends Obj {
     this._emitLine('root: root\n};');
   }
 
-  compile(node, frame) {
-    var _compile = this['compile' + node.typename];
+  compile (node, frame) {
+    const _compile = this['compile' + node.typename];
     if (_compile) {
       _compile.call(this, node, frame);
     } else {
@@ -1174,13 +1174,13 @@ class Compiler extends Obj {
     }
   }
 
-  getCode() {
+  getCode () {
     return this.codebuf.join('');
   }
 }
 
 module.exports = {
-  compile: function compile(src, asyncFilters, extensions, name, opts = {}) {
+  compile: function compile (src, asyncFilters, extensions, name, opts = {}) {
     const c = new Compiler(name, opts.throwOnUndefined);
 
     // Run the extension preprocessors against the source.
@@ -1196,5 +1196,5 @@ module.exports = {
     return c.getCode();
   },
 
-  Compiler: Compiler
+  Compiler
 };

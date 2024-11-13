@@ -1,7 +1,7 @@
 'use strict';
 
 const lib = require('./src/lib');
-const {Environment, Template} = require('./src/environment');
+const { Environment, Template } = require('./src/environment');
 const Loader = require('./src/loader');
 const loaders = require('./src/loaders');
 const precompile = require('./src/precompile');
@@ -15,7 +15,7 @@ const installJinjaCompat = require('./src/jinja-compat');
 // A single instance of an environment, since this is so commonly used
 let e;
 
-function configure(templatesPath, opts) {
+function configure (templatesPath, opts) {
   opts = opts || {};
   if (lib.isObject(templatesPath)) {
     opts = templatesPath;
@@ -45,38 +45,38 @@ function configure(templatesPath, opts) {
 }
 
 module.exports = {
-  Environment: Environment,
-  Template: Template,
-  Loader: Loader,
+  Environment,
+  Template,
+  Loader,
   FileSystemLoader: loaders.FileSystemLoader,
   NodeResolveLoader: loaders.NodeResolveLoader,
   PrecompiledLoader: loaders.PrecompiledLoader,
   WebLoader: loaders.WebLoader,
-  compiler: compiler,
-  parser: parser,
-  lexer: lexer,
-  runtime: runtime,
-  lib: lib,
-  nodes: nodes,
-  installJinjaCompat: installJinjaCompat,
-  configure: configure,
-  reset() {
+  compiler,
+  parser,
+  lexer,
+  runtime,
+  lib,
+  nodes,
+  installJinjaCompat,
+  configure,
+  reset () {
     e = undefined;
   },
-  compile(src, env, path, eagerCompile) {
+  compile (src, env, path, eagerCompile) {
     if (!e) {
       configure();
     }
     return new Template(src, env, path, eagerCompile);
   },
-  render(name, ctx, cb) {
+  render (name, ctx, cb) {
     if (!e) {
       configure();
     }
 
     return e.render(name, ctx, cb);
   },
-  renderString(src, ctx, cb) {
+  renderString (src, ctx, cb) {
     if (!e) {
       configure();
     }
