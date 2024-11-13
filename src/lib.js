@@ -14,12 +14,6 @@ const escapeMap = {
 
 const escapeRegex = /[&"'<>\\]/g;
 
-function hasOwnProp (obj, k) {
-  return ObjProto.hasOwnProperty.call(obj, k);
-}
-
-module.exports.hasOwnProp = hasOwnProp;
-
 function lookupEscape (ch) {
   return escapeMap[ch];
 }
@@ -123,16 +117,7 @@ function TemplateError (message, lineno, colno) {
   return err;
 }
 
-if (Object.setPrototypeOf) {
-  Object.setPrototypeOf(TemplateError.prototype, Error.prototype);
-} else {
-  TemplateError.prototype = Object.create(Error.prototype, {
-    constructor: {
-      value: TemplateError,
-    },
-  });
-}
-
+Object.setPrototypeOf(TemplateError.prototype, Error.prototype);
 module.exports.TemplateError = TemplateError;
 
 function escape (val) {
@@ -197,7 +182,7 @@ function getAttrGetter (attribute) {
 
       // If item is not an object, and we still got parts to handle, it means
       // that something goes wrong. Just roll out to undefined in that case.
-      if (hasOwnProp(_item, part)) {
+      if (Object.hasOwn(_item, part)) {
         _item = _item[part];
       } else {
         return undefined;
@@ -348,7 +333,7 @@ module.exports.indexOf = indexOf;
 function keys_ (obj) {
   const arr = [];
   for (const k in obj) {
-    if (hasOwnProp(obj, k)) {
+    if (Object.hasOwn(obj, k)) {
       arr.push(k);
     }
   }
