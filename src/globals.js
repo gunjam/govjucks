@@ -1,16 +1,16 @@
 'use strict';
 
-function cycler(items) {
-  var index = -1;
+function cycler (items) {
+  let index = -1;
 
   return {
     current: null,
-    reset() {
+    reset () {
       index = -1;
       this.current = null;
     },
 
-    next() {
+    next () {
       index++;
       if (index >= items.length) {
         index = 0;
@@ -22,7 +22,7 @@ function cycler(items) {
   };
 }
 
-function joiner(sep) {
+function joiner (sep) {
   sep = sep || ',';
   let first = true;
 
@@ -36,9 +36,9 @@ function joiner(sep) {
 // Making this a function instead so it returns a new object
 // each time it's called. That way, if something like an environment
 // uses it, they will each have their own copy.
-function globals() {
+function globals () {
   return {
-    range(start, stop, step) {
+    range (start, stop, step) {
       if (typeof stop === 'undefined') {
         stop = start;
         start = 0;
@@ -53,18 +53,18 @@ function globals() {
           arr.push(i);
         }
       } else {
-        for (let i = start; i > stop; i += step) { // eslint-disable-line for-direction
+        for (let i = start; i > stop; i += step) {
           arr.push(i);
         }
       }
       return arr;
     },
 
-    cycler() {
+    cycler () {
       return cycler(Array.prototype.slice.call(arguments));
     },
 
-    joiner(sep) {
+    joiner (sep) {
       return joiner(sep);
     }
   };

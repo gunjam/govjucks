@@ -2,7 +2,7 @@
 
 const assert = require('node:assert/strict');
 const { describe, it } = require('node:test');
-const {precompile, precompileString} = require('../src/precompile');
+const { precompile, precompileString } = require('../src/precompile');
 
 describe('precompile', () => {
   it('should return a string', () => {
@@ -16,7 +16,7 @@ describe('precompile', () => {
       let fileName;
 
       precompile('./tests/templates/item.njk', {
-        wrapper(templates) {
+        wrapper (templates) {
           fileName = templates[0].name;
         }
       });
@@ -30,7 +30,7 @@ describe('precompile', () => {
       precompile('<span>test</span>', {
         name: 'path\\to\\file.j2',
         isString: true,
-        wrapper(templates) {
+        wrapper (templates) {
           fileName = templates[0].name;
         }
       });

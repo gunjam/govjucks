@@ -6,14 +6,14 @@ const { describe, it } = require('node:test');
 const { execFile } = require('node:child_process');
 
 const rootDir = path.resolve(path.join(__dirname, '..'));
-const precompileBin = path.join(rootDir, 'bin', 'precompile');
+let precompileBin = path.join(rootDir, 'bin', 'precompile');
 
 if (process.platform === 'win32') {
   precompileBin += '.cmd';
 }
 
-function execPrecompile(args, cb) {
-  execFile(precompileBin, args, {cwd: rootDir}, cb);
+function execPrecompile (args, cb) {
+  execFile(precompileBin, args, { cwd: rootDir }, cb);
 }
 
 describe('precompile cli', () => {

@@ -1,15 +1,13 @@
-/* eslint-disable no-console */
-
 'use strict';
 
 const fs = require('fs');
 const path = require('path');
 const Loader = require('./loader');
-const {PrecompiledLoader} = require('./precompiled-loader.js');
+const { PrecompiledLoader } = require('./precompiled-loader.js');
 let chokidar;
 
 class FileSystemLoader extends Loader {
-  constructor(searchPaths, opts) {
+  constructor (searchPaths, opts) {
     super();
     if (typeof opts === 'boolean') {
       console.log(
@@ -35,7 +33,7 @@ class FileSystemLoader extends Loader {
       // Watch all the templates in the paths and fire an event when
       // they change
       try {
-        chokidar = require('chokidar'); // eslint-disable-line global-require
+        chokidar = require('chokidar');
       } catch (e) {
         throw new Error('watch requires chokidar to be installed');
       }
@@ -53,9 +51,9 @@ class FileSystemLoader extends Loader {
     }
   }
 
-  getSource(name) {
-    var fullpath = null;
-    var paths = this.searchPaths;
+  getSource (name) {
+    let fullpath = null;
+    const paths = this.searchPaths;
 
     for (let i = 0; i < paths.length; i++) {
       const basePath = path.resolve(paths[i]);
@@ -86,7 +84,7 @@ class FileSystemLoader extends Loader {
 }
 
 class NodeResolveLoader extends Loader {
-  constructor(opts) {
+  constructor (opts) {
     super();
     opts = opts || {};
     this.pathsToNames = {};
@@ -94,7 +92,7 @@ class NodeResolveLoader extends Loader {
 
     if (opts.watch) {
       try {
-        chokidar = require('chokidar'); // eslint-disable-line global-require
+        chokidar = require('chokidar');
       } catch (e) {
         throw new Error('watch requires chokidar to be installed');
       }
@@ -113,7 +111,7 @@ class NodeResolveLoader extends Loader {
     }
   }
 
-  getSource(name) {
+  getSource (name) {
     // Don't allow file-system traversal
     if ((/^\.?\.?(\/|\\)/).test(name)) {
       return null;
@@ -144,7 +142,7 @@ class NodeResolveLoader extends Loader {
 }
 
 module.exports = {
-  FileSystemLoader: FileSystemLoader,
-  PrecompiledLoader: PrecompiledLoader,
-  NodeResolveLoader: NodeResolveLoader,
+  FileSystemLoader,
+  PrecompiledLoader,
+  NodeResolveLoader,
 };

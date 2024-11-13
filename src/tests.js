@@ -1,13 +1,13 @@
 'use strict';
 
-var SafeString = require('./runtime').SafeString;
+const SafeString = require('./runtime').SafeString;
 
 /**
  * Returns `true` if the object is a function, otherwise `false`.
  * @param { any } value
  * @returns { boolean }
  */
-function callable(value) {
+function callable (value) {
   return typeof value === 'function';
 }
 
@@ -18,7 +18,7 @@ exports.callable = callable;
  * @param { any } value
  * @returns { boolean }
  */
-function defined(value) {
+function defined (value) {
   return value !== undefined;
 }
 
@@ -31,7 +31,7 @@ exports.defined = defined;
  * @param { number } two
  * @returns { boolean }
  */
-function divisibleby(one, two) {
+function divisibleby (one, two) {
   return (one % two) === 0;
 }
 
@@ -42,7 +42,7 @@ exports.divisibleby = divisibleby;
  * @param { any } value
  * @returns { boolean }
  */
-function escaped(value) {
+function escaped (value) {
   return value instanceof SafeString;
 }
 
@@ -53,7 +53,7 @@ exports.escaped = escaped;
  * @param { any } one
  * @param { any } two
  */
-function equalto(one, two) {
+function equalto (one, two) {
   return one === two;
 }
 
@@ -68,7 +68,7 @@ exports.sameas = exports.equalto;
  * @param { number } value
  * @returns { boolean }
  */
-function even(value) {
+function even (value) {
   return value % 2 === 0;
 }
 
@@ -82,7 +82,7 @@ exports.even = even;
  * @param { any } value
  * @returns { boolean }
  */
-function falsy(value) {
+function falsy (value) {
   return !value;
 }
 
@@ -95,7 +95,7 @@ exports.falsy = falsy;
  * @param { number } two
  * @returns { boolean }
  */
-function ge(one, two) {
+function ge (one, two) {
   return one >= two;
 }
 
@@ -108,7 +108,7 @@ exports.ge = ge;
  * @param { number } two
  * @returns { boolean }
  */
-function greaterthan(one, two) {
+function greaterthan (one, two) {
   return one > two;
 }
 
@@ -124,7 +124,7 @@ exports.gt = exports.greaterthan;
  * @param { number } two
  * @returns { boolean }
  */
-function le(one, two) {
+function le (one, two) {
   return one <= two;
 }
 
@@ -137,7 +137,7 @@ exports.le = le;
  * @param { number } two
  * @returns { boolean }
  */
-function lessthan(one, two) {
+function lessthan (one, two) {
   return one < two;
 }
 
@@ -151,7 +151,7 @@ exports.lt = exports.lessthan;
  * @param { string } value
  * @returns { boolean }
  */
-function lower(value) {
+function lower (value) {
   return value.toLowerCase() === value;
 }
 
@@ -164,7 +164,7 @@ exports.lower = lower;
  * @param { number } two
  * @returns { boolean }
  */
-function ne(one, two) {
+function ne (one, two) {
   return one !== two;
 }
 
@@ -175,7 +175,7 @@ exports.ne = ne;
  * @param { any }
  * @returns { boolean }
  */
-function nullTest(value) {
+function nullTest (value) {
   return value === null;
 }
 
@@ -186,7 +186,7 @@ exports.null = nullTest;
  * @param { any }
  * @returns { boolean }
  */
-function number(value) {
+function number (value) {
   return typeof value === 'number';
 }
 
@@ -197,7 +197,7 @@ exports.number = number;
  * @param { number } value
  * @returns { boolean }
  */
-function odd(value) {
+function odd (value) {
   return value % 2 === 1;
 }
 
@@ -208,7 +208,7 @@ exports.odd = odd;
  * @param { any } value
  * @returns { boolean }
  */
-function string(value) {
+function string (value) {
   return typeof value === 'string';
 }
 
@@ -220,7 +220,7 @@ exports.string = string;
  * @param { any } value
  * @returns { boolean }
  */
-function truthy(value) {
+function truthy (value) {
   return !!value;
 }
 
@@ -231,7 +231,7 @@ exports.truthy = truthy;
  * @param { any } value
  * @returns { boolean }
  */
-function undefinedTest(value) {
+function undefinedTest (value) {
   return value === undefined;
 }
 
@@ -242,7 +242,7 @@ exports.undefined = undefinedTest;
  * @param { string } value
  * @returns { boolean }
  */
-function upper(value) {
+function upper (value) {
   return value.toUpperCase() === value;
 }
 
@@ -258,7 +258,7 @@ exports.upper = upper;
  * @param { any } value
  * @returns { boolean }
  */
-function iterable(value) {
+function iterable (value) {
   if (typeof Symbol !== 'undefined') {
     return !!value[Symbol.iterator];
   } else {
@@ -274,12 +274,12 @@ exports.iterable = iterable;
  * @param { any } value
  * @returns { boolean }
  */
-function mapping(value) {
+function mapping (value) {
   // only maps and object hashes
-  var bool = value !== null
-    && value !== undefined
-    && typeof value === 'object'
-    && !Array.isArray(value);
+  const bool = value !== null &&
+    value !== undefined &&
+    typeof value === 'object' &&
+    !Array.isArray(value);
   if (Set) {
     return bool && !(value instanceof Set);
   } else {

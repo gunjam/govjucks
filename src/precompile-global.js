@@ -1,7 +1,7 @@
 'use strict';
 
-function precompileGlobal(templates, opts) {
-  var out = '';
+function precompileGlobal (templates, opts) {
+  let out = '';
   opts = opts || {};
 
   for (let i = 0; i < templates.length; i++) {

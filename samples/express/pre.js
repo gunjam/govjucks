@@ -2,12 +2,11 @@
 
 'use strict';
 
-var precompileString = require('../..').precompileString;
-var fs = require('fs');
-var path = require('path');
+const { precompileString } = require('../..');
+const fs = require('node:fs');
+const path = require('node:path');
 
-
-var out = 'window.baseTmpl = ' +
+let out = 'window.baseTmpl = ' +
 precompileString(
   fs.readFileSync(path.join(__dirname, 'views/base.html'), 'utf-8'), {
     name: 'base.html',

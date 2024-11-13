@@ -1,27 +1,25 @@
 'use strict';
 
-var lib = require('./lib');
-var r = require('./runtime');
+const lib = require('./lib');
+const r = require('./runtime');
 
-var exports = module.exports = {};
-
-function normalize(value, defaultValue) {
+function normalize (value, defaultValue) {
   if (value === null || value === undefined || value === false) {
     return defaultValue;
   }
   return value;
 }
 
-exports.abs = Math.abs;
+module.exports.abs = Math.abs;
 
-function isNaN(num) {
+function isNaN (num) {
   return num !== num; // eslint-disable-line no-self-compare
 }
 
-function batch(arr, linecount, fillWith) {
-  var i;
-  var res = [];
-  var tmp = [];
+function batch (arr, linecount, fillWith) {
+  let i;
+  const res = [];
+  let tmp = [];
 
   for (i = 0; i < arr.length; i++) {
     if (i % linecount === 0 && tmp.length) {
@@ -45,17 +43,17 @@ function batch(arr, linecount, fillWith) {
   return res;
 }
 
-exports.batch = batch;
+module.exports.batch = batch;
 
-function capitalize(str) {
+function capitalize (str) {
   str = normalize(str, '');
   const ret = str.toLowerCase();
   return r.copySafeness(str, ret.charAt(0).toUpperCase() + ret.slice(1));
 }
 
-exports.capitalize = capitalize;
+module.exports.capitalize = capitalize;
 
-function center(str, width) {
+function center (str, width) {
   str = normalize(str, '');
   width = width || 80;
 
@@ -69,9 +67,9 @@ function center(str, width) {
   return r.copySafeness(str, pre + str + post);
 }
 
-exports.center = center;
+module.exports.center = center;
 
-function default_(val, def, bool) {
+function default_ (val, def, bool) {
   if (bool) {
     return val || def;
   } else {
@@ -80,16 +78,16 @@ function default_(val, def, bool) {
 }
 
 // TODO: it is confusing to export something called 'default'
-exports['default'] = default_; // eslint-disable-line dot-notation
+exports['default'] = default_;
 
-function dictsort(val, caseSensitive, by) {
+function dictsort (val, caseSensitive, by) {
   if (!lib.isObject(val)) {
     throw new lib.TemplateError('dictsort filter: val must be an object');
   }
 
-  let array = [];
+  const array = [];
   // deliberately include properties from the object's prototype
-  for (let k in val) { // eslint-disable-line guard-for-in, no-restricted-syntax
+  for (const k in val) {
     array.push([k, val[k]]);
   }
 
@@ -104,8 +102,8 @@ function dictsort(val, caseSensitive, by) {
   }
 
   array.sort((t1, t2) => {
-    var a = t1[si];
-    var b = t2[si];
+    let a = t1[si];
+    let b = t2[si];
 
     if (!caseSensitive) {
       if (lib.isString(a)) {
@@ -116,21 +114,21 @@ function dictsort(val, caseSensitive, by) {
       }
     }
 
-    return a > b ? 1 : (a === b ? 0 : -1); // eslint-disable-line no-nested-ternary
+    return a > b ? 1 : (a === b ? 0 : -1);
   });
 
   return array;
 }
 
-exports.dictsort = dictsort;
+module.exports.dictsort = dictsort;
 
-function dump(obj, spaces) {
+function dump (obj, spaces) {
   return JSON.stringify(obj, null, spaces);
 }
 
-exports.dump = dump;
+module.exports.dump = dump;
 
-function escape(str) {
+function escape (str) {
   if (str instanceof r.SafeString) {
     return str;
   }
@@ -138,9 +136,9 @@ function escape(str) {
   return r.markSafe(lib.escape(str.toString()));
 }
 
-exports.escape = escape;
+module.exports.escape = escape;
 
-function safe(str) {
+function safe (str) {
   if (str instanceof r.SafeString) {
     return str;
   }
@@ -148,28 +146,28 @@ function safe(str) {
   return r.markSafe(str.toString());
 }
 
-exports.safe = safe;
+module.exports.safe = safe;
 
-function first(arr) {
+function first (arr) {
   return arr[0];
 }
 
-exports.first = first;
+module.exports.first = first;
 
-function forceescape(str) {
+function forceescape (str) {
   str = (str === null || str === undefined) ? '' : str;
   return r.markSafe(lib.escape(str.toString()));
 }
 
-exports.forceescape = forceescape;
+module.exports.forceescape = forceescape;
 
-function groupby(arr, attr) {
+function groupby (arr, attr) {
   return lib.groupBy(arr, attr, this.env.opts.throwOnUndefined);
 }
 
-exports.groupby = groupby;
+module.exports.groupby = groupby;
 
-function indent(str, width, indentfirst) {
+function indent (str, width, indentfirst) {
   str = normalize(str, '');
 
   if (str === '') {
@@ -188,9 +186,9 @@ function indent(str, width, indentfirst) {
   return r.copySafeness(str, res);
 }
 
-exports.indent = indent;
+module.exports.indent = indent;
 
-function join(arr, del, attr) {
+function join (arr, del, attr) {
   del = del || '';
 
   if (attr) {
@@ -200,16 +198,16 @@ function join(arr, del, attr) {
   return arr.join(del);
 }
 
-exports.join = join;
+module.exports.join = join;
 
-function last(arr) {
+function last (arr) {
   return arr[arr.length - 1];
 }
 
-exports.last = last;
+module.exports.last = last;
 
-function lengthFilter(val) {
-  var value = normalize(val, '');
+function lengthFilter (val) {
+  const value = normalize(val, '');
 
   if (value !== undefined) {
     if (
@@ -228,13 +226,13 @@ function lengthFilter(val) {
   return 0;
 }
 
-exports.length = lengthFilter;
+module.exports.length = lengthFilter;
 
-function list(val) {
+function list (val) {
   if (lib.isString(val)) {
     return val.split('');
   } else if (lib.isObject(val)) {
-    return lib._entries(val || {}).map(([key, value]) => ({key, value}));
+    return lib._entries(val || {}).map(([key, value]) => ({ key, value }));
   } else if (lib.isArray(val)) {
     return val;
   } else {
@@ -242,29 +240,29 @@ function list(val) {
   }
 }
 
-exports.list = list;
+module.exports.list = list;
 
-function lower(str) {
+function lower (str) {
   str = normalize(str, '');
   return str.toLowerCase();
 }
 
-exports.lower = lower;
+module.exports.lower = lower;
 
-function nl2br(str) {
+function nl2br (str) {
   if (str === null || str === undefined) {
     return '';
   }
   return r.copySafeness(str, str.replace(/\r\n|\n/g, '<br />\n'));
 }
 
-exports.nl2br = nl2br;
+module.exports.nl2br = nl2br;
 
-function random(arr) {
+function random (arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-exports.random = random;
+module.exports.random = random;
 
 /**
  * Construct select or reject filter
@@ -272,12 +270,12 @@ exports.random = random;
  * @param {boolean} expectedTestResult
  * @returns {function(array, string, *): array}
  */
-function getSelectOrReject(expectedTestResult) {
-  function filter(arr, testName = 'truthy', secondArg) {
+function getSelectOrReject (expectedTestResult) {
+  function filter (arr, testName = 'truthy', secondArg) {
     const context = this;
     const test = context.env.getTest(testName);
 
-    return lib.toArray(arr).filter(function examineTestResult(item) {
+    return lib.toArray(arr).filter(function examineTestResult (item) {
       return test.call(context, item, secondArg) === expectedTestResult;
     });
   }
@@ -285,24 +283,24 @@ function getSelectOrReject(expectedTestResult) {
   return filter;
 }
 
-exports.reject = getSelectOrReject(false);
+module.exports.reject = getSelectOrReject(false);
 
-function rejectattr(arr, attr) {
+function rejectattr (arr, attr) {
   return arr.filter((item) => !item[attr]);
 }
 
-exports.rejectattr = rejectattr;
+module.exports.rejectattr = rejectattr;
 
-exports.select = getSelectOrReject(true);
+module.exports.select = getSelectOrReject(true);
 
-function selectattr(arr, attr) {
+function selectattr (arr, attr) {
   return arr.filter((item) => !!item[attr]);
 }
 
-exports.selectattr = selectattr;
+module.exports.selectattr = selectattr;
 
-function replace(str, old, new_, maxCount) {
-  var originalStr = str;
+function replace (str, old, new_, maxCount) {
+  const originalStr = str;
 
   if (old instanceof RegExp) {
     return str.replace(old, new_);
@@ -351,6 +349,7 @@ function replace(str, old, new_, maxCount) {
   let pos = 0;
   let count = 0; // # of replacements made
 
+  /* eslint-disable-next-line no-unmodified-loop-condition */
   while (nextIndex > -1 && (maxCount === -1 || count < maxCount)) {
     // Grab the next chunk of src string and add it with the
     // replacement, to the result
@@ -371,10 +370,10 @@ function replace(str, old, new_, maxCount) {
   return r.copySafeness(originalStr, res);
 }
 
-exports.replace = replace;
+module.exports.replace = replace;
 
-function reverse(val) {
-  var arr;
+function reverse (val) {
+  let arr;
   if (lib.isString(val)) {
     arr = list(val);
   } else {
@@ -390,9 +389,9 @@ function reverse(val) {
   return arr;
 }
 
-exports.reverse = reverse;
+module.exports.reverse = reverse;
 
-function round(val, precision, method) {
+function round (val, precision, method) {
   precision = precision || 0;
   const factor = Math.pow(10, precision);
   let rounder;
@@ -408,9 +407,9 @@ function round(val, precision, method) {
   return rounder(val * factor) / factor;
 }
 
-exports.round = round;
+module.exports.round = round;
 
-function slice(arr, slices, fillWith) {
+function slice (arr, slices, fillWith) {
   const sliceLength = Math.floor(arr.length / slices);
   const extra = arr.length % slices;
   const res = [];
@@ -433,9 +432,9 @@ function slice(arr, slices, fillWith) {
   return res;
 }
 
-exports.slice = slice;
+module.exports.slice = slice;
 
-function sum(arr, attr, start = 0) {
+function sum (arr, attr, start = 0) {
   if (attr) {
     arr = lib.map(arr, (v) => v[attr]);
   }
@@ -443,14 +442,14 @@ function sum(arr, attr, start = 0) {
   return start + arr.reduce((a, b) => a + b, 0);
 }
 
-exports.sum = sum;
+module.exports.sum = sum;
 
-exports.sort = r.makeMacro(
+module.exports.sort = r.makeMacro(
   ['value', 'reverse', 'case_sensitive', 'attribute'], [],
-  function sortFilter(arr, reversed, caseSens, attr) {
+  function sortFilter (arr, reversed, caseSens, attr) {
     // Copy it
-    let array = lib.map(arr, v => v);
-    let getAttribute = lib.getAttrGetter(attr);
+    const array = lib.map(arr, v => v);
+    const getAttribute = lib.getAttrGetter(attr);
 
     array.sort((a, b) => {
       let x = (attr) ? getAttribute(a) : a;
@@ -480,16 +479,16 @@ exports.sort = r.makeMacro(
     return array;
   });
 
-function string(obj) {
+function string (obj) {
   return r.copySafeness(obj, obj);
 }
 
-exports.string = string;
+module.exports.string = string;
 
-function striptags(input, preserveLinebreaks) {
+function striptags (input, preserveLinebreaks) {
   input = normalize(input, '');
-  let tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>|<!--[\s\S]*?-->/gi;
-  let trimmedInput = trim(input.replace(tags, ''));
+  const tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>|<!--[\s\S]*?-->/gi;
+  const trimmedInput = trim(input.replace(tags, ''));
   let res = '';
   if (preserveLinebreaks) {
     res = trimmedInput
@@ -503,24 +502,24 @@ function striptags(input, preserveLinebreaks) {
   return r.copySafeness(input, res);
 }
 
-exports.striptags = striptags;
+module.exports.striptags = striptags;
 
-function title(str) {
+function title (str) {
   str = normalize(str, '');
-  let words = str.split(' ').map(word => capitalize(word));
+  const words = str.split(' ').map(word => capitalize(word));
   return r.copySafeness(str, words.join(' '));
 }
 
-exports.title = title;
+module.exports.title = title;
 
-function trim(str) {
+function trim (str) {
   return r.copySafeness(str, str.replace(/^\s*|\s*$/g, ''));
 }
 
-exports.trim = trim;
+module.exports.trim = trim;
 
-function truncate(input, length, killwords, end) {
-  var orig = input;
+function truncate (input, length, killwords, end) {
+  const orig = input;
   input = normalize(input, '');
   length = length || 255;
 
@@ -543,37 +542,37 @@ function truncate(input, length, killwords, end) {
   return r.copySafeness(orig, input);
 }
 
-exports.truncate = truncate;
+module.exports.truncate = truncate;
 
-function upper(str) {
+function upper (str) {
   str = normalize(str, '');
   return str.toUpperCase();
 }
 
-exports.upper = upper;
+module.exports.upper = upper;
 
-function urlencode(obj) {
-  var enc = encodeURIComponent;
+function urlencode (obj) {
+  const enc = encodeURIComponent;
   if (lib.isString(obj)) {
     return enc(obj);
   } else {
-    let keyvals = (lib.isArray(obj)) ? obj : lib._entries(obj);
+    const keyvals = (lib.isArray(obj)) ? obj : lib._entries(obj);
     return keyvals.map(([k, v]) => `${enc(k)}=${enc(v)}`).join('&');
   }
 }
 
-exports.urlencode = urlencode;
+module.exports.urlencode = urlencode;
 
 // For the jinja regexp, see
 // https://github.com/mitsuhiko/jinja2/blob/f15b814dcba6aa12bc74d1f7d0c881d55f7126be/jinja2/utils.py#L20-L23
 const puncRe = /^(?:\(|<|&lt;)?(.*?)(?:\.|,|\)|\n|&gt;)?$/;
 // from http://blog.gerv.net/2011/05/html5_email_address_regexp/
-const emailRe = /^[\w.!#$%&'*+\-\/=?\^`{|}~]+@[a-z\d\-]+(\.[a-z\d\-]+)+$/i;
+const emailRe = /^[\w.!#$%&'*+\-/=?^`{|}~]+@[a-z\d-]+(\.[a-z\d-]+)+$/i;
 const httpHttpsRe = /^https?:\/\/.*$/;
 const wwwRe = /^www\./;
-const tldRe = /\.(?:org|net|com)(?:\:|\/|$)/;
+const tldRe = /\.(?:org|net|com)(?::|\/|$)/;
 
-function urlize(str, length, nofollow) {
+function urlize (str, length, nofollow) {
   if (isNaN(length)) {
     length = Infinity;
   }
@@ -585,9 +584,9 @@ function urlize(str, length, nofollow) {
     // trailing whitespace.
     return word && word.length;
   }).map((word) => {
-    var matches = word.match(puncRe);
-    var possibleUrl = (matches) ? matches[1] : word;
-    var shortUrl = possibleUrl.substr(0, length);
+    const matches = word.match(puncRe);
+    const possibleUrl = (matches) ? matches[1] : word;
+    const shortUrl = possibleUrl.substr(0, length);
 
     // url that starts with http or https
     if (httpHttpsRe.test(possibleUrl)) {
@@ -615,34 +614,34 @@ function urlize(str, length, nofollow) {
   return words.join('');
 }
 
-exports.urlize = urlize;
+module.exports.urlize = urlize;
 
-function wordcount(str) {
+function wordcount (str) {
   str = normalize(str, '');
   const words = (str) ? str.match(/\w+/g) : null;
   return (words) ? words.length : null;
 }
 
-exports.wordcount = wordcount;
+module.exports.wordcount = wordcount;
 
-function float(val, def) {
-  var res = parseFloat(val);
+function float (val, def) {
+  const res = parseFloat(val);
   return (isNaN(res)) ? def : res;
 }
 
-exports.float = float;
+module.exports.float = float;
 
 const intFilter = r.makeMacro(
   ['value', 'default', 'base'],
   [],
-  function doInt(value, defaultValue, base = 10) {
-    var res = parseInt(value, base);
+  function doInt (value, defaultValue, base = 10) {
+    const res = parseInt(value, base);
     return (isNaN(res)) ? defaultValue : res;
   }
 );
 
-exports.int = intFilter;
+module.exports.int = intFilter;
 
 // Aliases
-exports.d = exports.default;
-exports.e = exports.escape;
+module.exports.d = module.exports.default;
+module.exports.e = module.exports.escape;

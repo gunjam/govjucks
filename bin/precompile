@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-var {program} = require('commander');
-var precompile = require('../src/precompile').precompile;
-var Environment = require('../src/environment').Environment;
-var lib = require('../src/lib');
 
-var cmdpath = null;
+const { program } = require('commander');
+const precompile = require('../src/precompile').precompile;
+const Environment = require('../src/environment').Environment;
+const lib = require('../src/lib');
+
+let cmdpath = null;
 
 program
   .storeOptionsAsProperties(false)
@@ -36,7 +37,7 @@ if (cmdpath == null) {
   process.exit(1);
 }
 
-var env = new Environment([]);
+const env = new Environment([]);
 
 const opts = program.opts();
 

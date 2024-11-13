@@ -1,22 +1,22 @@
-function installCompat() {
+function installCompat () {
   'use strict';
 
   /* eslint-disable camelcase */
 
   // This must be called like `govjucks.installCompat` so that `this`
   // references the govjucks instance
-  var runtime = this.runtime;
-  var lib = this.lib;
+  const runtime = this.runtime;
+  const lib = this.lib;
   // Handle slim case where these 'modules' are excluded from the built source
-  var Compiler = this.compiler.Compiler;
-  var Parser = this.parser.Parser;
-  var nodes = this.nodes;
-  var lexer = this.lexer;
+  const Compiler = this.compiler.Compiler;
+  const Parser = this.parser.Parser;
+  const nodes = this.nodes;
+  const lexer = this.lexer;
 
-  var orig_contextOrFrameLookup = runtime.contextOrFrameLookup;
-  var orig_memberLookup = runtime.memberLookup;
-  var orig_Compiler_assertType;
-  var orig_Parser_parseAggregate;
+  const orig_contextOrFrameLookup = runtime.contextOrFrameLookup;
+  const orig_memberLookup = runtime.memberLookup;
+  let orig_Compiler_assertType;
+  let orig_Parser_parseAggregate;
   if (Compiler) {
     orig_Compiler_assertType = Compiler.prototype.assertType;
   }
@@ -24,7 +24,7 @@ function installCompat() {
     orig_Parser_parseAggregate = Parser.prototype.parseAggregate;
   }
 
-  function uninstall() {
+  function uninstall () {
     runtime.contextOrFrameLookup = orig_contextOrFrameLookup;
     runtime.memberLookup = orig_memberLookup;
     if (Compiler) {
@@ -35,8 +35,8 @@ function installCompat() {
     }
   }
 
-  runtime.contextOrFrameLookup = function contextOrFrameLookup(context, frame, key) {
-    var val = orig_contextOrFrameLookup.apply(this, arguments);
+  runtime.contextOrFrameLookup = function contextOrFrameLookup (context, frame, key) {
+    const val = orig_contextOrFrameLookup.apply(this, arguments);
     if (val !== undefined) {
       return val;
     }
@@ -52,7 +52,7 @@ function installCompat() {
     }
   };
 
-  function getTokensState(tokens) {
+  function getTokensState (tokens) {
     return {
       index: tokens.index,
       lineno: tokens.lineno,
@@ -63,7 +63,7 @@ function installCompat() {
   if (process.env.BUILD_TYPE !== 'SLIM' && nodes && Compiler && Parser) { // i.e., not slim mode
     const Slice = nodes.Node.extend('Slice', {
       fields: ['start', 'stop', 'step'],
-      init(lineno, colno, start, stop, step) {
+      init (lineno, colno, start, stop, step) {
         start = start || new nodes.Literal(lineno, colno, null);
         stop = stop || new nodes.Literal(lineno, colno, null);
         step = step || new nodes.Literal(lineno, colno, 1);
@@ -71,13 +71,13 @@ function installCompat() {
       }
     });
 
-    Compiler.prototype.assertType = function assertType(node) {
+    Compiler.prototype.assertType = function assertType (node) {
       if (node instanceof Slice) {
         return;
       }
       orig_Compiler_assertType.apply(this, arguments);
     };
-    Compiler.prototype.compileSlice = function compileSlice(node, frame) {
+    Compiler.prototype.compileSlice = function compileSlice (node, frame) {
       this._emit('(');
       this._compileExpression(node.start, frame);
       this._emit('),(');
@@ -87,8 +87,8 @@ function installCompat() {
       this._emit(')');
     };
 
-    Parser.prototype.parseAggregate = function parseAggregate() {
-      var origState = getTokensState(this.tokens);
+    Parser.prototype.parseAggregate = function parseAggregate () {
+      const origState = getTokensState(this.tokens);
       // Set back one accounting for opening bracket/parens
       origState.colno--;
       origState.index--;
@@ -145,7 +145,7 @@ function installCompat() {
     };
   }
 
-  function sliceLookup(obj, start, stop, step) {
+  function sliceLookup (obj, start, stop, step) {
     obj = obj || [];
     if (start === null) {
       start = (step < 0) ? (obj.length - 1) : 0;
@@ -177,12 +177,12 @@ function installCompat() {
     return results;
   }
 
-  function hasOwnProp(obj, key) {
+  function hasOwnProp (obj, key) {
     return Object.prototype.hasOwnProperty.call(obj, key);
   }
 
   const ARRAY_MEMBERS = {
-    pop(index) {
+    pop (index) {
       if (index === undefined) {
         return this.pop();
       }
@@ -191,10 +191,10 @@ function installCompat() {
       }
       return this.splice(index, 1);
     },
-    append(element) {
+    append (element) {
       return this.push(element);
     },
-    remove(element) {
+    remove (element) {
       for (let i = 0; i < this.length; i++) {
         if (this[i] === element) {
           return this.splice(i, 1);
@@ -202,8 +202,8 @@ function installCompat() {
       }
       throw new Error('ValueError');
     },
-    count(element) {
-      var count = 0;
+    count (element) {
+      let count = 0;
       for (let i = 0; i < this.length; i++) {
         if (this[i] === element) {
           count++;
@@ -211,42 +211,42 @@ function installCompat() {
       }
       return count;
     },
-    index(element) {
-      var i;
+    index (element) {
+      let i;
       if ((i = this.indexOf(element)) === -1) {
         throw new Error('ValueError');
       }
       return i;
     },
-    find(element) {
+    find (element) {
       return this.indexOf(element);
     },
-    insert(index, elem) {
+    insert (index, elem) {
       return this.splice(index, 0, elem);
     }
   };
   const OBJECT_MEMBERS = {
-    items() {
+    items () {
       return lib._entries(this);
     },
-    values() {
+    values () {
       return lib._values(this);
     },
-    keys() {
+    keys () {
       return lib.keys(this);
     },
-    get(key, def) {
-      var output = this[key];
+    get (key, def) {
+      let output = this[key];
       if (output === undefined) {
         output = def;
       }
       return output;
     },
-    has_key(key) {
+    has_key (key) {
       return hasOwnProp(this, key);
     },
-    pop(key, def) {
-      var output = this[key];
+    pop (key, def) {
+      let output = this[key];
       if (output === undefined && def !== undefined) {
         output = def;
       } else if (output === undefined) {
@@ -256,7 +256,7 @@ function installCompat() {
       }
       return output;
     },
-    popitem() {
+    popitem () {
       const keys = lib.keys(this);
       if (!keys.length) {
         throw new Error('KeyError');
@@ -266,13 +266,13 @@ function installCompat() {
       delete this[k];
       return [k, val];
     },
-    setdefault(key, def = null) {
+    setdefault (key, def = null) {
       if (!(key in this)) {
         this[key] = def;
       }
       return this[key];
     },
-    update(kwargs) {
+    update (kwargs) {
       lib._assign(this, kwargs);
       return null; // Always returns None
     }
@@ -281,7 +281,7 @@ function installCompat() {
   OBJECT_MEMBERS.itervalues = OBJECT_MEMBERS.values;
   OBJECT_MEMBERS.iterkeys = OBJECT_MEMBERS.keys;
 
-  runtime.memberLookup = function memberLookup(obj, val, autoescape) {
+  runtime.memberLookup = function memberLookup (obj, val, autoescape) {
     if (arguments.length === 4) {
       return sliceLookup.apply(this, arguments);
     }

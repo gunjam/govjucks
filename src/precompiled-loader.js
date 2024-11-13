@@ -3,12 +3,12 @@
 const Loader = require('./loader');
 
 class PrecompiledLoader extends Loader {
-  constructor(compiledTemplates) {
+  constructor (compiledTemplates) {
     super();
     this.precompiled = compiledTemplates || {};
   }
 
-  getSource(name) {
+  getSource (name) {
     if (this.precompiled[name]) {
       return {
         src: {
@@ -23,5 +23,5 @@ class PrecompiledLoader extends Loader {
 }
 
 module.exports = {
-  PrecompiledLoader: PrecompiledLoader,
+  PrecompiledLoader,
 };

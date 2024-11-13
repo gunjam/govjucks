@@ -61,9 +61,9 @@ describe('global', () => {
   });
 
   it('should allow addition of globals', (t, done) => {
-    var env = new Environment();
+    const env = new Environment();
 
-    env.addGlobal('hello', function(arg1) {
+    env.addGlobal('hello', function (arg1) {
       return 'Hello ' + arg1;
     });
 
@@ -73,11 +73,11 @@ describe('global', () => {
   });
 
   it('should allow chaining of globals', (t, done) => {
-    var env = new Environment();
+    const env = new Environment();
 
-    env.addGlobal('hello', function(arg1) {
+    env.addGlobal('hello', function (arg1) {
       return 'Hello ' + arg1;
-    }).addGlobal('goodbye', function(arg1) {
+    }).addGlobal('goodbye', function (arg1) {
       return 'Goodbye ' + arg1;
     });
 
@@ -88,8 +88,8 @@ describe('global', () => {
   });
 
   it('should allow getting of globals', (t, done) => {
-    var env = new Environment();
-    var hello = function(arg1) {
+    const env = new Environment();
+    const hello = function (arg1) {
       return 'Hello ' + arg1;
     };
 
@@ -101,8 +101,8 @@ describe('global', () => {
   });
 
   it('should allow getting boolean globals', (t, done) => {
-    var env = new Environment();
-    var hello = false;
+    const env = new Environment();
+    const hello = false;
 
     env.addGlobal('hello', hello);
 
@@ -112,7 +112,7 @@ describe('global', () => {
   });
 
   it('should fail on getting non-existent global', (t, done) => {
-    var env = new Environment();
+    const env = new Environment();
 
     // Using this format instead of .withArgs since env.getGlobal uses 'this'
     assert.throws(() => {
@@ -123,9 +123,9 @@ describe('global', () => {
   });
 
   it('should pass context as this to global functions', (t, done) => {
-    var env = new Environment();
+    const env = new Environment();
 
-    env.addGlobal('hello', function() {
+    env.addGlobal('hello', function () {
       return 'Hello ' + this.lookup('user');
     });
 
@@ -136,11 +136,10 @@ describe('global', () => {
   });
 
   it('should be exclusive to each environment', (t, done) => {
-    var env = new Environment();
-    var env2;
+    const env = new Environment();
 
     env.addGlobal('hello', 'konichiwa');
-    env2 = new Environment();
+    const env2 = new Environment();
 
     // Using this format instead of .withArgs since env2.getGlobal uses 'this'
     assert.throws(() => {
@@ -153,7 +152,7 @@ describe('global', () => {
   it('should return errors from globals', (t, done) => {
     const env = new Environment();
 
-    env.addGlobal('err', function() {
+    env.addGlobal('err', function () {
       throw new Error('Global error');
     });
 

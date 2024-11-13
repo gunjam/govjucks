@@ -5,7 +5,7 @@ const { describe, it } = require('node:test');
 const lib = require('../src/lib');
 const lexer = require('../src/lexer');
 
-function _hasTokens(ws, tokens, types) {
+function _hasTokens (ws, tokens, types) {
   let i;
   let type;
   let tok;
@@ -39,11 +39,11 @@ function _hasTokens(ws, tokens, types) {
   }
 }
 
-function hasTokens(tokens /* , types */) {
+function hasTokens (tokens /* , types */) {
   return _hasTokens(false, tokens, lib.toArray(arguments).slice(1));
 }
 
-function hasTokensWithWS(tokens /* , types */) {
+function hasTokensWithWS (tokens /* , types */) {
   return _hasTokens(true, tokens, lib.toArray(arguments).slice(1));
 }
 
@@ -159,7 +159,6 @@ describe('lexer', () => {
       lexer.TOKEN_SYMBOL,
       lexer.TOKEN_BLOCK_END);
   });
-
 
   it('should parse variable start and end', () => {
     tokens = lexer.lex('data {{ foo }} bar bizzle');

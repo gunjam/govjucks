@@ -58,7 +58,7 @@ describe('compiler', () => {
   });
 
   it('should compile references - object without prototype', (t, done) => {
-    var context = Object.create(null);
+    const context = Object.create(null);
     context.foo = Object.create(null);
     context.foo.bar = 'baz';
 
@@ -109,7 +109,7 @@ describe('compiler', () => {
   it('should compile function calls', (t, done) => {
     equal('{{ foo("msg") }}',
       {
-        foo: function(str) {
+        foo: function (str) {
           return str + 'hi';
         }
       },
@@ -120,7 +120,7 @@ describe('compiler', () => {
   it('should compile function calls with correct scope', (t, done) => {
     equal('{{ foo.bar() }}', {
       foo: {
-        bar: function() {
+        bar: function () {
           return this.baz;
         },
         baz: 'hello'
@@ -130,13 +130,13 @@ describe('compiler', () => {
     finish(done);
   });
 
-  it('should compile switch statements', function() {
+  it('should compile switch statements', function () {
     // standard switches
-    var tpl1 = '{% switch foo %}{% case "bar" %}BAR{% case "baz" %}BAZ{% default %}NEITHER FOO NOR BAR{% endswitch %}';
+    const tpl1 = '{% switch foo %}{% case "bar" %}BAR{% case "baz" %}BAZ{% default %}NEITHER FOO NOR BAR{% endswitch %}';
     // test no-default switches
-    var tpl2 = '{% switch foo %}{% case "bar" %}BAR{% case "baz" %}BAZ{% endswitch %}';
+    const tpl2 = '{% switch foo %}{% case "bar" %}BAR{% case "baz" %}BAZ{% endswitch %}';
     // test fall-through cases
-    var tpl3 = '{% switch foo %}{% case "bar" %}{% case "baz" %}BAR{% endswitch %}';
+    const tpl3 = '{% switch foo %}{% case "bar" %}{% case "baz" %}BAR{% endswitch %}';
     equal(tpl1, 'NEITHER FOO NOR BAR');
     equal(tpl1, {
       foo: 'bar'
@@ -154,7 +154,7 @@ describe('compiler', () => {
   });
 
   it('should compile if blocks', (t, done) => {
-    var tmpl = ('Give me some {% if hungry %}pizza' +
+    const tmpl = ('Give me some {% if hungry %}pizza' +
       '{% else %}water{% endif %}');
 
     equal(tmpl, {
@@ -252,7 +252,7 @@ describe('compiler', () => {
   });
 
   it('should compile inline conditionals', (t, done) => {
-    var tmpl = 'Give me some {{ "pizza" if hungry else "water" }}';
+    const tmpl = 'Give me some {{ "pizza" if hungry else "water" }}';
 
     equal(tmpl, {
       hungry: true
@@ -290,115 +290,115 @@ describe('compiler', () => {
     finish(done);
   });
 
-  function runLoopTests(block) {
-    var end = {
+  function runLoopTests (block) {
+    const end = {
       asyncAll: 'endall',
       asyncEach: 'endeach',
       for: 'endfor'
     }[block];
 
-    describe('the ' + block + ' tag', function() {
-      it('should loop over simple arrays', function() {
+    describe('the ' + block + ' tag', function () {
+      it('should loop over simple arrays', function () {
         equal(
           '{% ' + block + ' i in arr %}{{ i }}{% ' + end + ' %}',
           { arr: [1, 2, 3, 4, 5] },
           '12345');
       });
-      it('should loop normally with an {% else %} tag and non-empty array', function() {
+      it('should loop normally with an {% else %} tag and non-empty array', function () {
         equal(
           '{% ' + block + ' i in arr %}{{ i }}{% else %}empty{% ' + end + ' %}',
           { arr: [1, 2, 3, 4, 5] },
           '12345');
       });
-      it('should execute the {% else %} block when looping over an empty array', function() {
+      it('should execute the {% else %} block when looping over an empty array', function () {
         equal(
           '{% ' + block + ' i in arr %}{{ i }}{% else %}empty{% ' + end + ' %}',
           { arr: [] },
           'empty');
       });
-      it('should support destructured looping', function() {
+      it('should support destructured looping', function () {
         equal(
           '{% ' + block + ' a, b, c in arr %}' +
           '{{ a }},{{ b }},{{ c }}.{% ' + end + ' %}',
           { arr: [['x', 'y', 'z'], ['1', '2', '3']] },
           'x,y,z.1,2,3.');
       });
-      it('should do loop over key-values of a literal in-template Object', function() {
+      it('should do loop over key-values of a literal in-template Object', function () {
         equal(
           '{% ' + block + ' k, v in { one: 1, two: 2 } %}' +
           '-{{ k }}:{{ v }}-{% ' + end + ' %}', '-one:1--two:2-');
       });
-      it('should support loop.index', function() {
+      it('should support loop.index', function () {
         equal('{% ' + block + ' i in [7,3,6] %}{{ loop.index }}{% ' + end + ' %}', '123');
       });
-      it('should support loop.index0', function() {
+      it('should support loop.index0', function () {
         equal('{% ' + block + ' i in [7,3,6] %}{{ loop.index0 }}{% ' + end + ' %}', '012');
       });
-      it('should support loop.revindex', function() {
+      it('should support loop.revindex', function () {
         equal('{% ' + block + ' i in [7,3,6] %}{{ loop.revindex }}{% ' + end + ' %}', '321');
       });
-      it('should support loop.revindex0', function() {
+      it('should support loop.revindex0', function () {
         equal('{% ' + block + ' i in [7,3,6] %}{{ loop.revindex0 }}{% ' + end + ' %}', '210');
       });
-      it('should support loop.first', function() {
+      it('should support loop.first', function () {
         equal(
           '{% ' + block + ' i in [7,3,6] %}' +
           '{% if loop.first %}{{ i }}{% endif %}' +
           '{% ' + end + ' %}',
           '7');
       });
-      it('should support loop.last', function() {
+      it('should support loop.last', function () {
         equal(
           '{% ' + block + ' i in [7,3,6] %}' +
           '{% if loop.last %}{{ i }}{% endif %}' +
           '{% ' + end + ' %}',
           '6');
       });
-      it('should support loop.length', function() {
+      it('should support loop.length', function () {
         equal('{% ' + block + ' i in [7,3,6] %}{{ loop.length }}{% ' + end + ' %}', '333');
       });
-      it('should fail silently when looping over an undefined variable', function() {
+      it('should fail silently when looping over an undefined variable', function () {
         equal('{% ' + block + ' i in foo %}{{ i }}{% ' + end + ' %}', '');
       });
-      it('should fail silently when looping over an undefined property', function() {
+      it('should fail silently when looping over an undefined property', function () {
         equal(
           '{% ' + block + ' i in foo.bar %}{{ i }}{% ' + end + ' %}',
           { foo: {} },
           '');
       });
       // TODO: this behavior differs from jinja2
-      it('should fail silently when looping over a null variable', function() {
+      it('should fail silently when looping over a null variable', function () {
         equal(
           '{% ' + block + ' i in foo %}{{ i }}{% ' + end + ' %}',
           { foo: null },
           '');
       });
-      it('should loop over two-dimensional arrays', function() {
+      it('should loop over two-dimensional arrays', function () {
         equal('{% ' + block + ' x, y in points %}[{{ x }},{{ y }}]{% ' + end + ' %}',
           { points: [[1, 2], [3, 4], [5, 6]] },
           '[1,2][3,4][5,6]');
       });
-      it('should loop over four-dimensional arrays', function() {
+      it('should loop over four-dimensional arrays', function () {
         equal(
           '{% ' + block + ' a, b, c, d in arr %}[{{ a }},{{ b }},{{ c }},{{ d }}]{% ' + end + '%}',
           { arr: [[1, 2, 3, 4], [5, 6, 7, 8]] },
           '[1,2,3,4][5,6,7,8]');
       });
-      it('should support loop.index with two-dimensional loops', function() {
+      it('should support loop.index with two-dimensional loops', function () {
         equal('{% ' + block + ' x, y in points %}{{ loop.index }}{% ' + end + ' %}',
           {
             points: [[1, 2], [3, 4], [5, 6]]
           },
           '123');
       });
-      it('should support loop.revindex with two-dimensional loops', function() {
+      it('should support loop.revindex with two-dimensional loops', function () {
         equal('{% ' + block + ' x, y in points %}{{ loop.revindex }}{% ' + end + ' %}',
           {
             points: [[1, 2], [3, 4], [5, 6]]
           },
           '321');
       });
-      it('should support key-value looping over an Object variable', function() {
+      it('should support key-value looping over an Object variable', function () {
         equal('{% ' + block + ' k, v in items %}({{ k }},{{ v }}){% ' + end + ' %}',
           {
             items: {
@@ -408,7 +408,7 @@ describe('compiler', () => {
           },
           '(foo,1)(bar,2)');
       });
-      it('should support loop.index when looping over an Object\'s key-value pairs', function() {
+      it('should support loop.index when looping over an Object\'s key-value pairs', function () {
         equal('{% ' + block + ' k, v in items %}{{ loop.index }}{% ' + end + ' %}',
           {
             items: {
@@ -418,7 +418,7 @@ describe('compiler', () => {
           },
           '12');
       });
-      it('should support loop.revindex when looping over an Object\'s key-value pairs', function() {
+      it('should support loop.revindex when looping over an Object\'s key-value pairs', function () {
         equal('{% ' + block + ' k, v in items %}{{ loop.revindex }}{% ' + end + ' %}',
           {
             items: {
@@ -428,7 +428,7 @@ describe('compiler', () => {
           },
           '21');
       });
-      it('should support loop.length when looping over an Object\'s key-value pairs', function() {
+      it('should support loop.length when looping over an Object\'s key-value pairs', function () {
         equal('{% ' + block + ' k, v in items %}{{ loop.length }}{% ' + end + ' %}',
           {
             items: {
@@ -438,7 +438,7 @@ describe('compiler', () => {
           },
           '22');
       });
-      it('should support include tags in the body of the loop', function() {
+      it('should support include tags in the body of the loop', function () {
         equal('{% ' + block + ' item, v in items %}{% include "item.njk" %}{% ' + end + ' %}',
           {
             items: {
@@ -448,7 +448,7 @@ describe('compiler', () => {
           },
           'showing fooshowing bar');
       });
-      it('should work with {% set %} and {% include %} tags', function() {
+      it('should work with {% set %} and {% include %} tags', function () {
         equal(
           '{% set item = passed_var %}' +
           '{% include "item.njk" %}\n' +
@@ -463,7 +463,7 @@ describe('compiler', () => {
           'showing test\nshowing 1\nshowing 2\nshowing 3\n');
       });
       /* global Set */
-      it('should work with Set builtin', function() {
+      it('should work with Set builtin', function () {
         if (typeof Set === 'undefined') {
           this.skip();
         } else {
@@ -481,7 +481,7 @@ describe('compiler', () => {
         }
       });
       /* global Map */
-      it('should work with Map builtin', function() {
+      it('should work with Map builtin', function () {
         if (typeof Map === 'undefined') {
           this.skip();
         } else {
@@ -515,18 +515,18 @@ describe('compiler', () => {
   });
 
   it('should compile async control', (t, done) => {
-    var opts;
+    let opts;
     if (!fs) {
       this.skip();
     } else {
       opts = {
         asyncFilters: {
-          getContents: function(tmpl, cb) {
+          getContents: function (tmpl, cb) {
             fs.readFile(tmpl, cb);
           },
 
-          getContentsArr: function(arr, cb) {
-            fs.readFile(arr[0], function(err, res) {
+          getContentsArr: function (arr, cb) {
+            fs.readFile(arr[0], function (err, res) {
               cb(err, [res]);
             });
           }
@@ -538,7 +538,7 @@ describe('compiler', () => {
           tmpl: 'tests/templates/for-async-content.njk'
         },
         opts,
-        function(err, res) {
+        function (_, res) {
           assert.equal(res, 'somecontenthere');
         });
 
@@ -547,7 +547,7 @@ describe('compiler', () => {
           tmpl: 'tests/templates/for-async-content.njk'
         },
         opts,
-        function(err, res) {
+        function (_, res) {
           assert.equal(res, 'somecontenthere');
         });
 
@@ -556,7 +556,7 @@ describe('compiler', () => {
           tmpl: 'tests/templates/for-async-content.njk'
         },
         opts,
-        function(err, res) {
+        function (_, res) {
           assert.equal(res, 'yes');
         });
 
@@ -565,7 +565,7 @@ describe('compiler', () => {
           tmpl: 'tests/templates/for-async-content.njk'
         },
         opts,
-        function(err, res) {
+        function (_, res) {
           assert.equal(res, 'somecontenthere*somecontenthere*');
         });
 
@@ -574,7 +574,7 @@ describe('compiler', () => {
           tmpl: 'tests/templates/for-async-content.njk'
         },
         opts,
-        function(err, res) {
+        function (_, res) {
           assert.equal(res, 'somecontenthere');
         });
 
@@ -583,7 +583,7 @@ describe('compiler', () => {
           tmpl: 'tests/templates/for-async-content.njk'
         },
         opts,
-        function(err, res) {
+        function (_, res) {
           assert.equal(res, 'oof');
         });
 
@@ -595,7 +595,7 @@ describe('compiler', () => {
           tmpl: 'tests/templates/for-async-content.njk'
         },
         opts,
-        function(err, res) {
+        function (_, res) {
           assert.equal(res, 'somecontenthere*somecontenthere*');
         });
 
@@ -604,7 +604,7 @@ describe('compiler', () => {
           tmpl: 'tests/templates/for-async-content.njk'
         },
         opts,
-        function(err, res) {
+        function (_, res) {
           assert.equal(res, 'somecontenthere');
         });
 
@@ -613,7 +613,7 @@ describe('compiler', () => {
           tmpl: 'tests/templates/for-async-content.njk'
         },
         opts,
-        function(err, res) {
+        function (_, res) {
           assert.equal(res, 'hello somecontenthere');
         });
 
@@ -622,7 +622,7 @@ describe('compiler', () => {
           tmpl: 'tests/templates/for-async-content.njk'
         },
         opts,
-        function(err, res) {
+        function (_, res) {
           assert.equal(res, 'somecontenthere');
         });
 
@@ -631,7 +631,7 @@ describe('compiler', () => {
           tmpl: 'tests/templates/for-async-content.njk'
         },
         opts,
-        function(err, res) {
+        function (_, res) {
           assert.equal(res, 'somecontenthere\n');
         });
 
@@ -640,7 +640,7 @@ describe('compiler', () => {
           tmpl: 'tests/templates/for-async-content.njk'
         },
         opts,
-        function(err, res) {
+        function (_, res) {
           assert.equal(res, 'somecontenthere\nsomecontenthere\n');
         });
 
@@ -649,7 +649,7 @@ describe('compiler', () => {
           tmpl: 'tests/templates/for-async-content.njk'
         },
         opts,
-        function(err, res) {
+        function (_, res) {
           assert.equal(res, '-0:somecontenthere\n-' +
             '-1:somecontenthere\n-' +
             '-2:somecontenthere\n-' +
@@ -661,27 +661,27 @@ describe('compiler', () => {
     finish(done);
   });
 
-  it('should compile basic arithmetic operators', function() {
+  it('should compile basic arithmetic operators', function () {
     equal('{{ 3 + 4 - 5 * 6 / 10 }}', '4');
   });
 
-  it('should compile the exponentiation (**) operator', function() {
+  it('should compile the exponentiation (**) operator', function () {
     equal('{{ 4**5 }}', '1024');
   });
 
-  it('should compile the integer division (//) operator', function() {
+  it('should compile the integer division (//) operator', function () {
     equal('{{ 9//5 }}', '1');
   });
 
-  it('should compile the modulus operator', function() {
+  it('should compile the modulus operator', function () {
     equal('{{ 9%5 }}', '4');
   });
 
-  it('should compile numeric negation operator', function() {
+  it('should compile numeric negation operator', function () {
     equal('{{ -5 }}', '-5');
   });
 
-  it('should compile comparison operators', function() {
+  it('should compile comparison operators', function () {
     equal('{% if 3 < 4 %}yes{% endif %}', 'yes');
     equal('{% if 3 > 4 %}yes{% endif %}', '');
     equal('{% if 9 >= 10 %}yes{% endif %}', '');
@@ -701,7 +701,7 @@ describe('compiler', () => {
 
     equal('{% if foo(20) > bar %}yes{% endif %}',
       {
-        foo: function(n) {
+        foo: function (n) {
           return n - 1;
         },
         bar: 15
@@ -709,14 +709,14 @@ describe('compiler', () => {
       'yes');
   });
 
-  it('should compile python-style ternary operators', function() {
+  it('should compile python-style ternary operators', function () {
     equal('{{ "yes" if 1 is odd else "no"  }}', 'yes');
     equal('{{ "yes" if 2 is even else "no"  }}', 'yes');
     equal('{{ "yes" if 2 is odd else "no"  }}', 'no');
     equal('{{ "yes" if 1 is even else "no"  }}', 'no');
   });
 
-  it('should compile the "in" operator for Arrays', function() {
+  it('should compile the "in" operator for Arrays', function () {
     equal('{% if 1 in [1, 2] %}yes{% endif %}', 'yes');
     equal('{% if 1 in [2, 3] %}yes{% endif %}', '');
     equal('{% if 1 not in [1, 2] %}yes{% endif %}', '');
@@ -726,7 +726,7 @@ describe('compiler', () => {
       'yes');
   });
 
-  it('should compile the "in" operator for objects', function() {
+  it('should compile the "in" operator for objects', function () {
     equal('{% if "a" in obj %}yes{% endif %}',
       { obj: { a: true } },
       'yes');
@@ -735,7 +735,7 @@ describe('compiler', () => {
       '');
   });
 
-  it('should compile the "in" operator for strings', function() {
+  it('should compile the "in" operator for strings', function () {
     equal('{% if "foo" in "foobar" %}yes{% endif %}', 'yes');
   });
 
@@ -746,7 +746,7 @@ describe('compiler', () => {
       {
         noThrow: true
       },
-      function(err, res) {
+      function (err, res) {
         assert.equal(res, undefined);
         assert.match(err.message,
           /Cannot use "in" operator to search for "a" in unexpected types\./
@@ -760,7 +760,7 @@ describe('compiler', () => {
       {
         noThrow: true
       },
-      function(err, res) {
+      function (err, res) {
         assert.equal(res, undefined);
         assert.match(err.message,
           /Cannot use "in" operator to search for "a" in unexpected types\./
@@ -772,25 +772,25 @@ describe('compiler', () => {
   });
 
   if (!isSlim) {
-    it('should throw exceptions when called synchronously', function() {
+    it('should throw exceptions when called synchronously', function () {
       const tmpl = new Template('{% from "doesnotexist" import foo %}');
-      function templateRender() {
+      function templateRender () {
         tmpl.render();
       }
       assert.throws(templateRender, { message: /template not found: doesnotexist/ });
     });
 
     it('should include error line in raised TemplateError', (t, done) => {
-      var tmplStr = [
+      const tmplStr = [
         '{% set items = ["a", "b",, "c"] %}',
         '{{ items | join(",") }}',
       ].join('\n');
 
-      var loader = new Loader('tests/templates');
-      var env = new Environment(loader);
-      var tmpl = new Template(tmplStr, env, 'parse-error.njk');
+      const loader = new Loader('tests/templates');
+      const env = new Environment(loader);
+      const tmpl = new Template(tmplStr, env, 'parse-error.njk');
 
-      tmpl.render({}, function(err, res) {
+      tmpl.render({}, function (err, res) {
         assert.equal(res, undefined);
         assert.equal(err.toString(), [
           'Template render error: (parse-error.njk) [Line 1, Column 26]',
@@ -801,19 +801,19 @@ describe('compiler', () => {
     });
 
     it('should include error line when exception raised in user function', (t, done) => {
-      var tmplStr = [
+      const tmplStr = [
         '{% block content %}',
         '<div>{{ foo() }}</div>',
         '{% endblock %}',
       ].join('\n');
-      var env = new Environment(new Loader('tests/templates'));
-      var tmpl = new Template(tmplStr, env, 'user-error.njk');
+      const env = new Environment(new Loader('tests/templates'));
+      const tmpl = new Template(tmplStr, env, 'user-error.njk');
 
-      function foo() {
+      function foo () {
         throw new Error('ERROR');
       }
 
-      tmpl.render({foo: foo}, function(err, res) {
+      tmpl.render({ foo }, function (err, res) {
         assert.equal(res, undefined);
         assert.equal(err.toString(), [
           'Template render error: (user-error.njk) [Line 1, Column 11]',
@@ -824,9 +824,9 @@ describe('compiler', () => {
     });
   }
 
-  it('should throw exceptions from included templates when called synchronously', function() {
-    function templateRender() {
-      render('{% include "broken-import.njk" %}', {str: 'abc'});
+  it('should throw exceptions from included templates when called synchronously', function () {
+    function templateRender () {
+      render('{% include "broken-import.njk" %}', { str: 'abc' });
     }
     assert.throws(templateRender, { message: /template not found: doesnotexist/ });
   });
@@ -834,9 +834,9 @@ describe('compiler', () => {
   it('should pass errors from included templates to callback when async', (t, done) => {
     render(
       '{% include "broken-import.njk" %}',
-      {str: 'abc'},
-      {noThrow: true},
-      function(err, res) {
+      { str: 'abc' },
+      { noThrow: true },
+      function (err, res) {
         assert.match(err.message, /template not found: doesnotexist/);
         assert.equal(res, undefined);
         done();
@@ -1211,12 +1211,12 @@ describe('compiler', () => {
     finish(done);
   });
   it('should not call blocks not defined from template inheritance', (t, done) => {
-    var count = 0;
+    let count = 0;
     render(
       '{% extends "base.njk" %}' +
       '{% block notReal %}{{ foo() }}{% endblock %}',
-      { foo: function() { count++; } },
-      function() {
+      { foo: function () { count++; } },
+      function () {
         assert.equal(count, 0);
       });
 
@@ -1256,7 +1256,7 @@ describe('compiler', () => {
   });
 
   it('should error if same block is defined multiple times', (t, done) => {
-    var func = function() {
+    const func = function () {
       render(
         '{% extends "simple-base.njk" %}' +
         '{% block test %}{% endblock %}' +
@@ -1412,7 +1412,7 @@ describe('compiler', () => {
       {
         noThrow: true
       },
-      function(err, res) {
+      function (err, res) {
         assert.equal(res, undefined);
         assert.match(err.message, /template not found: missing.njk/);
       }
@@ -1654,7 +1654,7 @@ describe('compiler', () => {
       {
         noThrow: true
       },
-      function(err) {
+      function (err) {
         assert.match(err.message, /cannot import 'boozle'/);
       });
 
@@ -1662,22 +1662,20 @@ describe('compiler', () => {
   });
 
   it('should allow custom tag compilation', (t, done) => {
-    function TestExtension() {
+    function TestExtension () {
       this.tags = ['test'];
 
-      this.parse = function(parser, nodes) {
-        var content;
-        var tag;
+      this.parse = function (parser, nodes) {
         parser.advanceAfterBlockEnd();
 
-        content = parser.parseUntilBlocks('endtest');
-        tag = new nodes.CallExtension(this, 'run', null, [content]);
+        const content = parser.parseUntilBlocks('endtest');
+        const tag = new nodes.CallExtension(this, 'run', null, [content]);
         parser.advanceAfterBlockEnd();
 
         return tag;
       };
 
-      this.run = function(context, content) {
+      this.run = function (context, content) {
         // Reverse the string
         return content().split('').reverse().join('');
       };
@@ -1691,19 +1689,19 @@ describe('compiler', () => {
   });
 
   it('should allow custom tag compilation without content', (t, done) => {
-    function TestExtension() {
+    function TestExtension () {
       // jshint validthis: true
       this.tags = ['test'];
 
-      this.parse = function(parser, nodes) {
-        var tok = parser.nextToken();
-        var args = parser.parseSignature(null, true);
+      this.parse = function (parser, nodes) {
+        const tok = parser.nextToken();
+        const args = parser.parseSignature(null, true);
         parser.advanceAfterBlockEnd(tok.value);
 
         return new nodes.CallExtension(this, 'run', args, null);
       };
 
-      this.run = function(context, arg1) {
+      this.run = function (context, arg1) {
         // Reverse the string
         return arg1.split('').reverse().join('');
       };
@@ -1717,20 +1715,19 @@ describe('compiler', () => {
   });
 
   it('should allow complicated custom tag compilation', (t, done) => {
-    function TestExtension() {
+    function TestExtension () {
       // jshint validthis: true
       this.tags = ['test'];
 
       /* normally this is automatically done by Environment */
       this._name = TestExtension;
 
-      this.parse = function(parser, nodes, lexer) {
-        var body;
-        var intermediate = null;
+      this.parse = function (parser, nodes, lexer) {
+        let intermediate = null;
 
         parser.advanceAfterBlockEnd();
 
-        body = parser.parseUntilBlocks('intermediate', 'endtest');
+        const body = parser.parseUntilBlocks('intermediate', 'endtest');
 
         if (parser.skipSymbol('intermediate')) {
           parser.skip(lexer.TOKEN_BLOCK_END);
@@ -1742,8 +1739,8 @@ describe('compiler', () => {
         return new nodes.CallExtension(this, 'run', null, [body, intermediate]);
       };
 
-      this.run = function(context, body, intermediate) {
-        var output = body().split('').join(',');
+      this.run = function (context, body, intermediate) {
+        let output = body().split('').join(',');
         if (intermediate) {
           // Reverse the string.
           output += intermediate().split('').reverse().join('');
@@ -1765,32 +1762,28 @@ describe('compiler', () => {
   });
 
   it('should allow custom tag with args compilation', (t, done) => {
-    var opts;
-
-    function TestExtension() {
+    function TestExtension () {
       // jshint validthis: true
       this.tags = ['test'];
 
       /* normally this is automatically done by Environment */
       this._name = TestExtension;
 
-      this.parse = function(parser, nodes) {
-        var body;
-        var args;
-        var tok = parser.nextToken();
+      this.parse = function (parser, nodes) {
+        const tok = parser.nextToken();
 
         // passing true makes it tolerate when no args exist
-        args = parser.parseSignature(true);
+        const args = parser.parseSignature(true);
         parser.advanceAfterBlockEnd(tok.value);
 
-        body = parser.parseUntilBlocks('endtest');
+        const body = parser.parseUntilBlocks('endtest');
         parser.advanceAfterBlockEnd();
 
         return new nodes.CallExtension(this, 'run', args, [body]);
       };
 
-      this.run = function(context, prefix, kwargs, body) {
-        var output;
+      this.run = function (context, prefix, kwargs, body) {
+        let output;
         if (typeof prefix === 'function') {
           body = prefix;
           prefix = '';
@@ -1809,7 +1802,7 @@ describe('compiler', () => {
       };
     }
 
-    opts = {
+    const opts = {
       extensions: {
         TestExtension: new TestExtension()
       }
@@ -1869,7 +1862,7 @@ describe('compiler', () => {
 
     equal(
       '{{ foo }}',
-      { foo: { toString: function() { return '<p>foo</p>'; } } },
+      { foo: { toString: function () { return '<p>foo</p>'; } } },
       { autoescape: true },
       '&lt;p&gt;foo&lt;/p&gt;');
 
@@ -1892,7 +1885,7 @@ describe('compiler', () => {
 
     equal(
       '{{ foo | safe }}',
-      { foo: { toString: function() { return '<p>foo</p>'; } } },
+      { foo: { toString: function () { return '<p>foo</p>'; } } },
       { autoescape: true },
       '<p>foo</p>');
 
@@ -1917,7 +1910,7 @@ describe('compiler', () => {
       {
         autoescape: true
       },
-      function(err, res) {
+      function (_, res) {
         assert.equal(res, '&lt;&gt;&amp; and &lt;&gt;');
       }
     );
@@ -1929,7 +1922,7 @@ describe('compiler', () => {
       {
         autoescape: true
       },
-      function(err, res) {
+      function (_, res) {
         assert.equal(res, '<>& and &lt;&gt;');
       }
     );
@@ -1945,7 +1938,7 @@ describe('compiler', () => {
       {
         autoescape: true
       },
-      function(err, res) {
+      function (_, res) {
         assert.equal(res, '<b>Foo</b>');
       }
     );
@@ -1964,20 +1957,20 @@ describe('compiler', () => {
   });
 
   it('should not autoescape when extension set false', (t, done) => {
-    function TestExtension() {
+    function TestExtension () {
       // jshint validthis: true
       this.tags = ['test'];
 
       this.autoescape = false;
 
-      this.parse = function(parser, nodes) {
-        var tok = parser.nextToken();
-        var args = parser.parseSignature(null, true);
+      this.parse = function (parser, nodes) {
+        const tok = parser.nextToken();
+        const args = parser.parseSignature(null, true);
         parser.advanceAfterBlockEnd(tok.value);
         return new nodes.CallExtension(this, 'run', args, null);
       };
 
-      this.run = function() {
+      this.run = function () {
         // Reverse the string
         return '<b>Foo</b>';
       };
@@ -1990,7 +1983,7 @@ describe('compiler', () => {
         extensions: { TestExtension: new TestExtension() },
         autoescape: true
       },
-      function(err, res) {
+      function (_, res) {
         assert.equal(res, '<b>Foo</b>');
       }
     );
@@ -2004,12 +1997,12 @@ describe('compiler', () => {
       { foo: 1, bar: 2 },
       {
         filters: {
-          hallo: function(foo) {
+          hallo: function (foo) {
             return foo + this.lookup('bar');
           }
         }
       },
-      function(err, res) {
+      function (_, res) {
         assert.equal(res, '3');
       }
     );
@@ -2030,9 +2023,9 @@ describe('compiler', () => {
   it('should throw an error when {% call %} is passed an object that is not a function', (t, done) => {
     render(
       '{% call foo() %}{% endcall %}',
-      {foo: 'bar'},
-      {noThrow: true},
-      function(err, res) {
+      { foo: 'bar' },
+      { noThrow: true },
+      function (err, res) {
         assert.equal(res, undefined);
         assert.match(err.message, /Unable to call `\w+`, which is not a function/);
       });
@@ -2047,7 +2040,7 @@ describe('compiler', () => {
       {
         noThrow: true
       },
-      function(err, res) {
+      function (err, res) {
         assert.equal(res, undefined);
         assert.match(err.message, /Unable to call `\w+`, which is undefined or falsey/);
       }
@@ -2063,7 +2056,7 @@ describe('compiler', () => {
       {
         noThrow: true
       },
-      function(err, res) {
+      function (err, res) {
         assert.equal(res, undefined);
         assert.match(err.message, /Unable to call `\w+`, which is undefined or falsey/);
       }
@@ -2077,7 +2070,7 @@ describe('compiler', () => {
       '{% include "import-macro-call-undefined-macro.njk" %}',
       { list: [1, 2, 3] },
       { noThrow: true },
-      function(err, res) {
+      function (err, res) {
         assert.equal(res, undefined);
         assert.match(err.message, /Unable to call `\w+`, which is undefined or falsey/);
       }
@@ -2086,15 +2079,14 @@ describe('compiler', () => {
     finish(done);
   });
 
-
   it('should control whitespaces correctly', (t, done) => {
     equal(
       '{% if true -%}{{"hello"}} {{"world"}}{% endif %}',
       'hello world');
 
     equal(
-      '{% if true -%}{% if true %} {{"hello"}} {{"world"}}'
-      + '{% endif %}{% endif %}',
+      '{% if true -%}{% if true %} {{"hello"}} {{"world"}}' +
+      '{% endif %}{% endif %}',
       ' hello world');
 
     equal(
@@ -2132,7 +2124,7 @@ describe('compiler', () => {
       '{% endmacro %}' +
       '' +
       '{# calling macro2 #}' +
-      '{{macro2("this should be outputted") }}', {}, {}, function(err, res) {
+      '{{macro2("this should be outputted") }}', {}, {}, function (_, res) {
         assert.equal(res.trim(), 'this should be outputted');
       });
 
@@ -2150,7 +2142,7 @@ describe('compiler', () => {
       '{% endmacro %}' +
       '' +
       '{# calling macro2 #}' +
-      '{{macro2("this should not be outputted") }}', {}, {}, function(err, res) {
+      '{{macro2("this should not be outputted") }}', {}, {}, function (_, res) {
         assert.equal(res.trim(), 'foo');
       });
 
@@ -2168,7 +2160,7 @@ describe('compiler', () => {
       '{{ var }}' +
       '{% endcall %}' +
       '{% endmacro %}' +
-      '{{ outside("foobar") }}', {}, {}, function(err, res) {
+      '{{ outside("foobar") }}', {}, {}, function (_, res) {
         assert.equal(res.trim(), 'foobar\nfoobar');
       });
 
@@ -2187,24 +2179,23 @@ describe('compiler', () => {
       '{% endcall %}' +
       '{% endmacro %}' +
       '{{ outside() }}' +
-      '{{ var }}', {}, {}, function(err, res) {
+      '{{ var }}', {}, {}, function (_, res) {
         assert.equal(res.trim(), 'expected');
       });
 
     finish(done);
   });
 
-
   if (!isSlim) {
     it('should import template objects', (t, done) => {
-      var tmpl = new Template('{% macro foo() %}Inside a macro{% endmacro %}' +
+      const tmpl = new Template('{% macro foo() %}Inside a macro{% endmacro %}' +
         '{% set bar = "BAZ" %}');
 
       equal(
         '{% import tmpl as imp %}' +
         '{{ imp.foo() }} {{ imp.bar }}',
         {
-          tmpl: tmpl
+          tmpl
         },
         'Inside a macro BAZ');
 
@@ -2212,7 +2203,7 @@ describe('compiler', () => {
         '{% from tmpl import foo as baz, bar %}' +
         '{{ bar }} {{ baz() }}',
         {
-          tmpl: tmpl
+          tmpl
         },
         'BAZ Inside a macro');
 
@@ -2220,12 +2211,12 @@ describe('compiler', () => {
     });
 
     it('should inherit template objects', (t, done) => {
-      var tmpl = new Template('Foo{% block block1 %}Bar{% endblock %}' +
+      const tmpl = new Template('Foo{% block block1 %}Bar{% endblock %}' +
         '{% block block2 %}Baz{% endblock %}Whizzle');
 
       equal('hola {% extends tmpl %} fizzle mumble',
         {
-          tmpl: tmpl
+          tmpl
         },
         'FooBarBazWhizzle');
 
@@ -2234,7 +2225,7 @@ describe('compiler', () => {
         '{% block block1 %}BAR{% endblock %}' +
         '{% block block2 %}BAZ{% endblock %}',
         {
-          tmpl: tmpl
+          tmpl
         },
         'FooBARBAZWhizzle');
 
@@ -2242,12 +2233,12 @@ describe('compiler', () => {
     });
 
     it('should include template objects', (t, done) => {
-      var tmpl = new Template('FooInclude {{ name }}');
+      const tmpl = new Template('FooInclude {{ name }}');
 
       equal('hello world {% include tmpl %}',
         {
           name: 'thedude',
-          tmpl: tmpl
+          tmpl
         },
         'hello world FooInclude thedude');
 
@@ -2261,7 +2252,7 @@ describe('compiler', () => {
         {
           noThrow: true
         },
-        function(err, res) {
+        function (err, res) {
           assert.equal(res, undefined);
           assert.match(err.message, /unexpected token: }}/);
         }
@@ -2272,7 +2263,7 @@ describe('compiler', () => {
   }
 });
 
-describe('the filter tag', function() {
+describe('the filter tag', () => {
   it('should apply the title filter to the body', (t, done) => {
     equal('{% filter title %}may the force be with you{% endfilter %}',
       'May The Force Be With You');
