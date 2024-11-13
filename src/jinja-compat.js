@@ -177,10 +177,6 @@ function installCompat () {
     return results;
   }
 
-  function hasOwnProp (obj, key) {
-    return Object.prototype.hasOwnProperty.call(obj, key);
-  }
-
   const ARRAY_MEMBERS = {
     pop (index) {
       if (index === undefined) {
@@ -243,7 +239,7 @@ function installCompat () {
       return output;
     },
     has_key (key) {
-      return hasOwnProp(this, key);
+      return Object.hasOwn(this, key);
     },
     pop (key, def) {
       let output = this[key];
@@ -289,10 +285,10 @@ function installCompat () {
 
     // If the object is an object, return any of the methods that Python would
     // otherwise provide.
-    if (lib.isArray(obj) && hasOwnProp(ARRAY_MEMBERS, val)) {
+    if (lib.isArray(obj) && Object.hasOwn(ARRAY_MEMBERS, val)) {
       return ARRAY_MEMBERS[val].bind(obj);
     }
-    if (lib.isObject(obj) && hasOwnProp(OBJECT_MEMBERS, val)) {
+    if (lib.isObject(obj) && Object.hasOwn(OBJECT_MEMBERS, val)) {
       return OBJECT_MEMBERS[val].bind(obj);
     }
 
