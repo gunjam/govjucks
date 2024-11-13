@@ -30,7 +30,7 @@ function _isAST (node1, node2) {
 
       if (value instanceof nodes.Node) {
         _isAST(ofield, value);
-      } else if (lib.isArray(ofield) && lib.isArray(value)) {
+      } else if (Array.isArray(ofield) && Array.isArray(value)) {
         assert.equal('num-children: ' + ofield.length, 'num-children: ' + value.length);
 
         lib.each(ofield, function (v, i) {
@@ -77,7 +77,7 @@ function isAST (node1, ast) {
 // of "AST literal" that you can specify with arrays. This
 // transforms it into a real AST.
 function toNodes (ast) {
-  if (!(ast && lib.isArray(ast))) {
+  if (!(ast && Array.isArray(ast))) {
     return ast;
   }
 
@@ -95,7 +95,7 @@ function toNodes (ast) {
     return new Type(0, 0, lib.map(ast.slice(1), toNodes));
   } else if (dummy instanceof nodes.CallExtension) {
     return new Type(ast[1], ast[2], ast[3] ? toNodes(ast[3]) : ast[3],
-      lib.isArray(ast[4]) ? lib.map(ast[4], toNodes) : ast[4]);
+      Array.isArray(ast[4]) ? lib.map(ast[4], toNodes) : ast[4]);
   } else {
     return new Type(0, 0,
       toNodes(ast[1]),
