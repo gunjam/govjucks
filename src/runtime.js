@@ -331,7 +331,7 @@ function asyncAll (arr, dimen, func, cb) {
       }
     }
   } else {
-    const keys = lib.keys(arr || {});
+    const keys = Object.keys(arr || {});
     len = keys.length;
     outputArr = new Array(len);
 
@@ -367,7 +367,6 @@ module.exports = {
   contextOrFrameLookup,
   callWrap,
   handleError,
-  keys: lib.keys,
   SafeString,
   copySafeness,
   markSafe,

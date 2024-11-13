@@ -298,7 +298,7 @@ function asyncIter (arr, iter, cb) {
 module.exports.asyncIter = asyncIter;
 
 function asyncFor (obj, iter, cb) {
-  const keys = keys_(obj || {});
+  const keys = Object.keys(obj || {});
   const len = keys.length;
   let i = -1;
 
@@ -324,33 +324,9 @@ function indexOf (arr, searchElement, fromIndex) {
 
 module.exports.indexOf = indexOf;
 
-function keys_ (obj) {
-  const arr = [];
-  for (const k in obj) {
-    if (Object.hasOwn(obj, k)) {
-      arr.push(k);
-    }
-  }
-  return arr;
-}
-
-module.exports.keys = keys_;
-
-function _entries (obj) {
-  return keys_(obj).map((k) => [k, obj[k]]);
-}
-
-module.exports._entries = _entries;
-
-function _values (obj) {
-  return keys_(obj).map((k) => obj[k]);
-}
-
-module.exports._values = _values;
-
 function extend (obj1, obj2) {
   obj1 = obj1 || {};
-  keys_(obj2).forEach(k => {
+  Object.keys(obj2).forEach(k => {
     obj1[k] = obj2[k];
   });
   return obj1;
