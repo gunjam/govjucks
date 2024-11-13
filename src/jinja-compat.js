@@ -285,7 +285,7 @@ function installCompat () {
 
     // If the object is an object, return any of the methods that Python would
     // otherwise provide.
-    if (lib.isArray(obj) && Object.hasOwn(ARRAY_MEMBERS, val)) {
+    if (Array.isArray(obj) && Object.hasOwn(ARRAY_MEMBERS, val)) {
       return ARRAY_MEMBERS[val].bind(obj);
     }
     if (lib.isObject(obj) && Object.hasOwn(OBJECT_MEMBERS, val)) {

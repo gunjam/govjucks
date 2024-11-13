@@ -132,12 +132,6 @@ function isFunction (obj) {
 
 module.exports.isFunction = isFunction;
 
-function isArray (obj) {
-  return ObjProto.toString.call(obj) === '[object Array]';
-}
-
-module.exports.isArray = isArray;
-
 function isString (obj) {
   return ObjProto.toString.call(obj) === '[object String]';
 }
@@ -365,7 +359,7 @@ function extend (obj1, obj2) {
 module.exports._assign = module.exports.extend = extend;
 
 function inOperator (key, val) {
-  if (isArray(val) || isString(val)) {
+  if (Array.isArray(val) || isString(val)) {
     return val.indexOf(key) !== -1;
   } else if (isObject(val)) {
     return key in val;

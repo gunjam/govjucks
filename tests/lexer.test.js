@@ -19,7 +19,7 @@ function _hasTokens (ws, tokens, types) {
       }
     }
 
-    if (lib.isArray(type)) {
+    if (Array.isArray(type)) {
       assert.equal(tok.type, type[0]);
       assert.equal(tok.value, type[1]);
     } else if (lib.isObject(type)) {

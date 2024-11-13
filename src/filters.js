@@ -233,7 +233,7 @@ function list (val) {
     return val.split('');
   } else if (lib.isObject(val)) {
     return lib._entries(val || {}).map(([key, value]) => ({ key, value }));
-  } else if (lib.isArray(val)) {
+  } else if (Array.isArray(val)) {
     return val;
   } else {
     throw new lib.TemplateError('list filter: type not iterable');
@@ -556,7 +556,7 @@ function urlencode (obj) {
   if (lib.isString(obj)) {
     return enc(obj);
   } else {
-    const keyvals = (lib.isArray(obj)) ? obj : lib._entries(obj);
+    const keyvals = (Array.isArray(obj)) ? obj : lib._entries(obj);
     return keyvals.map(([k, v]) => `${enc(k)}=${enc(v)}`).join('&');
   }
 }

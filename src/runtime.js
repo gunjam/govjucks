@@ -264,7 +264,7 @@ function handleError (error, lineno, colno) {
 }
 
 function asyncEach (arr, dimen, iter, cb) {
-  if (lib.isArray(arr)) {
+  if (Array.isArray(arr)) {
     const len = arr.length;
 
     lib.asyncIter(arr, function iterCallback (item, i, next) {
@@ -304,7 +304,7 @@ function asyncAll (arr, dimen, func, cb) {
     }
   }
 
-  if (lib.isArray(arr)) {
+  if (Array.isArray(arr)) {
     len = arr.length;
     outputArr = new Array(len);
 
@@ -347,7 +347,7 @@ function asyncAll (arr, dimen, func, cb) {
 }
 
 function fromIterator (arr) {
-  if (typeof arr !== 'object' || arr === null || lib.isArray(arr)) {
+  if (typeof arr !== 'object' || arr === null || Array.isArray(arr)) {
     return arr;
   } else if (supportsIterators && Symbol.iterator in arr) {
     return arrayFrom(arr);
@@ -367,7 +367,6 @@ module.exports = {
   contextOrFrameLookup,
   callWrap,
   handleError,
-  isArray: lib.isArray,
   keys: lib.keys,
   SafeString,
   copySafeness,
