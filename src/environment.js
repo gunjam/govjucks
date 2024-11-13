@@ -91,8 +91,8 @@ class Environment extends EmitterObj {
     this.extensions = {};
     this.extensionsList = [];
 
-    lib._entries(filters).forEach(([name, filter]) => this.addFilter(name, filter));
-    lib._entries(tests).forEach(([name, test]) => this.addTest(name, test));
+    Object.entries(filters).forEach(([name, filter]) => this.addFilter(name, filter));
+    Object.entries(tests).forEach(([name, test]) => this.addTest(name, test));
   }
 
   _initLoaders () {
@@ -345,7 +345,7 @@ class Context extends Obj {
     this.blocks = {};
     this.exported = [];
 
-    lib.keys(blocks).forEach(name => {
+    Object.keys(blocks).forEach(name => {
       this.addBlock(name, blocks[name]);
     });
   }
@@ -573,7 +573,7 @@ class Template extends Obj {
   _getBlocks (props) {
     const blocks = {};
 
-    lib.keys(props).forEach((k) => {
+    Object.keys(props).forEach((k) => {
       if (k.slice(0, 2) === 'b_') {
         blocks[k.slice(2)] = props[k];
       }

@@ -219,7 +219,7 @@ function lengthFilter (val) {
     }
     if (lib.isObject(value) && !(value instanceof r.SafeString)) {
       // Objects (besides SafeStrings), non-primative Arrays
-      return lib.keys(value).length;
+      return Object.keys(value).length;
     }
     return value.length;
   }
@@ -232,7 +232,7 @@ function list (val) {
   if (lib.isString(val)) {
     return val.split('');
   } else if (lib.isObject(val)) {
-    return lib._entries(val || {}).map(([key, value]) => ({ key, value }));
+    return Object.entries(val || {}).map(([key, value]) => ({ key, value }));
   } else if (Array.isArray(val)) {
     return val;
   } else {
@@ -556,7 +556,7 @@ function urlencode (obj) {
   if (lib.isString(obj)) {
     return enc(obj);
   } else {
-    const keyvals = (Array.isArray(obj)) ? obj : lib._entries(obj);
+    const keyvals = (Array.isArray(obj)) ? obj : Object.entries(obj);
     return keyvals.map(([k, v]) => `${enc(k)}=${enc(v)}`).join('&');
   }
 }

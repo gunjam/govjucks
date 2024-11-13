@@ -223,13 +223,13 @@ function installCompat () {
   };
   const OBJECT_MEMBERS = {
     items () {
-      return lib._entries(this);
+      return Object.entries(this);
     },
     values () {
-      return lib._values(this);
+      return Object.values(this);
     },
     keys () {
-      return lib.keys(this);
+      return Object.keys(this);
     },
     get (key, def) {
       let output = this[key];
@@ -253,7 +253,7 @@ function installCompat () {
       return output;
     },
     popitem () {
-      const keys = lib.keys(this);
+      const keys = Object.keys(this);
       if (!keys.length) {
         throw new Error('KeyError');
       }

@@ -701,7 +701,7 @@ class Compiler extends Obj {
       frame.set(val.value, v);
 
       this._emitLine(`${i} = -1;`);
-      this._emitLine(`var ${len} = runtime.keys(${arr}).length;`);
+      this._emitLine(`var ${len} = Object.keys(${arr}).length;`);
       this._emitLine(`for(var ${k} in ${arr}) {`);
       this._emitLine(`${i}++;`);
       this._emitLine(`var ${v} = ${arr}[${k}];`);
