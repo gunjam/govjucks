@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('node:path');
 
 module.exports = function express (env, app) {
   function GovjucksView (name, opts) {

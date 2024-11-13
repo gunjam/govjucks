@@ -1,6 +1,6 @@
 'use strict';
 
-const path = require('path');
+const path = require('node:path');
 const { EmitterObj } = require('./object');
 
 module.exports = class Loader extends EmitterObj {
