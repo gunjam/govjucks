@@ -873,7 +873,7 @@ class Compiler extends Obj {
       'var callerFrame = frame;',
       'frame = ' + ((keepFrame) ? 'frame.push(true);' : 'new runtime.Frame();'),
       'kwargs = kwargs || {};',
-      'if (Object.prototype.hasOwnProperty.call(kwargs, "caller")) {',
+      'if (Object.hasOwn(kwargs, "caller")) {',
       'frame.set("caller", kwargs.caller); }');
 
     // Expose the arguments to the template. Don't need to use
@@ -889,7 +889,7 @@ class Compiler extends Obj {
       for (const pair of kwargs.children) {
         const name = pair.key.value;
         this._emit(`frame.set("${name}", `);
-        this._emit(`Object.prototype.hasOwnProperty.call(kwargs, "${name}")`);
+        this._emit(`Object.hasOwn(kwargs, "${name}")`);
         this._emit(` ? kwargs["${name}"] : `);
         this._compileExpression(pair.value, currFrame);
         this._emit(');');
@@ -987,7 +987,7 @@ class Compiler extends Obj {
         alias = name;
       }
 
-      this._emitLine(`if(Object.prototype.hasOwnProperty.call(${importedId}, "${name}")) {`);
+      this._emitLine(`if(Object.hasOwn(${importedId}, "${name}")) {`);
       this._emitLine(`var ${id} = ${importedId}.${name};`);
       this._emitLine('} else {');
       this._emitLine(`cb(new Error("cannot import '${name}'")); return;`);

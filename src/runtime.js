@@ -122,7 +122,7 @@ function makeKeywordArgs (obj) {
 }
 
 function isKeywordArgs (obj) {
-  return obj && Object.prototype.hasOwnProperty.call(obj, '__keywords');
+  return obj && Object.hasOwn(obj, '__keywords');
 }
 
 function getKeywordArgs (args) {
