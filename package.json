@@ -10,30 +10,19 @@
   },
   "type": "commonjs",
   "devDependencies": {
+    "c8": "^10.1.2",
     "connect": "^3.6.5",
     "core-js": "^2.5.3",
-    "cross-env": "^5.1.3",
     "eslint": "^4.13.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
-    "expect.js": "*",
     "express": "4.x",
     "fs-extra": "^5.0.0",
     "get-port": "^3.2.0",
     "mitata": "^1.0.10",
-    "mocha": "< 8.x",
-    "mocha-phantomjs-core": "^2.1.2",
-    "mocha-phantomjs-istanbul": "0.0.2",
     "module-alias": "^2.0.3",
-    "node-libs-browser": "^0.7.0",
     "nunjucks": "^3.2.4",
-    "nyc": "^11.4.1",
-    "phantomjs-prebuilt": "^2.1.16",
-    "serve-static": "^1.13.1",
-    "supertest": "*",
-    "uglify-js": "^2.8.29",
-    "uglifyjs-webpack-plugin": "^1.1.6",
-    "webpack": "^3.10.0"
+    "supertest": "*"
   },
   "peerDependencies": {
     "chokidar": "^3.3.0"
@@ -48,10 +37,10 @@
   },
   "scripts": {
     "codecov": "codecov",
-    "mocha": "mocha -R spec tests",
-    "lint": "eslint src scripts tests",
-    "test:runner": "cross-env NODE_ENV=test NODE_PATH=tests/test-node-pkgs scripts/testrunner.js",
-    "test": "npm run lint && npm run test:runner"
+    "lint": "eslint src tests",
+    "test:unit": "NODE_PATH=tests/test-node-pkgs node --test",
+    "test:coverage": "c8 npm run test:unit",
+    "test": "npm run lint && npm run test:coverage"
   },
   "bin": {
     "govjucks-precompile": "./bin/precompile"

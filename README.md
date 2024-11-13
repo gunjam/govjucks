@@ -29,8 +29,6 @@ See [here](https://mozilla.github.io/govjucks/).
 
 Run the tests with `npm test`.
 
-Watch `master` branch's [tests running in the browser](https://mozilla.github.io/govjucks/files/tests/browser/).
-
 ## Mailing List
 
 Join our mailing list and get help with and issues you have:
