@@ -2,9 +2,6 @@
 
 const lib = require('./lib');
 const arrayFrom = Array.from;
-const supportsIterators = (
-  typeof Symbol === 'function' && Symbol.iterator && typeof arrayFrom === 'function'
-);
 
 // Frames keep track of scoping both at compile-time and run-time so
 // we know how to access variables. Block tags can introduce special
@@ -350,7 +347,7 @@ function asyncAll (arr, dimen, func, cb) {
 function fromIterator (arr) {
   if (typeof arr !== 'object' || arr === null || Array.isArray(arr)) {
     return arr;
-  } else if (supportsIterators && Symbol.iterator in arr) {
+  } else if (Symbol.iterator in arr) {
     return arrayFrom(arr);
   } else {
     return arr;
