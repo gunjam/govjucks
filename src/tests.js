@@ -261,22 +261,16 @@ function iterable (value) {
 exports.iterable = iterable;
 
 /**
- * If ES6 features are available, returns `true` if the value is an object hash
- * or an ES6 Map. Otherwise just return if it's an object hash.
+ * Returns `true` if the value is an object hash or an Map.
  * @param { any } value
  * @returns { boolean }
  */
 function mapping (value) {
   // only maps and object hashes
-  const bool = value !== null &&
-    value !== undefined &&
+  return value !== null &&
     typeof value === 'object' &&
-    !Array.isArray(value);
-  if (Set) {
-    return bool && !(value instanceof Set);
-  } else {
-    return bool;
-  }
+    !Array.isArray(value) &&
+    !(value instanceof Set);
 }
 
 exports.mapping = mapping;
