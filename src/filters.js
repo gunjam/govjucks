@@ -206,23 +206,20 @@ function last (arr) {
 module.exports.last = last;
 
 function lengthFilter (val) {
-  const value = normalize(val, '');
+  const value = normalize(val, undefined);
 
-  if (value !== undefined) {
-    if (
-      (typeof Map === 'function' && value instanceof Map) ||
-      (typeof Set === 'function' && value instanceof Set)
-    ) {
+  if (value === undefined) {
+    return 0;
+  }
+  if (value instanceof Map || value instanceof Set) {
       // ECMAScript 2015 Maps and Sets
       return value.size;
     }
-    if (lib.isObject(value) && !(value instanceof r.SafeString)) {
+  if (lib.isObject(value) && value instanceof r.SafeString === false) {
       // Objects (besides SafeStrings), non-primative Arrays
       return Object.keys(value).length;
     }
     return value.length;
-  }
-  return 0;
 }
 
 module.exports.length = lengthFilter;
