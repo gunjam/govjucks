@@ -393,19 +393,22 @@ function replace (str, old, new_, maxCount) {
 module.exports.replace = replace;
 
 function reverse (val) {
-  let arr;
-  if (lib.isString(val)) {
-    arr = list(val);
-  } else {
-    // Copy it
-    arr = lib.map(val, v => v);
-  }
-
-  arr.reverse();
+  const length = val.length;
 
   if (lib.isString(val)) {
-    return r.copySafeness(val, arr.join(''));
+    let str = '';
+    for (let i = length; i !== -1; --i) {
+      str += val.charAt(i);
+    }
+    return r.copySafeness(val, str);
   }
+
+  // Copy it
+  const arr = new Array(length);
+  for (let i = 0; i !== length; ++i) {
+    arr[i] = val[length - 1 - i];
+  }
+
   return arr;
 }
 
