@@ -320,16 +320,11 @@ function selectattr (arr, attr) {
 module.exports.selectattr = selectattr;
 
 function replace (str, old, new_, maxCount) {
-  const originalStr = str;
-
   if (old instanceof RegExp) {
     return str.replace(old, new_);
   }
 
-  if (typeof maxCount === 'undefined') {
-    maxCount = -1;
-  }
-
+  const originalStr = str;
   let res = ''; // Output
 
   // Cast Numbers in the search term to string
@@ -347,7 +342,7 @@ function replace (str, old, new_, maxCount) {
   }
 
   // If by now, we don't have a string, throw it back
-  if (typeof str !== 'string' && !(str instanceof r.SafeString)) {
+  if (typeof str !== 'string' && str instanceof r.SafeString === false) {
     return str;
   }
 
@@ -355,10 +350,15 @@ function replace (str, old, new_, maxCount) {
   if (old === '') {
     // Mimic the python behaviour: empty string is replaced
     // by replacement e.g. "abc"|replace("", ".") -> .a.b.c.
-    res = new_ + str.split('').join(new_) + new_;
+    for (let i = 0; i !== str.length; ++i) {
+      res += `${new_}${str.charAt(i)}`;
+    }
+    res += new_;
+
     return r.copySafeness(str, res);
   }
 
+  maxCount = maxCount || Infinity;
   let nextIndex = str.indexOf(old);
   // if # of replacements to perform is 0, or the string to does
   // not contain the old value, return the string
@@ -368,14 +368,14 @@ function replace (str, old, new_, maxCount) {
 
   let pos = 0;
   let count = 0; // # of replacements made
+  const oldLength = old.length;
 
-  /* eslint-disable-next-line no-unmodified-loop-condition */
-  while (nextIndex > -1 && (maxCount === -1 || count < maxCount)) {
+  while (nextIndex !== -1 && count !== maxCount) {
     // Grab the next chunk of src string and add it with the
     // replacement, to the result
-    res += str.substring(pos, nextIndex) + new_;
+    res += str.slice(pos, nextIndex) + new_;
     // Increment our pointer in the src string
-    pos = nextIndex + old.length;
+    pos = nextIndex + oldLength;
     count++;
     // See if there are any more replacements to be made
     nextIndex = str.indexOf(old, pos);
@@ -384,7 +384,7 @@ function replace (str, old, new_, maxCount) {
   // We've either reached the end, or done the max # of
   // replacements, tack on any remaining string
   if (pos < str.length) {
-    res += str.substring(pos);
+    res += str.slice(pos);
   }
 
   return r.copySafeness(originalStr, res);
