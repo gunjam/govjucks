@@ -190,11 +190,11 @@ module.exports.indent = indent;
 function join (arr, del, attr) {
   del = del || '';
 
-  if (attr) {
-    arr = lib.map(arr, (v) => v[attr]);
+  let str = attr ? arr[0][attr] : arr[0];
+  for (let i = 1, len = arr.length; i !== len; ++i) {
+    str += `${del}${attr ? arr[i][attr] : arr[i]}`;
   }
-
-  return arr.join(del);
+  return str;
 }
 
 module.exports.join = join;
