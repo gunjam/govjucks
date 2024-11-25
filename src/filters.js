@@ -253,11 +253,12 @@ function lower (str) {
 
 module.exports.lower = lower;
 
+const newLines = /\r\n|\n/g;
 function nl2br (str) {
   if (str === null || str === undefined) {
     return '';
   }
-  return r.copySafeness(str, str.replace(/\r\n|\n/g, '<br />\n'));
+  return r.copySafeness(str, str.replace(newLines, '<br>\n'));
 }
 
 module.exports.nl2br = nl2br;

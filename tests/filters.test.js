@@ -576,14 +576,14 @@ describe('filter', () => {
     equal('{{ nothing | nl2br }}', '');
     equal('{{ str | nl2br }}', {
       str: r.markSafe('foo\r\nbar')
-    }, 'foo<br />\nbar');
+    }, 'foo<br>\nbar');
     equal('{{ str | nl2br }}', {
       str: r.markSafe('foo\nbar')
-    }, 'foo<br />\nbar');
+    }, 'foo<br>\nbar');
     equal('{{ str | nl2br }}', {
       str: r.markSafe('foo\n\nbar')
-    }, 'foo<br />\n<br />\nbar');
-    equal('{{ "foo\nbar" | nl2br }}', 'foo&lt;br /&gt;\nbar');
+    }, 'foo<br>\n<br>\nbar');
+    equal('{{ "foo\nbar" | nl2br }}', 'foo&lt;br&gt;\nbar');
     finish(done);
   });
 
