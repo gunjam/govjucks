@@ -78,7 +78,7 @@ function default_ (val, def, bool) {
 }
 
 // TODO: it is confusing to export something called 'default'
-exports['default'] = default_;
+module.exports['default'] = default_;
 
 function dictsort (val, caseSensitive, by) {
   if (!lib.isObject(val)) {
