@@ -12,10 +12,6 @@ function normalize (value, defaultValue) {
 
 module.exports.abs = Math.abs;
 
-function isNaN (num) {
-  return num !== num; // eslint-disable-line no-self-compare
-}
-
 function batch (arr, linecount, fillWith) {
   const length = arr.length;
   const groups = Math.ceil(length / linecount);
@@ -703,7 +699,7 @@ module.exports.wordcount = wordcount;
 
 function float (val, def) {
   const res = parseFloat(val);
-  return (isNaN(res)) ? def : res;
+  return (Number.isNaN(res)) ? def : res;
 }
 
 module.exports.float = float;
@@ -712,8 +708,8 @@ const intFilter = r.makeMacro(
   ['value', 'default', 'base'],
   [],
   function doInt (value, defaultValue, base = 10) {
-    const res = parseInt(value, base);
-    return (isNaN(res)) ? defaultValue : res;
+    const res = Number.parseInt(value, base);
+    return (Number.isNaN(res)) ? defaultValue : res;
   }
 );
 
