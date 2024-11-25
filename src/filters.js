@@ -550,8 +550,18 @@ module.exports.striptags = striptags;
 
 function title (str) {
   str = normalize(str, '');
-  const words = str.split(' ').map(word => capitalize(word));
-  return r.copySafeness(str, words.join(' '));
+  const words = str.split(' ');
+  const length = words.length;
+
+  let res = '';
+  if (length !== 0) {
+    res += capitalize(words[0]);
+    for (let i = 1; i < length; i++) {
+      res += ` ${capitalize(words[i])}`;
+    }
+  }
+
+  return r.copySafeness(str, res);
 }
 
 module.exports.title = title;
