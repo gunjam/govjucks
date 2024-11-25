@@ -276,13 +276,28 @@ module.exports.random = random;
  * @returns {function(array, string, *): array}
  */
 function getSelectOrReject (expectedTestResult) {
-  function filter (arr, testName = 'truthy', secondArg) {
-    const context = this;
-    const test = context.env.getTest(testName);
+  function filter (arr, testName, secondArg) {
+    let _arr;
 
-    return lib.toArray(arr).filter(function examineTestResult (item) {
-      return test.call(context, item, secondArg) === expectedTestResult;
-    });
+    if (Array.isArray(arr)) {
+      _arr = arr;
+    } else if (typeof arr === 'string' || arr instanceof r.SafeString) {
+      _arr = arr.split('');
+    } else {
+      return [];
+    }
+
+    testName = testName || 'truthy';
+    const filtered = [];
+
+    for (let i = 0, len = _arr.length; i !== len; ++i) {
+      const item = _arr[i];
+      if (this.env.getTest(testName).call(this, item, secondArg) === expectedTestResult) {
+        filtered.push(item);
+      }
+    }
+
+    return filtered;
   }
 
   return filter;
