@@ -522,19 +522,26 @@ function string (obj) {
 
 module.exports.string = string;
 
+const tags = /<\/?[a-z][a-z0-9]*\b[^>]*>|<!--[\s\S]*?-->/gi;
+const nlSpaces = /^ +| +$/gm;
+const adjSpaces = / +/g;
+const lineBreaks = /\r\n/g;
+const abnormalBr = /\n\n\n+/g;
+const spaces = /\s+/gi;
+
 function striptags (input, preserveLinebreaks) {
   input = normalize(input, '');
-  const tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>|<!--[\s\S]*?-->/gi;
+  preserveLinebreaks = preserveLinebreaks || false;
   const trimmedInput = trim(input.replace(tags, ''));
   let res = '';
   if (preserveLinebreaks) {
     res = trimmedInput
-      .replace(/^ +| +$/gm, '') // remove leading and trailing spaces
-      .replace(/ +/g, ' ') // squash adjacent spaces
-      .replace(/(\r\n)/g, '\n') // normalize linebreaks (CRLF -> LF)
-      .replace(/\n\n\n+/g, '\n\n'); // squash abnormal adjacent linebreaks
+      .replace(nlSpaces, '') // remove leading and trailing spaces
+      .replace(adjSpaces, ' ') // squash adjacent spaces
+      .replace(lineBreaks, '\n') // normalize linebreaks (CRLF -> LF)
+      .replace(abnormalBr, '\n\n'); // squash abnormal adjacent linebreaks
   } else {
-    res = trimmedInput.replace(/\s+/gi, ' ');
+    res = trimmedInput.replace(spaces, ' ');
   }
   return r.copySafeness(input, res);
 }
