@@ -633,47 +633,62 @@ const emailRe = /^[\w.!#$%&'*+\-/=?^`{|}~]+@[a-z\d-]+(\.[a-z\d-]+)+$/i;
 const httpHttpsRe = /^https?:\/\/.*$/;
 const wwwRe = /^www\./;
 const tldRe = /\.(?:org|net|com)(?::|\/|$)/;
+const spaceRe = /^\s+$/;
+const splitRe = /(\s+)/;
 
 function urlize (str, length, nofollow) {
-  if (isNaN(length)) {
-    length = Infinity;
+  if (Number.isNaN(length)) {
+    length = Number.Infinity;
   }
 
   const noFollowAttr = (nofollow === true ? ' rel="nofollow"' : '');
+  const words = str.split(splitRe);
+  let urlized = '';
 
-  const words = str.split(/(\s+)/).filter((word) => {
+  for (let i = 0, len = words.length; i < len; i++) {
+    const word = words[i];
+
     // If the word has no length, bail. This can happen for str with
     // trailing whitespace.
-    return word && word.length;
-  }).map((word) => {
-    const matches = word.match(puncRe);
-    const possibleUrl = (matches) ? matches[1] : word;
-    const shortUrl = possibleUrl.substr(0, length);
+    if (word && word.length) {
+      if (spaceRe.test(word)) {
+        urlized += word;
+        continue;
+      }
 
-    // url that starts with http or https
-    if (httpHttpsRe.test(possibleUrl)) {
-      return `<a href="${possibleUrl}"${noFollowAttr}>${shortUrl}</a>`;
+      const matches = word.match(puncRe);
+      const possibleUrl = matches ? matches[1] : word;
+      const shortUrl = possibleUrl.substring(0, length);
+
+      // url that starts with http or https
+      if (httpHttpsRe.test(possibleUrl)) {
+        urlized += `<a href="${possibleUrl}"${noFollowAttr}>${shortUrl}</a>`;
+        continue;
+      }
+
+      // url that starts with www.
+      if (wwwRe.test(possibleUrl)) {
+        urlized += `<a href="http://${possibleUrl}"${noFollowAttr}>${shortUrl}</a>`;
+        continue;
+      }
+
+      // an email address of the form username@domain.tld
+      if (emailRe.test(possibleUrl)) {
+        urlized += `<a href="mailto:${possibleUrl}">${possibleUrl}</a>`;
+        continue;
+      }
+
+      // url that ends in .com, .org or .net that is not an email address
+      if (tldRe.test(possibleUrl)) {
+        urlized += `<a href="http://${possibleUrl}"${noFollowAttr}>${shortUrl}</a>`;
+        continue;
+      }
+
+      urlized += word;
     }
+  }
 
-    // url that starts with www.
-    if (wwwRe.test(possibleUrl)) {
-      return `<a href="http://${possibleUrl}"${noFollowAttr}>${shortUrl}</a>`;
-    }
-
-    // an email address of the form username@domain.tld
-    if (emailRe.test(possibleUrl)) {
-      return `<a href="mailto:${possibleUrl}">${possibleUrl}</a>`;
-    }
-
-    // url that ends in .com, .org or .net that is not an email address
-    if (tldRe.test(possibleUrl)) {
-      return `<a href="http://${possibleUrl}"${noFollowAttr}>${shortUrl}</a>`;
-    }
-
-    return word;
-  });
-
-  return words.join('');
+  return urlized;
 }
 
 module.exports.urlize = urlize;
