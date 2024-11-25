@@ -171,13 +171,16 @@ function indent (str, width, indentfirst) {
   }
 
   width = width || 4;
-  // let res = '';
+  indentfirst = indentfirst || false;
+
   const lines = str.split('\n');
   const sp = lib.repeat(' ', width);
+  let res = '';
 
-  const res = lines.map((l, i) => {
-    return (i === 0 && !indentfirst) ? l : `${sp}${l}`;
-  }).join('\n');
+  res += indentfirst ? `${sp}${lines[0]}` : lines[0];
+  for (let i = 1, len = lines.length; i !== len; ++i) {
+    res += `\n${sp}${lines[i]}`;
+  }
 
   return r.copySafeness(str, res);
 }
