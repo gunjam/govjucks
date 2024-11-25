@@ -567,7 +567,7 @@ function title (str) {
 module.exports.title = title;
 
 function trim (str) {
-  return r.copySafeness(str, str.replace(/^\s*|\s*$/g, ''));
+  return r.copySafeness(str, str.trim());
 }
 
 module.exports.trim = trim;
