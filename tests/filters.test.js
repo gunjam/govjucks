@@ -23,6 +23,36 @@ describe('filter', () => {
         '{% endfor %}'].join(''),
       '-12--34--56-');
 
+    // batch under count
+    equal(
+      [
+        '{% for a in [1,2,3,4,5,6]|batch(7) %}',
+        '-{% for b in a %}',
+        '{{ b }}',
+        '{% endfor %}-',
+        '{% endfor %}'].join(''),
+      '-123456-');
+
+    // batch with remainder
+    equal(
+      [
+        '{% for a in [1,2,3,4,5,6]|batch(4) %}',
+        '-{% for b in a %}',
+        '{{ b }}',
+        '{% endfor %}-',
+        '{% endfor %}'].join(''),
+      '-1234--56-');
+
+    // batch with remainder filled
+    equal(
+      [
+        '{% for a in [1,2,3,4,5,6]|batch(4, 0) %}',
+        '-{% for b in a %}',
+        '{{ b }}',
+        '{% endfor %}-',
+        '{% endfor %}'].join(''),
+      '-1234--5600-');
+
     finish(done);
   });
 
