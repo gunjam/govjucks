@@ -227,13 +227,21 @@ module.exports.length = lengthFilter;
 function list (val) {
   if (lib.isString(val)) {
     return val.split('');
-  } else if (lib.isObject(val)) {
-    return Object.entries(val || {}).map(([key, value]) => ({ key, value }));
-  } else if (Array.isArray(val)) {
-    return val;
-  } else {
-    throw new lib.TemplateError('list filter: type not iterable');
   }
+  if (lib.isObject(val)) {
+    const keys = Object.keys(val);
+    const len = keys.length;
+    const arr = new Array(len);
+    for (let i = 0; i !== len; ++i) {
+      const key = keys[i];
+      arr[i] = { key, value: val[key] };
+    }
+    return arr;
+  }
+  if (Array.isArray(val)) {
+    return val;
+  }
+  throw new lib.TemplateError('list filter: type not iterable');
 }
 
 module.exports.list = list;
