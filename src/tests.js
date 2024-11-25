@@ -158,7 +158,7 @@ function lower (value) {
 exports.lower = lower;
 
 /**
- * Returns `true` if the operand (one) is less than or equal to the test's
+ * Returns `true` if the operand (one) is not equal to the test's
  * argument (two).
  * @param { number } one
  * @param { number } two
