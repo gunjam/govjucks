@@ -33,9 +33,9 @@ function batch (arr, linecount, fillWith) {
 
   if (fillWith !== undefined) {
     for (let i = tmp.length; i < linecount; i++) {
-        tmp.push(fillWith);
-      }
+      tmp.push(fillWith);
     }
+  }
 
   res[groups - 1] = tmp;
 
