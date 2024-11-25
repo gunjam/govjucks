@@ -609,10 +609,18 @@ function urlencode (obj) {
   const enc = encodeURIComponent;
   if (lib.isString(obj)) {
     return enc(obj);
-  } else {
-    const keyvals = (Array.isArray(obj)) ? obj : Object.entries(obj);
-    return keyvals.map(([k, v]) => `${enc(k)}=${enc(v)}`).join('&');
   }
+  if (Array.isArray(obj)) {
+    return new URLSearchParams(obj).toString();
+  }
+  const keys = Object.keys(obj);
+  const first = keys[0];
+  let str = `${enc(first)}=${enc(obj[first])}`;
+  for (let i = 1, len = keys.length; i < len; i++) {
+    const key = keys[i];
+    str += `&${enc(key)}=${enc(obj[key])}`;
+  }
+  return str;
 }
 
 module.exports.urlencode = urlencode;
