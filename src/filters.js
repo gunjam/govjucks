@@ -475,33 +475,42 @@ module.exports.sum = sum;
 module.exports.sort = r.makeMacro(
   ['value', 'reverse', 'case_sensitive', 'attribute'], [],
   function sortFilter (arr, reversed, caseSens, attr) {
+    const reverse = reversed ? -1 : 1;
+    caseSens = caseSens || false;
+    attr = attr || false;
+
     // Copy it
-    const array = lib.map(arr, v => v);
-    const getAttribute = lib.getAttrGetter(attr);
+    const array = arr.slice(0);
+    const getAttribute = attr && lib.getAttrGetter(attr);
 
     array.sort((a, b) => {
-      let x = (attr) ? getAttribute(a) : a;
-      let y = (attr) ? getAttribute(b) : b;
+      let x = a;
+      let y = b;
 
-      if (
-        this.env.opts.throwOnUndefined &&
-        attr && (x === undefined || y === undefined)
-      ) {
-        throw new TypeError(`sort: attribute "${attr}" resolved to undefined`);
+      if (attr) {
+        x = getAttribute(a);
+        y = getAttribute(b);
+
+        if (
+          this.env.opts.throwOnUndefined &&
+          (x === undefined || y === undefined)
+        ) {
+          throw new TypeError(`sort: attribute "${attr}" resolved to undefined`);
+        }
       }
 
-      if (!caseSens && lib.isString(x) && lib.isString(y)) {
+      if (caseSens === false && lib.isString(x) && lib.isString(y)) {
         x = x.toLowerCase();
         y = y.toLowerCase();
       }
 
       if (x < y) {
-        return reversed ? 1 : -1;
-      } else if (x > y) {
-        return reversed ? -1 : 1;
-      } else {
-        return 0;
+        return -1 * reverse;
       }
+      if (x > y) {
+        return 1 * reverse;
+      }
+      return 0;
     });
 
     return array;
