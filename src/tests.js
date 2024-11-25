@@ -249,21 +249,13 @@ function upper (value) {
 exports.upper = upper;
 
 /**
- * If ES6 features are available, returns `true` if the value implements the
- * `Symbol.iterator` method. If not, it's a string or Array.
- *
- * Could potentially cause issues if a browser exists that has Set and Map but
- * not Symbol.
+ * Returns `true` if the value implements the `Symbol.iterator` method.
  *
  * @param { any } value
  * @returns { boolean }
  */
 function iterable (value) {
-  if (typeof Symbol !== 'undefined') {
-    return !!value[Symbol.iterator];
-  } else {
-    return Array.isArray(value) || typeof value === 'string';
-  }
+  return value[Symbol.iterator] !== undefined;
 }
 
 exports.iterable = iterable;
