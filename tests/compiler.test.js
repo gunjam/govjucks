@@ -1826,7 +1826,7 @@ describe('compiler', () => {
   it('should autoescape by default', (t, done) => {
     equal('{{ foo }}', {
       foo: '"\'<>&'
-    }, '&quot;&#39;&lt;&gt;&amp;');
+    }, '&#34;&#39;&lt;&gt;&#38;');
     finish(done);
   });
 
@@ -1835,12 +1835,12 @@ describe('compiler', () => {
       '{{ foo }}',
       { foo: '"\'<>&' },
       { autoescape: true },
-      '&quot;&#39;&lt;&gt;&amp;');
+      '&#34;&#39;&lt;&gt;&#38;');
 
     equal('{{ foo|reverse }}',
       { foo: '"\'<>&' },
       { autoescape: true },
-      '&amp;&gt;&lt;&#39;&quot;');
+      '&#38;&gt;&lt;&#39;&#34;');
 
     equal(
       '{{ foo|reverse|safe }}',
@@ -1911,7 +1911,7 @@ describe('compiler', () => {
         autoescape: true
       },
       function (_, res) {
-        assert.equal(res, '&lt;&gt;&amp; and &lt;&gt;');
+        assert.equal(res, '&lt;&gt;&#38; and &lt;&gt;');
       }
     );
 

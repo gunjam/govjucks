@@ -78,13 +78,13 @@ describe('filter', () => {
 
   it('dump', () => {
     equal('{{ [\'a\', 1, {b: true}] | dump  }}',
-      '[&quot;a&quot;,1,{&quot;b&quot;:true}]');
+      '[&#34;a&#34;,1,{&#34;b&#34;:true}]');
     equal('{{ [\'a\', 1, {b: true}] | dump(2) }}',
-      '[\n  &quot;a&quot;,\n  1,\n  {\n    &quot;b&quot;: true\n  }\n]');
+      '[\n  &#34;a&#34;,\n  1,\n  {\n    &#34;b&#34;: true\n  }\n]');
     equal('{{ [\'a\', 1, {b: true}] | dump(4) }}',
-      '[\n    &quot;a&quot;,\n    1,\n    {\n        &quot;b&quot;: true\n    }\n]');
+      '[\n    &#34;a&#34;,\n    1,\n    {\n        &#34;b&#34;: true\n    }\n]');
     equal('{{ [\'a\', 1, {b: true}] | dump(\'\t\') }}',
-      '[\n\t&quot;a&quot;,\n\t1,\n\t{\n\t\t&quot;b&quot;: true\n\t}\n]');
+      '[\n\t&#34;a&#34;,\n\t1,\n\t{\n\t\t&#34;b&#34;: true\n\t}\n]');
   });
 
   it('escape', () => {
