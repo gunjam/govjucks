@@ -212,14 +212,14 @@ function lengthFilter (val) {
     return 0;
   }
   if (value instanceof Map || value instanceof Set) {
-      // ECMAScript 2015 Maps and Sets
-      return value.size;
-    }
+    // ECMAScript 2015 Maps and Sets
+    return value.size;
+  }
   if (lib.isObject(value) && value instanceof r.SafeString === false) {
-      // Objects (besides SafeStrings), non-primative Arrays
-      return Object.keys(value).length;
-    }
-    return value.length;
+    // Objects (besides SafeStrings), non-primative Arrays
+    return Object.keys(value).length;
+  }
+  return value.length;
 }
 
 module.exports.length = lengthFilter;
