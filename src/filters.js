@@ -138,8 +138,8 @@ function safe (str) {
   if (str instanceof r.SafeString) {
     return str;
   }
-  str = (str === null || str === undefined) ? '' : str;
-  return r.markSafe(str.toString());
+  str = (str === null || str === undefined) ? '' : str.toString();
+  return r.markSafe(str);
 }
 
 module.exports.safe = safe;
@@ -151,8 +151,8 @@ function first (arr) {
 module.exports.first = first;
 
 function forceescape (str) {
-  str = (str === null || str === undefined) ? '' : str;
-  return r.markSafe(lib.escape(str.toString()));
+  str = (str === null || str === undefined) ? '' : str.toString();
+  return r.markSafe(lib.escape(str));
 }
 
 module.exports.forceescape = forceescape;
