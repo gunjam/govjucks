@@ -3,20 +3,55 @@
 const ArrayProto = Array.prototype;
 const ObjProto = Object.prototype;
 
-const escapeMap = {
-  '&': '&amp;',
-  '"': '&quot;',
-  '\'': '&#39;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '\\': '&#92;',
+const escapeRegExp = /["&'<>\\]/g;
+
+const escapeFunction = (string) => {
+  let escaped = '';
+  let start = 0;
+
+  while (escapeRegExp.test(string)) {
+    const i = escapeRegExp.lastIndex - 1;
+
+    switch (string.charCodeAt(i)) {
+      // "
+      case 34: {
+        escaped += string.slice(start, i) + '&#34;';
+        break;
+      }
+      // &
+      case 38: {
+        escaped += string.slice(start, i) + '&#38;';
+        break;
+      }
+      // '
+      case 39: {
+        escaped += string.slice(start, i) + '&#39;';
+        break;
+      }
+      // <
+      case 60: {
+        escaped += string.slice(start, i) + '&lt;';
+        break;
+      }
+      // >
+      case 62: {
+        escaped += string.slice(start, i) + '&gt;';
+        break;
+      }
+      // \\
+      case 92: {
+        escaped += string.slice(start, i) + '&#92;';
+        break;
+      }
+    }
+
+    start = escapeRegExp.lastIndex;
+  }
+
+  return escaped + string.slice(start);
 };
 
-const escapeRegex = /[&"'<>\\]/g;
-
-function lookupEscape (ch) {
-  return escapeMap[ch];
-}
+module.exports.escape = escapeFunction;
 
 function _prettifyError (path, withInternals, err) {
   if (!err.Update) {
@@ -119,12 +154,6 @@ function TemplateError (message, lineno, colno) {
 
 Object.setPrototypeOf(TemplateError.prototype, Error.prototype);
 module.exports.TemplateError = TemplateError;
-
-function escape (val) {
-  return val.replace(escapeRegex, lookupEscape);
-}
-
-module.exports.escape = escape;
 
 function isFunction (obj) {
   return ObjProto.toString.call(obj) === '[object Function]';
