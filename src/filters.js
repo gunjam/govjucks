@@ -61,8 +61,9 @@ function center (str, width) {
   }
 
   const spaces = width - str.length;
-  const pre = lib.repeat(' ', (spaces / 2) - (spaces % 2));
-  const post = lib.repeat(' ', spaces / 2);
+  const padWith = Math.ceil(spaces / 2);
+  const pre = ''.padEnd(padWith - (spaces % 2), ' ');
+  const post = pre.padEnd(padWith, ' ');
   return r.copySafeness(str, pre + str + post);
 }
 
