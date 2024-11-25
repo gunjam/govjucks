@@ -17,28 +17,27 @@ function isNaN (num) {
 }
 
 function batch (arr, linecount, fillWith) {
-  let i;
-  const res = [];
+  const length = arr.length;
+  const groups = Math.ceil(length / linecount);
+  const res = new Array(groups);
   let tmp = [];
 
-  for (i = 0; i < arr.length; i++) {
-    if (i % linecount === 0 && tmp.length) {
-      res.push(tmp);
+  for (let i = 0, p = 0; i < length; i++) {
+    if (i % linecount === 0 && i !== 0) {
+      res[p++] = tmp;
       tmp = [];
     }
 
     tmp.push(arr[i]);
   }
 
-  if (tmp.length) {
-    if (fillWith) {
-      for (i = tmp.length; i < linecount; i++) {
+  if (fillWith !== undefined) {
+    for (let i = tmp.length; i < linecount; i++) {
         tmp.push(fillWith);
       }
     }
 
-    res.push(tmp);
-  }
+  res[groups - 1] = tmp;
 
   return res;
 }
