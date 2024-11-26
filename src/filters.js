@@ -469,7 +469,7 @@ function sum (arr, attr, start) {
 module.exports.sum = sum;
 
 module.exports.sort = r.makeMacro(
-  ['value', 'reverse', 'case_sensitive', 'attribute'], [],
+  ['value', 'reverse', 'case_sensitive', 'attribute'],
   function sortFilter (arr, reversed, caseSens, attr) {
     const reverse = reversed ? -1 : 1;
     caseSens = caseSens || false;
@@ -706,7 +706,6 @@ module.exports.float = float;
 
 const intFilter = r.makeMacro(
   ['value', 'default', 'base'],
-  [],
   function doInt (value, defaultValue, base = 10) {
     const res = Number.parseInt(value, base);
     return (Number.isNaN(res)) ? defaultValue : res;

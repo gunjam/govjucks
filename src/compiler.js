@@ -832,28 +832,28 @@ class Compiler extends Obj {
   }
 
   _compileMacro (node, frame) {
-    const args = [];
-    let kwargs = null;
     const funcId = 'macro_' + this._tmpid();
     const keepFrame = (frame !== undefined);
+    const args = [];
+    const argsMap = {};
+    const argsDefaults = { caller: false };
 
-    // Type check the definition of the args
-    for (let i = 0, len = node.args.children.length; i < len; i++) {
-      const arg = node.args.children[i];
-
-      if (i === node.args.children.length - 1 && arg instanceof nodes.Dict) {
-        kwargs = arg;
+    for (const arg of node.args.children) {
+      if (arg instanceof nodes.Dict) {
+        for (const { key, value } of arg.children) {
+          argsMap[`${key.lineno}${key.colno}}`] = key.value;
+          argsDefaults[key.value] = value.value;
+        }
       } else {
-        this.assertType(arg, nodes.Symbol);
-        args.push(arg);
+        argsMap[`${arg.lineno}${arg.colno}}`] = arg.value;
       }
     }
+    for (const key of Object.keys(argsMap).sort()) {
+      args.push(argsMap[key]);
+    }
+    args.push('caller');
 
-    const realNames = [...args.map((n) => `l_${n.value}`), 'kwargs'];
-
-    // Quoted argument names
-    const argNames = args.map((n) => `"${n.value}"`);
-    const kwargNames = ((kwargs && kwargs.children) || []).map((n) => `"${n.key.value}"`);
+    const funcArgs = args.map((a) => `l_${a}`);
 
     // We pass a function to makeMacro which destructures the
     // arguments so support setting positional args with keywords
@@ -866,34 +866,28 @@ class Compiler extends Obj {
       currFrame = new Frame();
     }
     this._emitLines(
-      `var ${funcId} = runtime.makeMacro(`,
-      `[${argNames.join(', ')}], `,
-      `[${kwargNames.join(', ')}], `,
-      `function (${realNames.join(', ')}) {`,
+      `const ${funcId} = runtime.makeMacro(`,
+      `[${`'${args.join("', '")}'`}], `,
+      `function (${funcArgs.join(', ')}) {`
+    );
+
+    for (const key of Object.keys(argsDefaults)) {
+      this._emitLine(`l_${key} = l_${key} || ${JSON.stringify(argsDefaults[key])}`);
+    }
+
+    this._emitLines(
       'var callerFrame = frame;',
       'frame = ' + ((keepFrame) ? 'frame.push(true);' : 'new runtime.Frame();'),
-      'kwargs = kwargs || {};',
-      'if (Object.hasOwn(kwargs, "caller")) {',
-      'frame.set("caller", kwargs.caller); }');
+      'if (l_caller) {',
+      'frame.set("caller", l_caller); }'
+    );
 
     // Expose the arguments to the template. Don't need to use
     // random names because the function
     // will create a new run-time scope for us
-    for (const arg of args) {
-      this._emitLine(`frame.set("${arg.value}", l_${arg.value});`);
-      currFrame.set(arg.value, `l_${arg.value}`);
-    }
-
-    // Expose the keyword arguments
-    if (kwargs) {
-      for (const pair of kwargs.children) {
-        const name = pair.key.value;
-        this._emit(`frame.set("${name}", `);
-        this._emit(`Object.hasOwn(kwargs, "${name}")`);
-        this._emit(` ? kwargs["${name}"] : `);
-        this._compileExpression(pair.value, currFrame);
-        this._emit(');');
-      }
+    for (const arg of args.slice(0, -1)) {
+      this._emitLine(`frame.set("${arg}", l_${arg});`);
+      currFrame.set(arg, `l_${arg}`);
     }
 
     const bufferId = this._pushBuffer();

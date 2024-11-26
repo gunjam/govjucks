@@ -2,6 +2,7 @@
 
 const lib = require('./lib');
 const arrayFrom = Array.from;
+const kKeywords = Symbol('keywordArgs');
 
 // Frames keep track of scoping both at compile-time and run-time so
 // we know how to access variables. Block tags can introduce special
@@ -77,63 +78,34 @@ class Frame {
   }
 }
 
-function makeMacro (argNames, kwargNames, func) {
+function makeMacro (argNames, func) {
+  const argCount = argNames.length;
+  const argMap = {};
+  for (let i = 0; i < argCount; i++) {
+    argMap[argNames[i]] = i;
+  }
+
   return function macro (...macroArgs) {
-    const argCount = numArgs(macroArgs);
-    let args;
-    const kwargs = getKeywordArgs(macroArgs);
+    const lastArg = macroArgs[macroArgs.length - 1];
 
-    if (argCount > argNames.length) {
-      args = macroArgs.slice(0, argNames.length);
-
-      // Positional arguments that should be passed in as
-      // keyword arguments (essentially default values)
-      const pArgs = macroArgs.slice(args.length, argCount);
-      for (let i = 0, len = pArgs.length; i < len; i++) {
-        if (i < kwargNames.length) {
-          kwargs[kwargNames[i]] = pArgs[i];
-        }
+    if (isKeywordArgs(lastArg)) {
+      const kwargs = macroArgs.pop();
+      for (const key of Object.keys(kwargs)) {
+        macroArgs[argMap[key]] = kwargs[key];
       }
-      args.push(kwargs);
-    } else if (argCount < argNames.length) {
-      args = macroArgs.slice(0, argCount);
-
-      for (let i = argCount; i < argNames.length; i++) {
-        const arg = argNames[i];
-
-        // Keyword arguments that should be passed as
-        // positional arguments, i.e. the caller explicitly
-        // used the name of a positional arg
-        args.push(kwargs[arg]);
-        delete kwargs[arg];
-      }
-      args.push(kwargs);
-    } else {
-      args = macroArgs;
     }
 
-    return func.apply(this, args);
+    return func.apply(this, macroArgs);
   };
 }
 
 function makeKeywordArgs (obj) {
-  obj.__keywords = true;
+  obj[kKeywords] = true;
   return obj;
 }
 
 function isKeywordArgs (obj) {
-  return obj && Object.hasOwn(obj, '__keywords');
-}
-
-function getKeywordArgs (args) {
-  const len = args.length;
-  if (len) {
-    const lastArg = args[len - 1];
-    if (isKeywordArgs(lastArg)) {
-      return lastArg;
-    }
-  }
-  return {};
+  return obj && Object.hasOwn(obj, kKeywords);
 }
 
 function numArgs (args) {
