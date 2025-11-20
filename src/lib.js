@@ -156,7 +156,7 @@ Object.setPrototypeOf(TemplateError.prototype, Error.prototype);
 module.exports.TemplateError = TemplateError;
 
 function isFunction (obj) {
-  return ObjProto.toString.call(obj) === '[object Function]';
+  return obj instanceof Function;
 }
 
 module.exports.isFunction = isFunction;
