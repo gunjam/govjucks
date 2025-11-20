@@ -82,13 +82,7 @@ function dictsort (val, caseSensitive, by) {
     throw new lib.TemplateError('dictsort filter: val must be an object');
   }
 
-  const array = [];
-  // deliberately include properties from the object's prototype
-  for (const k in val) {
-    array.push([k, val[k]]);
-  }
-
-  let si = 0;
+  let si;
   if (by === undefined || by === 'key') {
     si = 0;
   } else if (by === 'value') {
@@ -98,13 +92,19 @@ function dictsort (val, caseSensitive, by) {
       'dictsort filter: You can only sort by either key or value');
   }
 
+  const array = [];
+  // deliberately include properties from the object's prototype
+  for (const k in val) {
+    array.push([k, val[k]]);
+  }
+
   array.sort((t1, t2) => {
     let a = t1[si];
     let b = t2[si];
 
-    if (caseSensitive === false && lib.isString(a) && lib.isString(b)) {
-      a = a.toLowerCase();
-      b = b.toLowerCase();
+    if (caseSensitive === false) {
+      a = a.toLowerCase?.() ?? a;
+      b = b.toLowerCase?.() ?? b;
     }
 
     return a > b ? 1 : (a === b ? 0 : -1);
