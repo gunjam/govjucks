@@ -162,7 +162,7 @@ function isFunction (obj) {
 module.exports.isFunction = isFunction;
 
 function isString (obj) {
-  return ObjProto.toString.call(obj) === '[object String]';
+  return typeof obj === 'string';
 }
 
 module.exports.isString = isString;
