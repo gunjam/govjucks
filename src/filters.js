@@ -57,10 +57,11 @@ function center (str, width) {
   }
 
   const spaces = width - str.length;
-  const padWith = Math.ceil(spaces / 2);
-  const pre = ''.padEnd(padWith - (spaces % 2), ' ');
-  const post = pre.padEnd(padWith, ' ');
-  return r.copySafeness(str, pre + str + post);
+  const pad = ' '.repeat(Math.floor(spaces / 2));
+  return r.copySafeness(
+    str,
+    pad + str + (spaces % 2 === 0 ? pad : pad + ' ')
+  );
 }
 
 module.exports.center = center;
