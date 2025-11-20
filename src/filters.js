@@ -569,27 +569,22 @@ function trim (str) {
 module.exports.trim = trim;
 
 function truncate (input, length, killwords, end) {
-  const orig = input;
-  input = normalize(input, '');
+  let res = normalize(input, '');
   length = length || 255;
 
-  if (input.length <= length) {
+  if (res.length <= length) {
     return input;
   }
 
-  if (killwords) {
-    input = input.substring(0, length);
-  } else {
-    let idx = input.lastIndexOf(' ', length);
-    if (idx === -1) {
-      idx = length;
+  if (killwords !== true) {
+    const idx = res.lastIndexOf(' ', length);
+    if (idx > -1) {
+      length = idx;
     }
-
-    input = input.substring(0, idx);
   }
 
-  input += (end !== undefined && end !== null) ? end : '...';
-  return r.copySafeness(orig, input);
+  res = `${res.substring(0, length)}${end ?? '...'}`;
+  return r.copySafeness(input, res);
 }
 
 module.exports.truncate = truncate;
