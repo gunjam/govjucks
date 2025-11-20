@@ -163,18 +163,17 @@ module.exports.groupby = groupby;
 function indent (str, width, indentfirst) {
   str = normalize(str, '');
 
-  if (str === '') {
-    return '';
+  if (str.length === 0) {
+    return str;
   }
 
-  width = width || 4;
   indentfirst = indentfirst || false;
 
   const lines = str.split('\n');
-  const sp = lib.repeat(' ', width);
+  const sp = ' '.repeat(width || 4);
   let res = '';
 
-  res += indentfirst ? `${sp}${lines[0]}` : lines[0];
+  res += indentfirst === true ? `${sp}${lines[0]}` : lines[0];
   for (let i = 1, len = lines.length; i !== len; ++i) {
     res += `\n${sp}${lines[i]}`;
   }
