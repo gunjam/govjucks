@@ -168,6 +168,10 @@ function isString (obj) {
 module.exports.isString = isString;
 
 function isObject (obj) {
+  if (typeof obj !== 'object' || obj === null) {
+    return false;
+  }
+
   return ObjProto.toString.call(obj) === '[object Object]';
 }
 
