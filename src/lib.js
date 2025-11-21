@@ -244,21 +244,11 @@ function toArray (obj) {
 
 module.exports.toArray = toArray;
 
-function without (array) {
-  const result = [];
+function without (array, ...remove) {
   if (!array) {
-    return result;
+    return [];
   }
-  const length = array.length;
-  const contains = toArray(arguments).slice(1);
-  let index = -1;
-
-  while (++index < length) {
-    if (indexOf(contains, array[index]) === -1) {
-      result.push(array[index]);
-    }
-  }
-  return result;
+  return array.filter((item) => remove.indexOf(item) === -1);
 }
 
 module.exports.without = without;
