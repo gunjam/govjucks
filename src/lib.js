@@ -276,21 +276,14 @@ function each (obj, func, context) {
 module.exports.each = each;
 
 function map (obj, func) {
-  const results = [];
-  if (obj == null) {
-    return results;
+  const length = obj?.length;
+  if (length === undefined) {
+    return [];
   }
 
-  if (ArrayProto.map && obj.map === ArrayProto.map) {
-    return obj.map(func);
-  }
-
-  for (let i = 0; i < obj.length; i++) {
-    results[results.length] = func(obj[i], i);
-  }
-
-  if (obj.length === +obj.length) {
-    results.length = obj.length;
+  const results = new Array(length);
+  for (let i = 0; i < length; i++) {
+    results[i] = func(obj[i], i);
   }
 
   return results;
