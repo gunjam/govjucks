@@ -253,12 +253,8 @@ function without (array, ...remove) {
 
 module.exports.without = without;
 
-function repeat (char_, n) {
-  let str = '';
-  for (let i = 0; i < n; i++) {
-    str += char_;
-  }
-  return str;
+function repeat (char, length) {
+  return char.repeat(length);
 }
 
 module.exports.repeat = repeat;
