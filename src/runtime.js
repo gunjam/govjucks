@@ -47,29 +47,25 @@ class Frame {
   }
 
   get (name) {
-    const val = this.variables[name];
-    if (val !== undefined) {
-      return val;
-    }
-    return null;
+    return this.variables[name] ?? null;
   }
 
   lookup (name) {
-    const p = this.parent;
     const val = this.variables[name];
     if (val !== undefined) {
       return val;
     }
-    return p && p.lookup(name);
+    return this.parent?.lookup(name);
   }
 
   resolve (name, forWrite) {
-    const p = (forWrite && this.isolateWrites) ? undefined : this.parent;
-    const val = this.variables[name];
-    if (val !== undefined) {
+    if (this.variables[name] !== undefined) {
       return this;
     }
-    return p && p.resolve(name);
+    if (forWrite && this.isolateWrites) {
+      return undefined;
+    }
+    return this.parent?.resolve(name);
   }
 
   push (isolateWrites) {
