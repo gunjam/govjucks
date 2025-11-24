@@ -151,23 +151,22 @@ function copySafeness (dest, target) {
 }
 
 function markSafe (val) {
-  const type = typeof val;
+  switch (typeof val) {
+    case 'string':
+      return new SafeString(val);
+    case 'function':
+      return function wrapSafe (_) {
+        const ret = val.apply(this, arguments);
 
-  if (type === 'string') {
-    return new SafeString(val);
+        if (typeof ret === 'string') {
+          return new SafeString(ret);
+        }
+
+        return ret;
+      };
+    default:
+      return val;
   }
-  if (type instanceof Function) {
-    return val;
-  }
-  return function wrapSafe (args) {
-    const ret = val.apply(this, arguments);
-
-    if (typeof ret === 'string') {
-      return new SafeString(ret);
-    }
-
-    return ret;
-  };
 }
 
 function suppressValue (val, autoescape) {
