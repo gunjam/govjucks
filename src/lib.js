@@ -334,11 +334,7 @@ function indexOf (arr, searchElement, fromIndex) {
 module.exports.indexOf = indexOf;
 
 function extend (obj1, obj2) {
-  obj1 = obj1 || {};
-  for (const k of Object.keys(obj2)) {
-    obj1[k] = obj2[k];
-  }
-  return obj1;
+  return Object.assign(obj1 ?? {}, obj2);
 }
 
 module.exports._assign = module.exports.extend = extend;
