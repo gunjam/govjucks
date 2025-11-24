@@ -4,12 +4,15 @@ const lib = require('./lib');
 const arrayFrom = Array.from;
 const kKeywords = Symbol('keywordArgs');
 
+const NullObject = function () {};
+NullObject.prototype = Object.create(null);
+
 // Frames keep track of scoping both at compile-time and run-time so
 // we know how to access variables. Block tags can introduce special
 // variables, for example.
 class Frame {
   constructor (parent, isolateWrites) {
-    this.variables = Object.create(null);
+    this.variables = new NullObject();
     this.parent = parent;
     this.topLevel = false;
     // if this is true, writes (set) should never propagate upwards past
