@@ -20,30 +20,49 @@ class Frame {
     this.isolateWrites = isolateWrites;
   }
 
-  set (name, val, resolveUp) {
-    // Allow variables with dots by automatically creating the
-    // nested structure
-    const parts = name.split('.');
-    let obj = this.variables;
-    let frame = this;
-
+  #set (name, val, resolveUp) {
     if (resolveUp) {
-      if ((frame = this.resolve(parts[0], true))) {
+      const frame = this.resolve(name, true)
+      if (frame) {
         frame.set(name, val);
         return;
       }
     }
 
-    for (let i = 0; i < parts.length - 1; i++) {
-      const id = parts[i];
+    this.variables[name] = val;
+  }
 
-      if (!obj[id]) {
-        obj[id] = {};
+  #setDeep (name, val, resolveUp) {
+    // Allow variables with dots by automatically creating the
+    // nested structure
+    const parts = name.split('.');
+
+    if (resolveUp) {
+      const frame = this.resolve(parts[0], true)
+      if (frame) {
+        frame.set(name, val);
+        return;
       }
+    }
+
+    let obj = this.variables;
+    const last = parts.length - 1;
+
+    for (let i = 0; i < last; i++) {
+      const id = parts[i];
+      obj[id] ??= {};
       obj = obj[id];
     }
 
-    obj[parts[parts.length - 1]] = val;
+    obj[parts[last]] = val;
+  }
+
+  set (name, val, resolveUp) {
+    if (name.indexOf('.') === -1) {
+      this.#set(name, val, resolveUp);
+    } else {
+      this.#setDeep(name, val, resolveUp);
+    }
   }
 
   get (name) {
