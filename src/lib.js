@@ -264,12 +264,9 @@ function each (obj, func, context) {
     return;
   }
 
-  if (ArrayProto.forEach && obj.forEach === ArrayProto.forEach) {
-    obj.forEach(func, context);
-  } else if (obj.length === +obj.length) {
-    for (let i = 0, l = obj.length; i < l; i++) {
-      func.call(context, obj[i], i, obj);
-    }
+  const fn = func.bind(context);
+  for (let i = 0, l = obj.length ?? 0; i < l; i++) {
+    fn(obj[i], i, obj);
   }
 }
 
