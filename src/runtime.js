@@ -155,19 +155,19 @@ function markSafe (val) {
 
   if (type === 'string') {
     return new SafeString(val);
-  } else if (type !== 'function') {
-    return val;
-  } else {
-    return function wrapSafe (args) {
-      const ret = val.apply(this, arguments);
-
-      if (typeof ret === 'string') {
-        return new SafeString(ret);
-      }
-
-      return ret;
-    };
   }
+  if (type instanceof Function) {
+    return val;
+  }
+  return function wrapSafe (args) {
+    const ret = val.apply(this, arguments);
+
+    if (typeof ret === 'string') {
+      return new SafeString(ret);
+    }
+
+    return ret;
+  };
 }
 
 function suppressValue (val, autoescape) {
