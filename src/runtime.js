@@ -205,9 +205,10 @@ function memberLookup (obj, val) {
 
 function callWrap (obj, name, context, args) {
   if (!obj) {
-    throw new Error('Unable to call `' + name + '`, which is undefined or falsey');
-  } else if (typeof obj !== 'function') {
-    throw new Error('Unable to call `' + name + '`, which is not a function');
+    throw new Error(`Unable to call \`${name}\`, which is undefined or falsey`);
+  }
+  if (typeof obj !== 'function') {
+    throw new Error(`Unable to call \`${name}\`, which is not a function`);
   }
 
   return obj.apply(context, args);
@@ -223,9 +224,8 @@ function contextOrFrameLookup (context, frame, name) {
 function handleError (error, lineno, colno) {
   if (error.lineno) {
     return error;
-  } else {
-    return new lib.TemplateError(error, lineno, colno);
   }
+  return new lib.TemplateError(error, lineno, colno);
 }
 
 function asyncEach (arr, dimen, iter, cb) {
