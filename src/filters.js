@@ -169,15 +169,13 @@ function indent (str, width, indentfirst) {
     return str;
   }
 
-  indentfirst = indentfirst || false;
-
   const lines = str.split('\n');
   const sp = ' '.repeat(width || 4);
-  let res = '';
+  const nl = '\n' + sp;
+  let res = indentfirst === true ? sp + lines[0] : lines[0];
 
-  res += indentfirst === true ? `${sp}${lines[0]}` : lines[0];
   for (let i = 1, len = lines.length; i !== len; ++i) {
-    res += `\n${sp}${lines[i]}`;
+    res += nl + lines[i];
   }
 
   return r.copySafeness(str, res);
