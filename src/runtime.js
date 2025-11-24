@@ -314,11 +314,11 @@ function asyncAll (arr, dimen, func, cb) {
 function fromIterator (arr) {
   if (typeof arr !== 'object' || arr === null || Array.isArray(arr)) {
     return arr;
-  } else if (Symbol.iterator in arr) {
-    return arrayFrom(arr);
-  } else {
-    return arr;
   }
+  if (Symbol.iterator in arr) {
+    return arrayFrom(arr);
+  }
+  return arr;
 }
 
 module.exports = {
