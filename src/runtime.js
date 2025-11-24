@@ -78,25 +78,21 @@ class Frame {
   }
 }
 
-function makeMacro (argNames, func) {
-  const argCount = argNames.length;
-  const argMap = {};
-  for (let i = 0; i < argCount; i++) {
-    argMap[argNames[i]] = i;
-  }
-
-  return function macro (...macroArgs) {
-    const lastArg = macroArgs[macroArgs.length - 1];
-
-    if (isKeywordArgs(lastArg)) {
-      const kwargs = macroArgs.pop();
-      for (const key of Object.keys(kwargs)) {
-        macroArgs[argMap[key]] = kwargs[key];
-      }
+function makeMacro (params, func) {
+  const paramCount = params.length;
+  return function (...args) {
+    const kwArgs = args[args.length - 1];
+    if (isKeywordArgs(kwArgs) === false) {
+      return func.apply(this, args);
     }
 
-    return func.apply(this, macroArgs);
-  };
+    args[args.length - 1] = undefined;
+    for (let i = 0; i < paramCount; i++) {
+      args[i] ??= kwArgs[params[i]];
+    }
+
+    return func.apply(this, args);
+  }
 }
 
 function makeKeywordArgs (obj) {
@@ -105,7 +101,7 @@ function makeKeywordArgs (obj) {
 }
 
 function isKeywordArgs (obj) {
-  return obj && Object.hasOwn(obj, kKeywords);
+  return obj?.[kKeywords] ?? false;
 }
 
 function numArgs (args) {
