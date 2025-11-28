@@ -114,7 +114,7 @@ class Compiler extends Obj {
   _makeCallback (res) {
     const err = this._tmpid();
 
-    return 'function(' + err + (res ? ',' + res : '') + ') {\n' +
+    return '(' + err + (res ? ',' + res : '') + ') => {\n' +
       'if(' + err + ') { cb(' + err + '); return; }';
   }
 
