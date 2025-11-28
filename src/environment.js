@@ -194,12 +194,9 @@ class Environment extends EmitterObj {
   }
 
   getTemplate (name, eagerCompile, parentName, ignoreMissing, cb) {
-    const that = this;
     let tmpl = null;
-    if (name && name.raw) {
-      // this fixes autoescape for templates referenced in symbols
-      name = name.raw;
-    }
+    // this fixes autoescape for templates referenced in symbols
+    name = name?.raw ?? name;
 
     if (lib.isFunction(parentName)) {
       cb = parentName;
@@ -249,9 +246,8 @@ class Environment extends EmitterObj {
         if (cb) {
           cb(err);
           return;
-        } else {
-          throw err;
         }
+        throw err;
       }
       let newTmpl;
       if (!info) {
@@ -282,7 +278,7 @@ class Environment extends EmitterObj {
       }
 
       // Resolve name relative to parentName
-      name = that.resolveTemplate(loader, parentName, name);
+      name = this.resolveTemplate(loader, parentName, name);
 
       if (loader.async) {
         loader.getSource(name, handle);
