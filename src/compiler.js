@@ -836,7 +836,7 @@ class Compiler extends Obj {
     const keepFrame = (frame !== undefined);
     const args = [];
     const argsMap = {};
-    const argsDefaults = { caller: false };
+    const argsDefaults = {};
 
     for (const arg of node.args.children) {
       if (arg instanceof nodes.Dict) {
@@ -851,7 +851,6 @@ class Compiler extends Obj {
     for (const key of Object.keys(argsMap).sort()) {
       args.push(argsMap[key]);
     }
-    args.push('caller');
 
     const funcArgs = args.map((a) => `l_${a}`);
 
@@ -865,27 +864,34 @@ class Compiler extends Obj {
     } else {
       currFrame = new Frame();
     }
+
+    this._emitLines(`function ${funcId}(${funcArgs.join(', ')}) {`);
     this._emitLines(
-      `const ${funcId} = runtime.makeMacro(`,
-      `[${`'${args.join("', '")}'`}], `,
-      `function (${funcArgs.join(', ')}) {`
+      'const callerFrame = frame;',
+      'frame = ' + ((keepFrame) ? 'frame.push(true);' : 'new runtime.Frame();'),
+      'const kwArgs = arguments[arguments.length - 1];',
+      'if (runtime.isKeywordArgs(kwArgs)) {'
     );
 
-    for (const key of Object.keys(argsDefaults)) {
-      this._emitLine(`l_${key} = l_${key} || ${JSON.stringify(argsDefaults[key])}`);
+    for (let i = 0; i < funcArgs.length; i++) {
+      this._emitLine(`${funcArgs[i]} = runtime.isKeywordArgs(${funcArgs[i]}) ? kwArgs.${args[i]} : ${funcArgs[i]} ?? kwArgs.${args[i]};`);
     }
 
     this._emitLines(
-      'var callerFrame = frame;',
-      'frame = ' + ((keepFrame) ? 'frame.push(true);' : 'new runtime.Frame();'),
-      'if (l_caller) {',
-      'frame.set("caller", l_caller); }'
+      'if (kwArgs.caller) {',
+      'frame.set("caller", kwArgs.caller);',
+      '}',
+      '}'
     );
+
+    for (const key of Object.keys(argsDefaults)) {
+      this._emitLine(`l_${key} ??= ${JSON.stringify(argsDefaults[key])}`);
+    }
 
     // Expose the arguments to the template. Don't need to use
     // random names because the function
     // will create a new run-time scope for us
-    for (const arg of args.slice(0, -1)) {
+    for (const arg of args) {
       this._emitLine(`frame.set("${arg}", l_${arg});`);
       currFrame.set(arg, `l_${arg}`);
     }
@@ -898,7 +904,7 @@ class Compiler extends Obj {
 
     this._emitLine('frame = ' + ((keepFrame) ? 'frame.pop();' : 'callerFrame;'));
     this._emitLine(`return new runtime.SafeString(${bufferId});`);
-    this._emitLine('});');
+    this._emitLine('}');
     this._popBuffer();
 
     return funcId;
@@ -922,10 +928,7 @@ class Compiler extends Obj {
   }
 
   compileCaller (node, frame) {
-    // basically an anonymous "macro expression"
-    this._emit('(function (){');
-    const funcId = this._compileMacro(node, frame);
-    this._emit(`return ${funcId};})()`);
+    this._compileMacro(node, frame);
   }
 
   _compileGetTemplate (node, frame, eagerCompile, ignoreMissing) {

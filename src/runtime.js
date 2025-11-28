@@ -111,7 +111,7 @@ function makeMacro (params, func) {
     }
 
     return func.apply(this, args);
-  }
+  };
 }
 
 function makeKeywordArgs (obj) {
@@ -123,18 +123,11 @@ function isKeywordArgs (obj) {
   return obj?.[kKeywords] ?? false;
 }
 
-function numArgs (args) {
-  const len = args.length;
-  if (len === 0) {
-    return 0;
+function getKeywordArg (val, kwArgs, key) {
+  if (isKeywordArgs(val)) {
+    return kwArgs[key];
   }
-
-  const lastArg = args[len - 1];
-  if (isKeywordArgs(lastArg)) {
-    return len - 1;
-  } else {
-    return len;
-  }
+  return kwArgs[key] ?? val;
 }
 
 // A SafeString object indicates that the string should not be
@@ -359,7 +352,8 @@ module.exports = {
   Frame,
   makeMacro,
   makeKeywordArgs,
-  numArgs,
+  isKeywordArgs,
+  getKeywordArg,
   suppressValue,
   ensureDefined,
   memberLookup,
