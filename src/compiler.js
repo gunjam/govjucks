@@ -1114,7 +1114,7 @@ class Compiler extends Obj {
     frame = new Frame();
 
     this._emitFuncBegin(node, 'root');
-    this._emitLine('var parentTemplate = null;');
+    this._emitLine('let parentTemplate = null;');
     this._compileChildren(node, frame);
     this._emitLine('if(parentTemplate) {');
     this._emitLine('parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);');
