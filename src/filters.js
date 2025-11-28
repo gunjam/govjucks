@@ -434,21 +434,26 @@ module.exports.round = round;
 function slice (arr, slices, fillWith) {
   const sliceLength = Math.floor(arr.length / slices);
   const extra = arr.length % slices;
-  const res = [];
-  let offset = 0;
+  const res = new Array(slices);
+  let start = 0;
 
   for (let i = 0; i < slices; i++) {
-    const start = offset + (i * sliceLength);
+    const offset = start;
+    let arrLength = sliceLength;
+    let fillAdjust = 0;
     if (i < extra) {
-      offset++;
+      arrLength++;
+      start++;
+    } else if (fillWith) {
+      fillAdjust++;
     }
-    const end = offset + ((i + 1) * sliceLength);
-
-    const currSlice = arr.slice(start, end);
-    if (fillWith && i >= extra) {
-      currSlice.push(fillWith);
+    const currSlice = new Array(arrLength + fillAdjust);
+    for (let j = 0; j < arrLength; j++) {
+      currSlice[j] = arr[offset + j];
     }
-    res.push(currSlice);
+    currSlice[currSlice.length - 1] ??= fillWith;
+    res[i] = currSlice;
+    start += sliceLength;
   }
 
   return res;
