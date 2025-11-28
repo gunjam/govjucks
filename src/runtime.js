@@ -20,9 +20,9 @@ class Frame {
     this.isolateWrites = isolateWrites;
   }
 
-  #set (name, val, resolveUp) {
+  #setShallow (name, val, resolveUp) {
     if (resolveUp) {
-      const frame = this.resolve(name, true)
+      const frame = this.resolve(name, true);
       if (frame) {
         frame.set(name, val);
         return;
@@ -38,7 +38,7 @@ class Frame {
     const parts = name.split('.');
 
     if (resolveUp) {
-      const frame = this.resolve(parts[0], true)
+      const frame = this.resolve(parts[0], true);
       if (frame) {
         frame.set(name, val);
         return;
@@ -59,7 +59,7 @@ class Frame {
 
   set (name, val, resolveUp) {
     if (name.indexOf('.') === -1) {
-      this.#set(name, val, resolveUp);
+      this.#setShallow(name, val, resolveUp);
     } else {
       this.#setDeep(name, val, resolveUp);
     }
