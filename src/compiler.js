@@ -637,7 +637,7 @@ class Compiler extends Obj {
     this._addScopeLevel();
   }
 
-  _emitLoopBindings (node, arr, i, len) {
+  _emitLoopBindings (i, len) {
     const bindings = [
       { name: 'index', val: `${i} + 1` },
       { name: 'index0', val: i },
@@ -648,9 +648,11 @@ class Compiler extends Obj {
       { name: 'length', val: len },
     ];
 
+    this._emitLine('frame.set("loop", {');
     for (const { name, val } of bindings) {
-      this._emitLine(`frame.set("loop.${name}", ${val});`);
+      this._emitLine(`${name}: ${val},`);
     }
+    this._emitLine('});');
   }
 
   compileFor (node, frame) {
@@ -693,7 +695,7 @@ class Compiler extends Obj {
         frame.set(child.value, tid);
       }
 
-      this._emitLoopBindings(node, arr, i, len);
+      this._emitLoopBindings(i, len);
       this._withScopedSyntax(() => {
         this.compile(node.body, frame);
       });
@@ -715,7 +717,7 @@ class Compiler extends Obj {
       this._emitLine(`frame.set("${key.value}", ${k});`);
       this._emitLine(`frame.set("${val.value}", ${v});`);
 
-      this._emitLoopBindings(node, arr, i, len);
+      this._emitLoopBindings(i, len);
       this._withScopedSyntax(() => {
         this.compile(node.body, frame);
       });
@@ -732,7 +734,7 @@ class Compiler extends Obj {
       this._emitLine(`var ${v} = ${arr}[${i}];`);
       this._emitLine(`frame.set("${node.name.value}", ${v});`);
 
-      this._emitLoopBindings(node, arr, i, len);
+      this._emitLoopBindings(i, len);
 
       this._withScopedSyntax(() => {
         this.compile(node.body, frame);
@@ -790,7 +792,7 @@ class Compiler extends Obj {
       frame.set(id, id);
     }
 
-    this._emitLoopBindings(node, arr, i, len);
+    this._emitLoopBindings(i, len);
 
     this._withScopedSyntax(() => {
       let buf;
