@@ -457,16 +457,17 @@ function slice (arr, slices, fillWith) {
 module.exports.slice = slice;
 
 function sum (arr, attr, start) {
-  start = start || 0;
+  let sum = start ?? 0;
   if (attr) {
-    let result = start;
     for (let i = 0, len = arr.length; i !== len; ++i) {
-      result += arr[i][attr];
+      sum += arr[i][attr];
     }
-    return result;
+    return sum;
   }
-
-  return arr.reduce((a, b) => a + b, start);
+  for (let i = 0, len = arr.length; i !== len; ++i) {
+    sum += arr[i];
+  }
+  return sum;
 }
 
 module.exports.sum = sum;
