@@ -1053,26 +1053,11 @@ class Compiler extends Obj {
   }
 
   compileInclude (node, frame) {
-    this._emitLine('var tasks = [];');
-    this._emitLine('tasks.push(');
-    this._emitLine('function(callback) {');
     const id = this._compileGetTemplate(node, frame, false, node.ignoreMissing);
-    this._emitLine(`callback(null,${id});});`);
-    this._emitLine('});');
-
     const id2 = this._tmpid();
-    this._emitLine('tasks.push(');
-    this._emitLine('function(template, callback){');
-    this._emitLine('template.render(context.getVariables(), frame, ' + this._makeCallback(id2));
-    this._emitLine('callback(null,' + id2 + ');});');
-    this._emitLine('});');
-
-    this._emitLine('tasks.push(');
-    this._emitLine('function(result, callback){');
-    this._emitLine(`${this.buffer} += result;`);
-    this._emitLine('callback(null);');
-    this._emitLine('});');
-    this._emitLine('env.waterfall(tasks, function(){');
+    this._emitLine(`${id}.render(context.getVariables(), frame, ` + this._makeCallback(id2));
+    this._emitLine(`${this.buffer} += ${id2};`);
+    this._addScopeLevel();
     this._addScopeLevel();
   }
 
