@@ -984,11 +984,10 @@ class Compiler extends Obj {
         alias = name;
       }
 
-      this._emitLine(`if(Object.hasOwn(${importedId}, "${name}")) {`);
-      this._emitLine(`var ${id} = ${importedId}.${name};`);
-      this._emitLine('} else {');
+      this._emitLine(`if(Object.hasOwn(${importedId}, "${name}") === false) {`);
       this._emitLine(`cb(new Error("cannot import '${name}'")); return;`);
       this._emitLine('}');
+      this._emitLine(`const ${id} = ${importedId}.${name};`);
 
       frame.set(alias, id);
 
