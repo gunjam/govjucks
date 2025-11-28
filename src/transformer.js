@@ -10,20 +10,15 @@ function gensym () {
 
 // copy-on-write version of map
 function mapCOW (arr, func) {
-  let res = null;
-  for (let i = 0; i < arr.length; i++) {
+  let res;
+  for (let i = 0, len = arr.length; i < len; i++) {
     const item = func(arr[i]);
-
     if (item !== arr[i]) {
-      if (!res) {
-        res = arr.slice();
-      }
-
+      res ??= [...arr];
       res[i] = item;
     }
   }
-
-  return res || arr;
+  return res ?? arr;
 }
 
 function walk (ast, func, depthFirst) {
