@@ -73,9 +73,9 @@ class Compiler extends Obj {
     this.buffer = 'output';
     this._scopeClosers = '';
     this._emitLine(`function ${name}(env, context, frame, runtime, cb) {`);
-    this._emitLine(`var lineno = ${node.lineno};`);
-    this._emitLine(`var colno = ${node.colno};`);
-    this._emitLine(`var ${this.buffer} = "";`);
+    this._emitLine(`let lineno = ${node.lineno};`);
+    this._emitLine(`let colno = ${node.colno};`);
+    this._emitLine(`let ${this.buffer} = "";`);
     this._emitLine('try {');
   }
 
