@@ -665,7 +665,7 @@ class Compiler extends Obj {
 
     this._emitLine('frame = frame.push();');
 
-    this._emit(`var ${arr} = `);
+    this._emit(`let ${arr} = `);
     this._compileExpression(node.arr, frame);
     this._emitLine(';');
 
@@ -675,7 +675,7 @@ class Compiler extends Obj {
     // If multiple names are passed, we need to bind them
     // appropriately
     if (node.name instanceof nodes.Array) {
-      this._emitLine(`var ${i};`);
+      this._emitLine(`let ${i};`);
 
       // The object could be an arroy or object. Note that the
       // body of the loop is duplicated for each condition, but
@@ -685,10 +685,10 @@ class Compiler extends Obj {
       this._emitLine(`for(${i}=0; ${i} < ${arr}.length; ${i}++) {`);
 
       // Bind each declared var
-      for (let u = 0, len = node.name.children.length; u < len; u++) {
+      for (let u = 0, leng = node.name.children.length; u < leng; u++) {
         const child = node.name.children[u];
         const tid = this._tmpid();
-        this._emitLine(`var ${tid} = ${arr}[${i}][${u}];`);
+        this._emitLine(`const ${tid} = ${arr}[${i}][${u}];`);
         this._emitLine(`frame.set("${child}", ${arr}[${i}][${u}]);`);
         frame.set(child.value, tid);
       }
