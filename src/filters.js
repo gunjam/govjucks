@@ -124,7 +124,7 @@ function dump (obj, spaces) {
 module.exports.dump = dump;
 
 function escape (str) {
-  if (str instanceof r.SafeString) {
+  if (r.SafeString.isSafeString(str)) {
     return str;
   }
   str = (str === null || str === undefined) ? '' : str.toString();
@@ -134,7 +134,7 @@ function escape (str) {
 module.exports.escape = escape;
 
 function safe (str) {
-  if (str instanceof r.SafeString) {
+  if (r.SafeString.isSafeString(str)) {
     return str;
   }
   str = (str === null || str === undefined) ? '' : str.toString();
@@ -209,7 +209,7 @@ function lengthFilter (val) {
   if (value instanceof Map || value instanceof Set) {
     return value.size;
   }
-  if (lib.isObject(value) && value instanceof r.SafeString === false) {
+  if (lib.isObject(value) && r.SafeString.isSafeString(value) === false) {
     let i = 0;
     for (const key in value) {
       if (hasOwnProperty.call(value, key)) {
@@ -280,7 +280,7 @@ function getSelectOrReject (expectedTestResult) {
 
     if (Array.isArray(arr)) {
       _arr = arr;
-    } else if (typeof arr === 'string' || arr instanceof r.SafeString) {
+    } else if (typeof arr === 'string' || r.SafeString.isSafeString(arr)) {
       _arr = arr.split('');
     } else {
       return [];
@@ -341,7 +341,7 @@ function replace (str, old, new_, maxCount) {
   }
 
   // If by now, we don't have a string, throw it back
-  if (typeof str !== 'string' && str instanceof r.SafeString === false) {
+  if (typeof str !== 'string' && r.SafeString.isSafeString(str) === false) {
     return str;
   }
 

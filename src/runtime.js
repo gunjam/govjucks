@@ -4,6 +4,7 @@ const lib = require('./lib');
 const arrayFrom = Array.from;
 const kKeywords = Symbol('keywordArgs');
 
+const kIsSafeString = Symbol('isSafeString');
 const NullObject = function () {};
 NullObject.prototype = Object.create(null);
 
@@ -144,6 +145,7 @@ function SafeString (val) {
     return val;
   }
 
+  this[kIsSafeString] = true;
   this.val = val;
   this.length = val.length;
 }
@@ -161,9 +163,15 @@ SafeString.prototype.valueOf = function valueOf () {
 SafeString.prototype.toString = function toString () {
   return this.val;
 };
+SafeString.isSafeString = function isSafeString (val) {
+  if (val === undefined || val === null) {
+    return false;
+  }
+  return val[kIsSafeString] === true;
+};
 
 function copySafeness (dest, target) {
-  if (dest instanceof SafeString) {
+  if (SafeString.isSafeString(dest)) {
     return new SafeString(target);
   }
   return target.toString();
@@ -193,7 +201,7 @@ function suppressValue (val, autoescape) {
     return '';
   }
 
-  if (autoescape && val instanceof SafeString === false) {
+  if (autoescape && SafeString.isSafeString(val) === false) {
     return lib.escape(val.toString());
   }
 
