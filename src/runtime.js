@@ -239,6 +239,15 @@ function callWrap (obj, name, context, args) {
   return obj.apply(context, args);
 }
 
+function assertFunction (func, name) {
+  if (typeof func !== 'function') {
+    if (!func) {
+      throw new Error(`Unable to call \`${name}\`, which is undefined or falsey`);
+    }
+    throw new Error(`Unable to call \`${name}\`, which is not a function`);
+  }
+}
+
 function contextOrFrameLookup (context, frame, name) {
   const val = frame.lookup(name);
   return (val !== undefined)
@@ -356,6 +365,7 @@ module.exports = {
   memberLookup,
   contextOrFrameLookup,
   callWrap,
+  assertFunction,
   handleError,
   SafeString,
   copySafeness,

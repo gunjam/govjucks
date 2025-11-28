@@ -483,19 +483,17 @@ class Compiler extends Obj {
     // variables within an expression. An expression in javascript
     // like (x, y, z) returns the last value, and x and y can be
     // anything
-    this._emit('(lineno = ' + node.lineno +
-      ', colno = ' + node.colno + ', ');
+    this._emit('(lineno = ' + node.lineno + ', colno = ' + node.colno + ', ');
 
-    this._emit('runtime.callWrap(');
-    // Compile it as normal.
+    // Assert that the function is a function and get friendly errors.
+    this._emit('runtime.assertFunction(');
     this._compileExpression(node.name, frame);
 
-    // Output the name of what we're calling so we can get friendly errors
-    // if the lookup fails.
-    this._emit(', "' + this._getNodeName(node.name).replace(/"/g, '\\"') + '", context, ');
-
-    this._compileAggregate(node.args, frame, '[', '])');
-
+    // Call the function with context as this
+    this._emit(', "' + this._getNodeName(node.name).replace(/"/g, '\\"') + '"), ');
+    this._compileExpression(node.name, frame);
+    this._emit('.call(context, ');
+    this._compileAggregate(node.args, frame, '', ')');
     this._emit(')');
   }
 
