@@ -1,6 +1,5 @@
 'use strict';
 
-const ArrayProto = Array.prototype;
 const ObjProto = Object.prototype;
 
 const escapeRegExp = /["&'<>\\]/g;
@@ -236,7 +235,10 @@ function groupBy (obj, val, throwOnUndefined) {
 module.exports.groupBy = groupBy;
 
 function toArray (obj) {
-  return Array.prototype.slice.call(obj);
+  if (obj?.[Symbol.iterator]) {
+    return [...obj];
+  }
+  return [];
 }
 
 module.exports.toArray = toArray;
