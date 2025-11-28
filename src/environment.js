@@ -374,7 +374,7 @@ class Context extends Obj {
   }
 
   addBlock (name, block) {
-    this.blocks[name] = this.blocks[name] || [];
+    this.blocks[name] ??= [];
     this.blocks[name].push(block);
     return this;
   }
