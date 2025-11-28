@@ -13,7 +13,7 @@ function traverseAndCheck (obj, type, results) {
 }
 
 class Node extends Obj {
-  init (lineno, colno, ...args) {
+  init (lineno, colno) {
     this.lineno = lineno;
     this.colno = colno;
 
