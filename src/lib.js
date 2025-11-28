@@ -204,15 +204,12 @@ function getAttrGetter (attribute) {
   return function attrGetter (item) {
     let _item = item;
 
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
-
+    for (let i = 0, len = parts.length; i < len; i++) {
       // If item is not an object, and we still got parts to handle, it means
       // that something goes wrong. Just roll out to undefined in that case.
-      if (Object.hasOwn(_item, part)) {
-        _item = _item[part];
-      } else {
-        return undefined;
+      _item = _item?.[parts[i]];
+      if (_item === undefined) {
+        return _item;
       }
     }
 
