@@ -220,15 +220,12 @@ function ensureDefined (val, lineno, colno) {
 }
 
 function memberLookup (obj, val) {
-  if (obj === undefined || obj === null) {
-    return undefined;
+  const ov = obj?.[val];
+  if (typeof ov !== 'function') {
+    return ov;
   }
 
-  if (typeof obj[val] === 'function') {
-    return (...args) => obj[val].apply(obj, args);
-  }
-
-  return obj[val];
+  return ov.bind(obj);
 }
 
 function callWrap (obj, name, context, args) {
