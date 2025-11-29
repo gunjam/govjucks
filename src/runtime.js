@@ -21,11 +21,11 @@ class Frame {
     this.isolateWrites = isolateWrites;
   }
 
-  #setShallow (name, val, resolveUp) {
+  setShallow (name, val, resolveUp) {
     if (resolveUp) {
       const frame = this.resolve(name, true);
       if (frame) {
-        frame.set(name, val);
+        frame.setShallow(name, val, false);
         return;
       }
     }
@@ -33,15 +33,11 @@ class Frame {
     this.variables[name] = val;
   }
 
-  #setDeep (name, val, resolveUp) {
-    // Allow variables with dots by automatically creating the
-    // nested structure
-    const parts = name.split('.');
-
+  setDeep (name, val, parts, resolveUp) {
     if (resolveUp) {
       const frame = this.resolve(parts[0], true);
       if (frame) {
-        frame.set(name, val);
+        frame.setDeep(name, val, parts, false);
         return;
       }
     }
@@ -60,9 +56,10 @@ class Frame {
 
   set (name, val, resolveUp) {
     if (name.indexOf('.') === -1) {
-      this.#setShallow(name, val, resolveUp);
+      this.setShallow(name, val, resolveUp);
     } else {
-      this.#setDeep(name, val, resolveUp);
+      const parts = name.split('.');
+      this.setDeep(name, val, parts, resolveUp);
     }
   }
 
