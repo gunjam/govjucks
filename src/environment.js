@@ -403,7 +403,8 @@ class Context extends Obj {
 
   getExported () {
     const exported = {};
-    for (const name of this.exported) {
+    for (let i = 0, len = this.exported.length; i < len; i++) {
+      const name = this.exported[i];
       exported[name] = this.ctx[name];
     }
     return exported;
