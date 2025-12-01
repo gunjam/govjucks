@@ -174,7 +174,8 @@ function indent (str, width, indentfirst) {
   let res = indentfirst === true ? sp + lines[0] : lines[0];
 
   for (let i = 1, len = lines.length; i !== len; ++i) {
-    res += nl + lines[i];
+    const line = lines[i];
+    res += (line.length === 0) ? '\n' : nl + line;
   }
 
   return r.copySafeness(str, res);
