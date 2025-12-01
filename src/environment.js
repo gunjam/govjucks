@@ -346,7 +346,9 @@ class Context extends Obj {
     this.blocks = {};
     this.exported = [];
 
-    for (const name of Object.keys(blocks)) {
+    const names = Object.keys(blocks);
+    for (let i = 0, len = names.length; i < len; i++) {
+      const name = names[i];
       this.addBlock(name, blocks[name]);
     }
   }
