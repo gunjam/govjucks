@@ -21,7 +21,7 @@ const compareOps = {
 };
 
 class Compiler extends Obj {
-  init (templateName, throwOnUndefined) {
+  init (templateName, throwOnUndefined, pathResolver) {
     this.templateName = templateName;
     this.codebuf = [];
     this.lastId = 0;
@@ -29,6 +29,7 @@ class Compiler extends Obj {
     this.bufferStack = [];
     this._scopeClosers = '';
     this.inBlock = false;
+    this.pathResolver = pathResolver;
     this.throwOnUndefined = throwOnUndefined;
   }
 
@@ -947,7 +948,16 @@ class Compiler extends Obj {
     const eagerCompileArg = (eagerCompile) ? 'true' : 'false';
     const ignoreMissingArg = (ignoreMissing) ? 'true' : 'false';
     this._emit('env.getTemplate(');
-    this._compileExpression(node.template, frame);
+    if (this.pathResolver && this.templateName && node.template instanceof nodes.Literal) {
+      const templateNode = new nodes.Literal(
+        node.template.lineno,
+        node.template.colno,
+        this.pathResolver(node.template.value)
+      );
+      this._compileExpression(templateNode, frame);
+    } else {
+      this._compileExpression(node.template, frame);
+    }
     this._emitLine(`, ${eagerCompileArg}, ${parentName}, ${ignoreMissingArg}, ${cb}`);
     return parentTemplateId;
   }
@@ -1179,8 +1189,8 @@ class Compiler extends Obj {
 }
 
 module.exports = {
-  compile: function compile (src, asyncFilters, extensions, name, opts = {}) {
-    const c = new Compiler(name, opts.throwOnUndefined);
+  compile: function compile (src, asyncFilters, extensions, name, opts = {}, pathResolver) {
+    const c = new Compiler(name, opts.throwOnUndefined, pathResolver);
 
     // Run the extension preprocessors against the source.
     const preprocessors = (extensions || []).map(ext => ext.preprocess).filter(f => !!f);

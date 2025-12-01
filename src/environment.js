@@ -253,7 +253,8 @@ class Environment extends EmitterObj {
       if (!info) {
         newTmpl = new Template(noopTmplSrc, this, '', eagerCompile);
       } else {
-        newTmpl = new Template(info.src, this, info.path, eagerCompile);
+        const resolver = (name) => this.resolveTemplate(info.loader, info.path, name);
+        newTmpl = new Template(info.src, this, info.path, eagerCompile, resolver);
         if (!info.noCache) {
           info.loader.cache.set(name, newTmpl);
         }
@@ -412,8 +413,9 @@ class Context extends Obj {
 }
 
 class Template extends Obj {
-  init (src, env, path, eagerCompile) {
+  init (src, env, path, eagerCompile, pathResolver) {
     this.env = env || new Environment();
+    this.pathResolver = pathResolver;
 
     if (lib.isObject(src)) {
       switch (src.type) {
@@ -563,7 +565,9 @@ class Template extends Obj {
         this.env.asyncFilters,
         this.env.extensionsList,
         this.path,
-        this.env.opts);
+        this.env.opts,
+        this.pathResolver
+      );
 
       const func = new Function(source); // eslint-disable-line no-new-func
       props = func();
