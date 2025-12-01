@@ -154,10 +154,7 @@ SafeString.prototype.toString = function toString () {
   return this.val;
 };
 SafeString.isSafeString = function isSafeString (val) {
-  if (val === undefined || val === null) {
-    return false;
-  }
-  return val[kIsSafeString] === true;
+  return val?.[kIsSafeString] ?? false;
 };
 
 function copySafeness (dest, target) {
