@@ -577,7 +577,9 @@ class Template extends Obj {
   _getBlocks (props) {
     const blocks = {};
 
-    for (const k of Object.keys(props)) {
+    const keys = Object.keys(props);
+    for (let i = 0, len = keys.length; i < len; i++) {
+      const k = keys[i];
       if (k.slice(0, 2) === 'b_') {
         blocks[k.slice(2)] = props[k];
       }
