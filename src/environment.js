@@ -103,10 +103,10 @@ class Environment extends EmitterObj {
   _initLoaders () {
     for (const loader of this.loaders) {
       // Caching and cache busting
-      loader.cache = {};
+      loader.cache = new Map();
       if (typeof loader.on === 'function') {
         loader.on('update', (name, fullname) => {
-          loader.cache[name] = null;
+          loader.cache.delete(name);
           this.emit('update', name, fullname, loader);
         });
         loader.on('load', (name, source) => {
@@ -118,7 +118,7 @@ class Environment extends EmitterObj {
 
   invalidateCache () {
     for (const loader of this.loaders) {
-      loader.cache = {};
+      loader.cache.clear();
     }
   }
 
@@ -214,9 +214,9 @@ class Environment extends EmitterObj {
     } else if (typeof name !== 'string') {
       throw new Error('template names must be a string: ' + name);
     } else {
-      for (let i = 0; i < this.loaders.length; i++) {
+      for (let i = 0, len = this.loaders.length; i < len; i++) {
         const loader = this.loaders[i];
-        tmpl = loader.cache[this.resolveTemplate(loader, parentName, name)];
+        tmpl = loader.cache.get(this.resolveTemplate(loader, parentName, name));
         if (tmpl) {
           break;
         }
@@ -255,7 +255,7 @@ class Environment extends EmitterObj {
       } else {
         newTmpl = new Template(info.src, this, info.path, eagerCompile);
         if (!info.noCache) {
-          info.loader.cache[name] = newTmpl;
+          info.loader.cache.set(name, newTmpl);
         }
       }
       if (cb) {
