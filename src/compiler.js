@@ -562,7 +562,7 @@ class Compiler extends Obj {
 
       // We are running this for every var, but it's very
       // uncommon to assign to multiple vars anyway
-      this._emitLine(`frame.set("${name}", ${id}, true);`);
+      this._compileFrameSet(name, id, true);
 
       this._emitLine('if(frame.topLevel) {');
       this._emitLine(`context.setVariable("${name}", ${id});`);
@@ -573,6 +573,16 @@ class Compiler extends Obj {
         this._emitLine(`context.addExport("${name}", ${id});`);
         this._emitLine('}');
       }
+    }
+  }
+
+  _compileFrameSet (name, id, resolveUp) {
+    const resolve = resolveUp ? 'true' : 'false';
+    if (name.toString().indexOf('.') === -1) {
+      this._emitLine(`frame.setShallow("${name}", ${id}, ${resolve});`);
+    } else {
+      const parts = name.split('.');
+      this._emitLine(`frame.setDeep("${name}", ${id}, [${parts.join(', ')}], ${resolve});`);
     }
   }
 
@@ -646,7 +656,7 @@ class Compiler extends Obj {
       { name: 'length', val: len },
     ];
 
-    this._emitLine('frame.set("loop", {');
+    this._emitLine('frame.setShallow("loop", {');
     for (const { name, val } of bindings) {
       this._emitLine(`${name}: ${val},`);
     }
@@ -689,7 +699,7 @@ class Compiler extends Obj {
         const child = node.name.children[u];
         const tid = this._tmpid();
         this._emitLine(`const ${tid} = ${arr}[${i}][${u}];`);
-        this._emitLine(`frame.set("${child}", ${arr}[${i}][${u}]);`);
+        this._compileFrameSet(child, `${arr}[${i}][${u}]`, false);
         frame.set(child.value, tid);
       }
 
@@ -712,8 +722,8 @@ class Compiler extends Obj {
       this._emitLine(`for(var ${k} in ${arr}) {`);
       this._emitLine(`${i}++;`);
       this._emitLine(`var ${v} = ${arr}[${k}];`);
-      this._emitLine(`frame.set("${key.value}", ${k});`);
-      this._emitLine(`frame.set("${val.value}", ${v});`);
+      this._compileFrameSet(key.value, k, false);
+      this._compileFrameSet(val.value, v, false);
 
       this._emitLoopBindings(i, len);
       this._withScopedSyntax(() => {
@@ -730,7 +740,7 @@ class Compiler extends Obj {
       this._emitLine(`var ${len} = ${arr}.length;`);
       this._emitLine(`for(var ${i}=0; ${i} < ${arr}.length; ${i}++) {`);
       this._emitLine(`var ${v} = ${arr}[${i}];`);
-      this._emitLine(`frame.set("${node.name.value}", ${v});`);
+      this._compileFrameSet(node.name.value, v, false);
 
       this._emitLoopBindings(i, len);
 
@@ -781,12 +791,12 @@ class Compiler extends Obj {
       for (const name of node.name.children) {
         const id = name.value;
         frame.set(id, id);
-        this._emitLine(`frame.set("${id}", ${id});`);
+        this._compileFrameSet(id, id, false);
       }
     } else {
       const id = node.name.value;
       this._emitLine(`runtime.${asyncMethod}(${arr}, 1, function(${id}, ${i}, ${len},next) {`);
-      this._emitLine('frame.set("' + id + '", ' + id + ');');
+      this._compileFrameSet(id, id, false);
       frame.set(id, id);
     }
 
@@ -877,10 +887,9 @@ class Compiler extends Obj {
       this._emitLine(`${funcArgs[i]} = runtime.isKeywordArgs(${funcArgs[i]}) ? kwArgs.${args[i]} : ${funcArgs[i]} ?? kwArgs.${args[i]};`);
     }
 
-    this._emitLines(
-      'if (kwArgs.caller) {',
-      'frame.set("caller", kwArgs.caller);',
-      '}',
+    this._emitLine('if (kwArgs.caller) {');
+    this._compileFrameSet('caller', 'kwArgs.caller', false);
+    this._emitLines('}',
       '}'
     );
 
@@ -892,7 +901,7 @@ class Compiler extends Obj {
     // random names because the function
     // will create a new run-time scope for us
     for (const arg of args) {
-      this._emitLine(`frame.set("${arg}", l_${arg});`);
+      this._compileFrameSet(arg, `l_${arg}`, false);
       currFrame.set(arg, `l_${arg}`);
     }
 
@@ -918,7 +927,7 @@ class Compiler extends Obj {
     frame.set(name, funcId);
 
     if (frame.parent) {
-      this._emitLine(`frame.set("${name}", ${funcId});`);
+      this._compileFrameSet(name, funcId, false);
     } else {
       if (node.name.value.charAt(0) !== '_') {
         this._emitLine(`context.addExport("${name}");`);
@@ -956,7 +965,7 @@ class Compiler extends Obj {
     frame.set(target, id);
 
     if (frame.parent) {
-      this._emitLine(`frame.set("${target}", ${id});`);
+      this._compileFrameSet(target, id, false);
     } else {
       this._emitLine(`context.setVariable("${target}", ${id});`);
     }
@@ -992,7 +1001,7 @@ class Compiler extends Obj {
       frame.set(alias, id);
 
       if (frame.parent) {
-        this._emitLine(`frame.set("${alias}", ${id});`);
+        this._compileFrameSet(alias, id, false);
       } else {
         this._emitLine(`context.setVariable("${alias}", ${id});`);
       }
