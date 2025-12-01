@@ -71,9 +71,8 @@ module.exports.center = center;
 function default_ (val, def, bool) {
   if (bool) {
     return val || def;
-  } else {
-    return (val !== undefined) ? val : def;
   }
+  return val !== undefined ? val : def;
 }
 
 // TODO: it is confusing to export something called 'default'
