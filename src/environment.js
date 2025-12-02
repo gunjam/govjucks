@@ -46,7 +46,7 @@ class Environment extends EmitterObj {
     // (the full trace from within govjucks may confuse developers using
     //  the library)
     // defaults to false
-    opts = this.opts = opts || new NullObject();
+    opts = this.opts = opts ?? new NullObject();
     this.opts.dev = !!opts.dev;
 
     // The autoescape flag sets global autoescaping. If true,
@@ -202,7 +202,7 @@ class Environment extends EmitterObj {
     if (lib.isFunction(parentName)) {
       cb = parentName;
       parentName = null;
-      eagerCompile = eagerCompile || false;
+      eagerCompile = eagerCompile ?? false;
     }
 
     if (lib.isFunction(eagerCompile)) {
@@ -326,7 +326,7 @@ class Environment extends EmitterObj {
       cb = opts;
       opts = new NullObject();
     }
-    opts = opts || new NullObject();
+    opts = opts ?? new NullObject();
 
     const tmpl = new Template(src, this, opts.path);
     return tmpl.render(ctx, cb);
@@ -344,7 +344,7 @@ class Context extends Obj {
       : lib.extend(new NullObject(), blocks);
 
     // Has to be tied to an environment so we can tap into its globals.
-    this.env = env || new Environment();
+    this.env = env ?? new Environment();
 
     // Make a duplicate of ctx
     this.ctx = lib.extend(new NullObject(), ctx);
@@ -394,7 +394,7 @@ class Context extends Obj {
   }
 
   getSuper (env, name, block, frame, runtime, cb) {
-    const idx = lib.indexOf(this.blocks[name] || [], block);
+    const idx = lib.indexOf(this.blocks[name] ?? [], block);
     const blk = this.blocks[name][idx + 1];
     const context = this;
 
@@ -421,7 +421,7 @@ class Context extends Obj {
 
 class Template extends Obj {
   init (src, env, path, eagerCompile, pathResolver) {
-    this.env = env || new Environment();
+    this.env = env ?? new Environment();
     this.pathResolver = pathResolver;
 
     if (lib.isObject(src)) {
@@ -482,7 +482,7 @@ class Template extends Obj {
       }
     }
 
-    const context = new Context(ctx || new NullObject(), this.blocks, this.env);
+    const context = new Context(ctx ?? new NullObject(), this.blocks, this.env);
     const frame = parentFrame ? parentFrame.push(true) : new Frame();
     frame.topLevel = true;
     let syncResult = null;
@@ -546,7 +546,7 @@ class Template extends Obj {
     frame.topLevel = true;
 
     // Run the rootRenderFunc to populate the context with exported vars
-    const context = new Context(ctx || new NullObject(), this.blocks, this.env);
+    const context = new Context(ctx ?? new NullObject(), this.blocks, this.env);
     this.rootRenderFunc(this.env, context, frame, globalRuntime, (err) => {
       if (err) {
         cb(err, null);
