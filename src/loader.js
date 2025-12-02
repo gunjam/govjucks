@@ -1,9 +1,9 @@
 'use strict';
 
+const EventEmitter = require('node:events');
 const path = require('node:path');
-const { EmitterObj } = require('./object');
 
-module.exports = class Loader extends EmitterObj {
+module.exports = class Loader extends EventEmitter {
   #resolveCache = new Map();
 
   /**
