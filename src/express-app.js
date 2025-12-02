@@ -1,5 +1,11 @@
 const path = require('node:path');
 
+/**
+ *
+ * @param {import("./environment.js").Environment} env
+ * @param {import("express").Application} app
+ * @returns
+ */
 module.exports = function express (env, app) {
   function GovjucksView (name, opts) {
     this.name = name;
@@ -20,5 +26,9 @@ module.exports = function express (env, app) {
 
   app.set('view', GovjucksView);
   app.set('govjucksEnv', env);
+
+  // For compatibilty with nunjucks
+  app.set('nunjucksEnv', env);
+
   return env;
 };

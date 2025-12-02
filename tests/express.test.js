@@ -23,6 +23,10 @@ describe('express', () => {
     assert.deepEqual(app.settings.govjucksEnv, env);
   });
 
+  it('should have reference to nunjucks env', () => {
+    assert.deepEqual(app.settings.nunjucksEnv, env);
+  });
+
   it('should render a view with extension', (t, done) => {
     app.get('/', (req, res) => {
       res.render('about.html');
