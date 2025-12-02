@@ -12,6 +12,7 @@ const { Obj, EmitterObj } = require('./object');
 const globalRuntime = require('./runtime');
 const { handleError, Frame } = globalRuntime;
 const expressApp = require('./express-app');
+const NullObject = require('./null-object');
 
 // If the user is using the async API, *always* call it
 // asynchronously even if the template was synchronous.
@@ -403,7 +404,7 @@ class Context extends Obj {
   }
 
   getExported () {
-    const exported = {};
+    const exported = new NullObject();
     for (let i = 0, len = this.exported.length; i < len; i++) {
       const name = this.exported[i];
       exported[name] = this.ctx[name];

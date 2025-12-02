@@ -1003,7 +1003,7 @@ class Compiler extends Obj {
         alias = name;
       }
 
-      this._emitLine(`if(Object.hasOwn(${importedId}, "${name}") === false) {`);
+      this._emitLine(`if(!("${name}" in ${importedId})) {`);
       this._emitLine(`cb(new Error("cannot import '${name}'")); return;`);
       this._emitLine('}');
       this._emitLine(`const ${id} = ${importedId}.${name};`);
