@@ -46,7 +46,7 @@ class Environment extends EmitterObj {
     // (the full trace from within govjucks may confuse developers using
     //  the library)
     // defaults to false
-    opts = this.opts = opts || {};
+    opts = this.opts = opts || new NullObject();
     this.opts.dev = !!opts.dev;
 
     // The autoescape flag sets global autoescaping. If true,
@@ -86,10 +86,10 @@ class Environment extends EmitterObj {
     this._initLoaders();
 
     this.globals = globals();
-    this.filters = {};
-    this.tests = {};
+    this.filters = new NullObject();
+    this.tests = new NullObject();
     this.asyncFilters = [];
-    this.extensions = {};
+    this.extensions = new NullObject();
     this.extensionsList = [];
 
     for (const [name, filter] of Object.entries(filters)) {
@@ -324,9 +324,9 @@ class Environment extends EmitterObj {
   renderString (src, ctx, opts, cb) {
     if (lib.isFunction(opts)) {
       cb = opts;
-      opts = {};
+      opts = new NullObject();
     }
-    opts = opts || {};
+    opts = opts || new NullObject();
 
     const tmpl = new Template(src, this, opts.path);
     return tmpl.render(ctx, cb);
@@ -339,18 +339,21 @@ class Environment extends EmitterObj {
 
 class Context extends Obj {
   init (ctx, blocks, env) {
+    blocks = NullObject.isNullObject(blocks)
+      ? blocks
+      : lib.extend(new NullObject(), blocks);
+
     // Has to be tied to an environment so we can tap into its globals.
     this.env = env || new Environment();
 
     // Make a duplicate of ctx
-    this.ctx = lib.extend({}, ctx);
+    this.ctx = lib.extend(new NullObject(), ctx);
 
-    this.blocks = {};
+    this.blocks = new NullObject();
     this.exported = [];
 
-    const names = Object.keys(blocks);
-    for (let i = 0, len = names.length; i < len; i++) {
-      const name = names[i];
+    // Input object should always have null prototype
+    for (const name in blocks) {
       this.addBlock(name, blocks[name]);
     }
   }
@@ -452,7 +455,7 @@ class Template extends Obj {
   render (ctx, parentFrame, cb) {
     if (typeof ctx === 'function') {
       cb = ctx;
-      ctx = {};
+      ctx = new NullObject();
     } else if (typeof parentFrame === 'function') {
       cb = parentFrame;
       parentFrame = null;
@@ -476,7 +479,7 @@ class Template extends Obj {
       }
     }
 
-    const context = new Context(ctx || {}, this.blocks, this.env);
+    const context = new Context(ctx || new NullObject(), this.blocks, this.env);
     const frame = parentFrame ? parentFrame.push(true) : new Frame();
     frame.topLevel = true;
     let syncResult = null;
@@ -517,7 +520,7 @@ class Template extends Obj {
   getExported (ctx, parentFrame, cb) {
     if (typeof ctx === 'function') {
       cb = ctx;
-      ctx = {};
+      ctx = new NullObject();
     }
 
     if (typeof parentFrame === 'function') {
@@ -540,7 +543,7 @@ class Template extends Obj {
     frame.topLevel = true;
 
     // Run the rootRenderFunc to populate the context with exported vars
-    const context = new Context(ctx || {}, this.blocks, this.env);
+    const context = new Context(ctx || new NullObject(), this.blocks, this.env);
     this.rootRenderFunc(this.env, context, frame, globalRuntime, (err) => {
       if (err) {
         cb(err, null);
@@ -580,13 +583,15 @@ class Template extends Obj {
   }
 
   _getBlocks (props) {
-    const blocks = {};
+    const blocks = new NullObject();
 
-    const keys = Object.keys(props);
-    for (let i = 0, len = keys.length; i < len; i++) {
-      const k = keys[i];
-      if (k.slice(0, 2) === 'b_') {
-        blocks[k.slice(2)] = props[k];
+    for (const key in props) {
+      if (
+        // Key starting with "b_"
+        Object.prototype.hasOwnProperty.call(props, key) &&
+        key.charCodeAt(0) === 98 &&
+        key.charCodeAt(1) === 95) {
+        blocks[key.slice(2)] = props[key];
       }
     }
 
