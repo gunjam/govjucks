@@ -1,11 +1,10 @@
 'use strict';
 
 const lib = require('./lib');
+const NullObject = require('./null-object');
+
 const arrayFrom = Array.from;
 const kKeywords = Symbol('keywordArgs');
-
-const NullObject = function () {};
-NullObject.prototype = Object.create(null);
 
 // Frames keep track of scoping both at compile-time and run-time so
 // we know how to access variables. Block tags can introduce special
