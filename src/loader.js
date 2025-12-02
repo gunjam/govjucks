@@ -4,6 +4,7 @@ const EventEmitter = require('node:events');
 const path = require('node:path');
 
 module.exports = class Loader extends EventEmitter {
+  /** @type {Map<string, string>} */
   #resolveCache = new Map();
 
   /**
