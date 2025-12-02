@@ -567,13 +567,10 @@ class Compiler extends Obj {
 
       this._emitLine('if(frame.topLevel) {');
       this._emitLine(`context.setVariable("${name}", ${id});`);
-      this._emitLine('}');
-
       if (name.charAt(0) !== '_') {
-        this._emitLine('if(frame.topLevel) {');
         this._emitLine(`context.addExport("${name}", ${id});`);
-        this._emitLine('}');
       }
+      this._emitLine('}');
     }
   }
 
