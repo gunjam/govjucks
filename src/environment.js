@@ -377,13 +377,16 @@ class Context extends Obj {
   }
 
   addBlock (name, block) {
-    this.blocks[name] ??= [];
-    this.blocks[name].push(block);
+    if (!(name in this.blocks)) {
+      this.blocks[name] = [block];
+    } else {
+      this.blocks[name].push(block);
+    }
     return this;
   }
 
   getBlock (name) {
-    if (!this.blocks[name]) {
+    if (!(name in this.blocks)) {
       throw new Error('unknown block "' + name + '"');
     }
 
