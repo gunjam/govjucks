@@ -126,8 +126,10 @@ function escape (str) {
   if (r.SafeString.isSafeString(str)) {
     return str;
   }
-  str = (str === null || str === undefined) ? '' : str.toString();
-  return r.markSafe(lib.escape(str));
+  if (str === null || str === undefined) {
+    return new r.SafeString('');
+  }
+  return new r.SafeString(lib.escape(str.toString()));
 }
 
 module.exports.escape = escape;
