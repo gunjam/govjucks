@@ -4,6 +4,11 @@ const ObjProto = Object.prototype;
 
 const escapeRegExp = /["&'<>\\]/g;
 
+/**
+ * Escapes HTML characters in a string.
+ * @param {string} string
+ * @returns {string} escaped string
+ */
 const escapeFunction = (string) => {
   let escaped = '';
   let start = 0;
@@ -71,6 +76,13 @@ function _prettifyError (path, withInternals, err) {
 
 module.exports._prettifyError = _prettifyError;
 
+/**
+ * Error to throw in templates, tracking line and column numbers for debugging.
+ * @param {string|Error} message
+ * @param {number} lineno
+ * @param {number} colno
+ * @returns {TemplateError}
+ */
 function TemplateError (message, lineno, colno) {
   let err;
   let cause;
@@ -154,18 +166,33 @@ function TemplateError (message, lineno, colno) {
 Object.setPrototypeOf(TemplateError.prototype, Error.prototype);
 module.exports.TemplateError = TemplateError;
 
+/**
+ * Returns true if input is a function
+ * @param {any} obj
+ * @returns {boolean}
+ */
 function isFunction (obj) {
   return typeof obj === 'function';
 }
 
 module.exports.isFunction = isFunction;
 
+/**
+ * Returns true if input is a string
+ * @param {any} obj
+ * @returns {boolean}
+ */
 function isString (obj) {
   return typeof obj === 'string';
 }
 
 module.exports.isString = isString;
 
+/**
+ * Returns true if input is an object literal
+ * @param {any} obj
+ * @returns {boolean}
+ */
 function isObject (obj) {
   if (typeof obj !== 'object' || obj === null) {
     return false;
@@ -234,6 +261,12 @@ function groupBy (obj, val, throwOnUndefined) {
 
 module.exports.groupBy = groupBy;
 
+/**
+ * Convert input iterable to an array, returns an empty array if input is not
+ * iterable.
+ * @param {any} obj
+ * @returns {Array}
+ */
 function toArray (obj) {
   if (obj?.[Symbol.iterator]) {
     return [...obj];
@@ -243,6 +276,11 @@ function toArray (obj) {
 
 module.exports.toArray = toArray;
 
+/**
+ * Return a new array with input values removed from it.
+ * @param {Array} array
+ * @returns {Array}
+ */
 function without (array, ...remove) {
   if (!array) {
     return [];
@@ -252,14 +290,27 @@ function without (array, ...remove) {
 
 module.exports.without = without;
 
+/**
+ * Returns a String value that is made from count copies appended together. If
+ * count is 0, the empty string is returned.
+ * @param {string} char
+ * @param {number} length
+ * @returns {string}
+ */
 function repeat (char, length) {
   return char.repeat(length);
 }
 
 module.exports.repeat = repeat;
 
+/**
+ * Calls a function for each element in an array, using the context as its `this`.
+ * @param {Array} obj
+ * @param {function} func
+ * @param {Context} context
+ */
 function each (obj, func, context) {
-  if (obj == null) {
+  if (obj === null || obj === undefined) {
     return;
   }
 
@@ -271,6 +322,12 @@ function each (obj, func, context) {
 
 module.exports.each = each;
 
+/**
+ * Calls a defined callback function on each element of an array, and returns an
+ * array that contains the results.
+ * @param {Array} obj
+ * @param {function} func
+ */
 function map (obj, func) {
   const length = obj?.length;
   if (length === undefined) {
@@ -287,6 +344,12 @@ function map (obj, func) {
 
 module.exports.map = map;
 
+/**
+ * Asyncronously iterates over an array, calling a function for each element.
+ * @param {Array} arr
+ * @param {function} iter
+ * @param {function} cb
+ */
 function asyncIter (arr, iter, cb) {
   let i = -1;
 
@@ -305,6 +368,12 @@ function asyncIter (arr, iter, cb) {
 
 module.exports.asyncIter = asyncIter;
 
+/**
+ * Asyncronously iterates over an object, calling a function for each element.
+ * @param {object} arr
+ * @param {function} iter
+ * @param {function} cb
+ */
 function asyncFor (obj, iter, cb) {
   const keys = Object.keys(obj || {});
   const len = keys.length;
@@ -326,18 +395,38 @@ function asyncFor (obj, iter, cb) {
 
 module.exports.asyncFor = asyncFor;
 
+/**
+ * Returns the index of the first occurrence of a value in an array, or -1 if it
+ * is not present.
+ * @param {Iterable} arr
+ * @param {any} searchElement
+ * @param {number} fromIndex
+ * @returns {number} index
+ */
 function indexOf (arr, searchElement, fromIndex) {
   return Array.prototype.indexOf.call(arr || [], searchElement, fromIndex);
 }
 
 module.exports.indexOf = indexOf;
 
+/**
+ * Add right object's properties to the left object
+ * @param {object} obj1
+ * @param {object} obj2
+ * @returns {object}
+ */
 function extend (obj1, obj2) {
   return Object.assign(obj1 ?? {}, obj2);
 }
 
 module.exports._assign = module.exports.extend = extend;
 
+/**
+ * Return true if key is a property of value.
+ * @param {string} key
+ * @param {any} val
+ * @returns {boolean}
+ */
 function inOperator (key, val) {
   if (Array.isArray(val) || isString(val)) {
     return val.indexOf(key) !== -1;
@@ -349,3 +438,5 @@ function inOperator (key, val) {
 }
 
 module.exports.inOperator = inOperator;
+
+/** @typedef {import("./environment.js").Context} Context */
