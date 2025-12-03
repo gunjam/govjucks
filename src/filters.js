@@ -138,8 +138,10 @@ function safe (str) {
   if (r.SafeString.isSafeString(str)) {
     return str;
   }
-  str = (str === null || str === undefined) ? '' : str.toString();
-  return r.markSafe(str);
+  if (str === null || str === undefined) {
+    return new r.SafeString('');
+  }
+  return new r.SafeString(str.toString());
 }
 
 module.exports.safe = safe;
