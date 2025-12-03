@@ -66,11 +66,12 @@ class Frame {
   }
 
   lookup (name) {
-    const val = this.variables[name];
-    if (val !== undefined) {
-      return val;
+    let frame = this;
+    let val = frame.variables[name];
+    while (val === undefined && (frame = frame.parent)) {
+      val = frame.variables[name];
     }
-    return this.parent?.lookup(name);
+    return val;
   }
 
   resolve (name, forWrite) {
