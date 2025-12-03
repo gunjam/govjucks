@@ -116,7 +116,7 @@ function TemplateError (message, lineno, colno) {
 
   if (cause) {
     const stackDescriptor = Object.getOwnPropertyDescriptor(cause, 'stack');
-    getStack = stackDescriptor && (stackDescriptor.get || (() => stackDescriptor.value));
+    getStack = stackDescriptor && (stackDescriptor.get ?? (() => stackDescriptor.value));
     if (!getStack) {
       getStack = () => cause.stack;
     }
@@ -138,7 +138,7 @@ function TemplateError (message, lineno, colno) {
   err.firstUpdate = true;
 
   err.Update = function Update (path) {
-    let msg = '(' + (path || 'unknown path') + ')';
+    let msg = '(' + (path ?? 'unknown path') + ')';
 
     // only show lineno + colno next to path of template
     // where error occurred
@@ -155,7 +155,7 @@ function TemplateError (message, lineno, colno) {
       msg += ' ';
     }
 
-    this.message = msg + (this.message || '');
+    this.message = msg + (this.message ?? '');
     this.firstUpdate = false;
     return this;
   };
@@ -375,7 +375,7 @@ module.exports.asyncIter = asyncIter;
  * @param {function} cb
  */
 function asyncFor (obj, iter, cb) {
-  const keys = Object.keys(obj || {});
+  const keys = Object.keys(obj ?? {});
   const len = keys.length;
   let i = -1;
 
@@ -404,7 +404,7 @@ module.exports.asyncFor = asyncFor;
  * @returns {number} index
  */
 function indexOf (arr, searchElement, fromIndex) {
-  return Array.prototype.indexOf.call(arr || [], searchElement, fromIndex);
+  return Array.prototype.indexOf.call(arr ?? [], searchElement, fromIndex);
 }
 
 module.exports.indexOf = indexOf;
