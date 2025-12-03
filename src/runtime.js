@@ -6,19 +6,29 @@ const NullObject = require('./null-object');
 const arrayFrom = Array.from;
 const kKeywords = Symbol('keywordArgs');
 
-// Frames keep track of scoping both at compile-time and run-time so
-// we know how to access variables. Block tags can introduce special
-// variables, for example.
 class Frame {
+  /**
+   * Frames keep track of scoping both at compile-time and run-time so
+   * we know how to access variables. Block tags can introduce special
+   * variables, for example.
+   * @param {Frame} parent
+   * @param {boolean} [isolateWrites]
+   */
   constructor (parent, isolateWrites) {
     this.variables = new NullObject();
     this.parent = parent;
     this.topLevel = false;
     // if this is true, writes (set) should never propagate upwards past
     // this frame to its parent (though reads may).
-    this.isolateWrites = isolateWrites;
+    this.isolateWrites = isolateWrites ?? false;
   }
 
+  /**
+   * Set a variable in this frame using the provided key, only sets a top level.
+   * @param {string} name
+   * @param {any} val
+   * @param {boolean} resolveUp
+   */
   setShallow (name, val, resolveUp) {
     if (resolveUp) {
       const frame = this.resolve(name, true);
@@ -31,6 +41,13 @@ class Frame {
     this.variables[name] = val;
   }
 
+  /**
+   * Deeply set a variable on this frame using a dot separated key path.
+   * @param {string} name
+   * @param {any} val
+   * @param {Array<string>} parts - the indiviual keys in the name
+   * @param {boolean} resolveUp
+   */
   setDeep (name, val, parts, resolveUp) {
     if (resolveUp) {
       const frame = this.resolve(parts[0], true);
@@ -52,6 +69,13 @@ class Frame {
     obj[parts[last]] = val;
   }
 
+  /**
+   * Set a variable in this frame using the provided key, a dot seperated key
+   * can be used to deeply set a variable on the frame.
+   * @param {string} name
+   * @param {any} val
+   * @param {boolean} resolveUp
+   */
   set (name, val, resolveUp) {
     if (name.indexOf('.') === -1) {
       this.setShallow(name, val, resolveUp);
@@ -61,10 +85,21 @@ class Frame {
     }
   }
 
+  /**
+   * Get a variable from the frame.
+   * @param {string} name
+   * @returns {any|null}
+   */
   get (name) {
     return this.variables[name] ?? null;
   }
 
+  /**
+   * Look up a variable on a frame, will return the value if it exists on the
+   * frame or any parent frame.
+   * @param {string} name
+   * @returns {any}
+   */
   lookup (name) {
     let frame = this;
     let val = frame.variables[name];
@@ -74,6 +109,13 @@ class Frame {
     return val;
   }
 
+  /**
+   * Resolve a variable on a frame, will return the frame if the variable exists
+   * on the frame or any parent frame.
+   * @param {string} name
+   * @param {boolean} forWrite
+   * @returns {Frame|undefined}
+   */
   resolve (name, forWrite) {
     if (this.variables[name] !== undefined) {
       return this;
@@ -84,15 +126,31 @@ class Frame {
     return this.parent?.resolve(name);
   }
 
+  /**
+   * Returns a new frame with this as its parent.
+   * @param {boolean} isolateWrites
+   * @returns {Frame}
+   */
   push (isolateWrites) {
     return new Frame(this, isolateWrites);
   }
 
+  /**
+   * Returns the parent frame, if one exists.
+   * @returns {Frame|undefined}
+   */
   pop () {
     return this.parent;
   }
 }
 
+/**
+ * Make a nunjucks macro from a given function, with support for keyword
+ * arguments.
+ * @param {Array<string>} params
+ * @param {function} func
+ * @returns {function}
+ */
 function makeMacro (params, func) {
   const paramCount = params.length;
   return function (...args) {
@@ -110,25 +168,47 @@ function makeMacro (params, func) {
   };
 }
 
+/**
+ * Make an input object into keyword arguments object
+ * @param {object} obj
+ * @returns {KeywordArgs}
+ */
 function makeKeywordArgs (obj) {
   obj[kKeywords] = true;
   return obj;
 }
 
+/**
+ * Check if an input object is a keyword arguments object
+ * @param {object} obj
+ * @returns {boolean}
+ */
 function isKeywordArgs (obj) {
   return obj?.[kKeywords] ?? false;
 }
 
-function getKeywordArg (val, kwArgs, key) {
+/**
+ * Get keyword argument value for a given parameter. If there is no keyword arg
+ * value for given paramenter, return the input (original) value, unless the
+ * input value was the keyword args object.
+ * @param {object} obj
+ * @returns {boolean}
+ */
+function getKeywordArg (val, kwArgs, param) {
   if (isKeywordArgs(val)) {
-    return kwArgs[key];
+    return kwArgs[param];
   }
-  return kwArgs[key] ?? val;
+  return kwArgs[param] ?? val;
 }
 
-// A SafeString object indicates that the string should not be
-// autoescaped. This happens magically because autoescaping only
-// occurs on primitive string objects.
+/**
+ * A SafeString object indicates that the string should not be
+ * autoescaped. This happens magically because autoescaping only
+ * occurs on primitive string objects.
+ * @extends {String}
+ * @param {any} val
+ * @returns {SafeString|any}
+ */
 function SafeString (val) {
   if (typeof val !== 'string') {
     return val;
@@ -151,6 +231,12 @@ SafeString.prototype.valueOf = function valueOf () {
 SafeString.prototype.toString = function toString () {
   return this.val;
 };
+
+/**
+ * Return true if input value is a SafeString.
+ * @param {any} val
+ * @returns {boolean}
+ */
 SafeString.isSafeString = function isSafeString (val = '') {
   return val instanceof SafeString;
 };
@@ -162,6 +248,12 @@ function copySafeness (dest, target) {
   return target.toString();
 }
 
+/**
+ * Convert input string to SafeString, or input function to a function that
+ * returns a SafeString (if it would otherwise return a string).
+ * @param {string|function} val
+ * @returns {SafeString|function}
+ */
 function markSafe (val) {
   switch (typeof val) {
     case 'string':
@@ -181,18 +273,33 @@ function markSafe (val) {
   }
 }
 
+/**
+ * Returns empty string for nullish values, converts value to HTML escaped
+ * string if autoescape is true (and input is not a SafeString).
+ * @param {any} val
+ * @param {boolean} autoescape
+ * @returns {string|SafeString}
+ */
 function suppressValue (val, autoescape) {
   if (val === undefined || val === null) {
     return '';
   }
 
-  if (autoescape && SafeString.isSafeString(val) === false) {
+  if (autoescape && !SafeString.isSafeString(val)) {
     return lib.escape(val.toString());
   }
 
   return val;
 }
 
+/**
+ * Throw template error for nullish values.
+ * @param {any} val
+ * @param {number} lineno
+ * @param {number} colno
+ * @throws {TemplateError}
+ * @returns {any}
+ */
 function ensureDefined (val, lineno, colno) {
   if (val === null || val === undefined) {
     throw new lib.TemplateError(
@@ -213,26 +320,49 @@ function memberLookup (obj, val) {
   return ov.bind(obj);
 }
 
-function callWrap (obj, name, context, args) {
-  if (!obj) {
-    throw new Error(`Unable to call \`${name}\`, which is undefined or falsey`);
+/**
+ * Assert input is a function and call it with the given context as its `this`.
+ * @template InputFunction
+ * @param {InputFunction} func
+ * @param {string} name name of the function
+ * @param {object} context `this` object to apply to function
+ * @param {Array<any>} args array of arguemnts to call the function with
+ * @throws {ReferenceError|TypeError}
+ * @returns {ReturnType<InputFunction>}
+ */
+function callWrap (func, name, context, args) {
+  if (!func) {
+    throw new ReferenceError(`Unable to call \`${name}\`, which is undefined or falsey`);
   }
-  if (typeof obj !== 'function') {
-    throw new Error(`Unable to call \`${name}\`, which is not a function`);
+  if (typeof func !== 'function') {
+    throw new TypeError(`Unable to call \`${name}\`, which is not a function`);
   }
 
-  return obj.apply(context, args);
+  return func.apply(context, args);
 }
 
+/**
+ * Assert input is a function
+ * @param {function} func
+ * @param {string} name name of the function
+ * @throws {ReferenceError|TypeError}
+ */
 function assertFunction (func, name) {
   if (typeof func !== 'function') {
     if (!func) {
-      throw new Error(`Unable to call \`${name}\`, which is undefined or falsey`);
+      throw new ReferenceError(`Unable to call \`${name}\`, which is undefined or falsey`);
     }
-    throw new Error(`Unable to call \`${name}\`, which is not a function`);
+    throw new TypeError(`Unable to call \`${name}\`, which is not a function`);
   }
 }
 
+/**
+ * Lookup and return a variable from the input frame, if it's not found, look it
+ * up in the context.
+ * @param {Context} context
+ * @param {Frame} frame
+ * @param {string} name
+ */
 function contextOrFrameLookup (context, frame, name) {
   const val = frame.lookup(name);
   return (val !== undefined)
@@ -240,6 +370,13 @@ function contextOrFrameLookup (context, frame, name) {
     : context.lookup(name);
 }
 
+/**
+ * Convert input error into a TemplateError.
+ * @param {Error} error
+ * @param {number} lineno
+ * @param {number} colno
+ * @returns {TemplateError}
+ */
 function handleError (error, lineno, colno) {
   if (error.lineno) {
     return error;
@@ -361,3 +498,6 @@ module.exports = {
   inOperator: lib.inOperator,
   fromIterator
 };
+
+/** @typedef {object} KeywordArgs macro keyword arguments object */
+/** @typedef {import("./lib.js").TemplateError} TemplateError */
