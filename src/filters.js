@@ -416,17 +416,12 @@ function getSelectOrReject (expectedTestResult) {
       return [];
     }
 
-    testName = testName || 'truthy';
-    const filtered = [];
-
-    for (let i = 0, len = _arr.length; i !== len; ++i) {
-      const item = _arr[i];
-      if (this.env.getTest(testName).call(this, item, secondArg) === expectedTestResult) {
-        filtered.push(item);
-      }
+    if (!testName) {
+      return _arr.filter((v) => !!v === expectedTestResult);
     }
 
-    return filtered;
+    const test = this.env.getTest(testName).bind(this);
+    return _arr.filter((item) => test(item, secondArg) === expectedTestResult);
   }
 
   return filter;
