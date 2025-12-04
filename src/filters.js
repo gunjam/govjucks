@@ -5,6 +5,15 @@ const r = require('./runtime');
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
+/**
+ * If value is nullish or false, return the default value, otherwise return the
+ * original value.
+ * @template V
+ * @param {V} value
+ * @template D
+ * @param {D} defaultValue
+ * @returns {V|D}
+ */
 function normalize (value, defaultValue) {
   if (value === null || value === undefined || value === false) {
     return defaultValue;
@@ -14,6 +23,12 @@ function normalize (value, defaultValue) {
 
 module.exports.abs = Math.abs;
 
+/**
+ * Return a list of lists with the given number of items.
+ * @param {Array} arr
+ * @param {number} linecount
+ * @param {any} fillWith
+ */
 function batch (arr, linecount, fillWith) {
   const length = arr.length;
   const groups = Math.ceil(length / linecount);
@@ -42,6 +57,10 @@ function batch (arr, linecount, fillWith) {
 
 module.exports.batch = batch;
 
+/**
+ * Make the first letter uppercase, the rest lower case.
+ * @param {string} str
+ */
 function capitalize (str) {
   str = normalize(str, '');
   const ret = str.toLowerCase();
@@ -50,6 +69,11 @@ function capitalize (str) {
 
 module.exports.capitalize = capitalize;
 
+/**
+ * Center the value in a field of a given width.
+ * @param {string} str
+ * @param {number} [width=80]
+ */
 function center (str, width) {
   str = normalize(str, '');
   width = width || 80;
@@ -68,6 +92,16 @@ function center (str, width) {
 
 module.exports.center = center;
 
+/**
+ * If `value` is strictly `undefined`, return `default`, otherwise `value`. If
+ * `boolean` is true, any JavaScript falsy value will return `default` (false,
+ * "", etc).
+ * @template V
+ * @param {V} val
+ * @template D
+ * @param {D} def
+ * @param {boolean} bool
+ */
 function default_ (val, def, bool) {
   if (bool) {
     return val || def;
@@ -78,6 +112,12 @@ function default_ (val, def, bool) {
 // TODO: it is confusing to export something called 'default'
 module.exports['default'] = default_;
 
+/**
+ * Sort a dict and yield (key, value) pairs.
+ * @param {object} val
+ * @param {boolean} caseSensitive
+ * @param {'key'|'value'} [by]
+ */
 function dictsort (val, caseSensitive, by) {
   if (!lib.isObject(val)) {
     throw new lib.TemplateError('dictsort filter: val must be an object');
@@ -116,12 +156,26 @@ function dictsort (val, caseSensitive, by) {
 
 module.exports.dictsort = dictsort;
 
+/**
+ * Call {@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify|`JSON.stringify`}
+ * on an object and dump the result into the template. Useful for debugging:
+ * `{{ items | dump }}`.
+ * @param {*} obj
+ * @param {number} [spaces]
+ */
 function dump (obj, spaces) {
   return JSON.stringify(obj, null, spaces);
 }
 
 module.exports.dump = dump;
 
+/**
+ * Convert the characters &, <, >, ‘, and ” in strings to HTML-safe sequences
+ * Use this if you need to display text that might contain such characters in
+ * HTML. Marks return value as markup string.
+ * @param {any} str
+ * @returns {string|SafeString}
+ */
 function escape (str) {
   if (r.SafeString.isSafeString(str)) {
     return str;
@@ -134,6 +188,12 @@ function escape (str) {
 
 module.exports.escape = escape;
 
+/**
+ * Mark the value as safe which means that in an environment with automatic
+ * escaping enabled this variable will not be escaped.
+ * @param {any} str
+ * @returns {string|SafeString}
+ */
 function safe (str) {
   if (r.SafeString.isSafeString(str)) {
     return str;
@@ -146,12 +206,20 @@ function safe (str) {
 
 module.exports.safe = safe;
 
+/**
+ * Get the first item in an array or the first letter if it's a string.
+ * @param {Array|string} arr
+ */
 function first (arr) {
   return arr[0];
 }
 
 module.exports.first = first;
 
+/**
+ * Enforce HTML escaping. This will probably double escape variables.
+ * @param {any} str
+ */
 function forceescape (str) {
   if (str === null || str === undefined) {
     return new r.SafeString('');
@@ -161,13 +229,31 @@ function forceescape (str) {
 
 module.exports.forceescape = forceescape;
 
+/**
+ * Group a sequence of objects by a common attribute.
+ * @param {Array<object>} arr
+ * @param {string} attr
+ * @returns {object}
+ */
 function groupby (arr, attr) {
   return lib.groupBy(arr, attr, this.env.opts.throwOnUndefined);
 }
 
 module.exports.groupby = groupby;
 
+/**
+ * Indent a string using spaces. Default behaviour is *not* to indent the first
+ * line. Default indentation is 4 spaces.
+ * @param {string} str
+ * @param {number} [width=4]
+ * @param {boolean} [indentfirst=false]
+ * @returns
+ */
 function indent (str, width, indentfirst) {
+  if (!this.env.opts.preserveWhiteSpace) {
+    return str;
+  }
+
   str = normalize(str, '');
 
   if (str.length === 0) {
@@ -189,6 +275,13 @@ function indent (str, width, indentfirst) {
 
 module.exports.indent = indent;
 
+/**
+ * Return a string which is the concatenation of the strings in a sequence.
+ * @param {Array<string|object>} arr
+ * @param {string} [del='']
+ * @param {string} [attr]
+ * @returns
+ */
 function join (arr, del, attr) {
   del = del || '';
 
@@ -201,12 +294,21 @@ function join (arr, del, attr) {
 
 module.exports.join = join;
 
+/**
+ * Get the last item in an array or the last letter if it's a string.
+ * @param {Array|string} arr
+ */
 function last (arr) {
   return arr[arr.length - 1];
 }
 
 module.exports.last = last;
 
+/**
+ * Return the length of an array or string, or the number of keys in an object.
+ * @param {Array|Map|Set|string|object} val
+ * @returns {number}
+ */
 function lengthFilter (val) {
   const value = normalize(val, undefined);
   if (value === undefined) {
@@ -229,6 +331,13 @@ function lengthFilter (val) {
 
 module.exports.length = lengthFilter;
 
+/**
+ * Convert the value into a list.
+ * If it was a string the returned list will be a list of characters.
+ * @param {string|object} val
+ * @throws {TemplateError}
+ * @returns {Array}
+ */
 function list (val) {
   if (lib.isString(val)) {
     return val.split('');
@@ -251,6 +360,10 @@ function list (val) {
 
 module.exports.list = list;
 
+/**
+ * Convert string to all lower case.
+ * @param {string} str
+ */
 function lower (str) {
   str = normalize(str, '');
   return str.toLowerCase();
@@ -259,6 +372,12 @@ function lower (str) {
 module.exports.lower = lower;
 
 const newLines = /\r\n|\n/g;
+
+/**
+ * Replace new lines with `<br>` HTML elements.
+ * @param {string} str
+ * @returns {string|Safestring}
+ */
 function nl2br (str) {
   if (str === null || str === undefined) {
     return '';
@@ -268,6 +387,11 @@ function nl2br (str) {
 
 module.exports.nl2br = nl2br;
 
+/**
+ * Select a random value from an array.
+ * (This will change everytime the page is refreshed).
+ * @param {Array} arr
+ */
 function random (arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
@@ -310,6 +434,18 @@ function getSelectOrReject (expectedTestResult) {
 
 module.exports.reject = getSelectOrReject(false);
 
+/**
+ * Filter a sequence of objects by applying a test to the specified attribute
+ * of each object, and rejecting the objects with the test succeeding.
+ *
+ * This is the opposite of ```selectattr``` filter.
+ *
+ * If no test is specified, the attribute’s value will be evaluated as a
+ * boolean.
+ * @param {Array<object>} arr
+ * @param {string} attr
+ * @returns {Array<object>}
+ */
 function rejectattr (arr, attr) {
   return arr.filter((item) => !item[attr]);
 }
@@ -318,12 +454,33 @@ module.exports.rejectattr = rejectattr;
 
 module.exports.select = getSelectOrReject(true);
 
+/**
+ * Filter a sequence of objects by applying a test to the specified attribute
+ * of each object, and only selecting the objects with the test succeeding.
+ *
+ * This is the opposite to ```rejectattr```.
+ *
+ * If no test is specified, the attribute’s value will be evaluated as a
+ * boolean.
+ * @param {Array<object>} arr
+ * @param {string} attr
+ * @returns {Array<object>}
+ */
 function selectattr (arr, attr) {
   return arr.filter((item) => !!item[attr]);
 }
 
 module.exports.selectattr = selectattr;
 
+/**
+ * Replace one item with another. The first item is the item to be
+ * replaced, the second item is the replaced value.
+ * @param {string} str
+ * @param {string|RegExp} old
+ * @param {string} [new_]
+ * @param {number} [maxCount=Infinity]
+ * @returns {string|Safestring}
+ */
 function replace (str, old, new_, maxCount) {
   if (old instanceof RegExp) {
     return str.replace(old, new_);
@@ -397,6 +554,11 @@ function replace (str, old, new_, maxCount) {
 
 module.exports.replace = replace;
 
+/**
+ * Reverse a string.
+ * @param {string|Array} val
+ * @returns {string|Safestring|Array}
+ */
 function reverse (val) {
   const length = val.length;
 
@@ -419,6 +581,13 @@ function reverse (val) {
 
 module.exports.reverse = reverse;
 
+/**
+ * Round a number.
+ * @param {number} val
+ * @param {number} [precision=0]
+ * @param {'ceil'|'floor'|'round'} [method='round']
+ * @returns {number}
+ */
 function round (val, precision, method) {
   precision = precision || 0;
   const factor = Math.pow(10, precision);
@@ -437,6 +606,13 @@ function round (val, precision, method) {
 
 module.exports.round = round;
 
+/**
+ * Slice an iterator and return a list of lists containing those items.
+ * @param {Array} arr
+ * @param {number} slices
+ * @param {any} [fillWith]
+ * @returns {Array}
+ */
 function slice (arr, slices, fillWith) {
   const sliceLength = Math.floor(arr.length / slices);
   const extra = arr.length % slices;
@@ -467,6 +643,13 @@ function slice (arr, slices, fillWith) {
 
 module.exports.slice = slice;
 
+/**
+ * Output the sum of items in the array.
+ * @param {Array<number|object>} arr
+ * @param {string} [attr]
+ * @param {number} [start=0]
+ * @returns {number}
+ */
 function sum (arr, attr, start) {
   let sum = start ?? 0;
   if (attr) {
@@ -485,6 +668,17 @@ module.exports.sum = sum;
 
 module.exports.sort = r.makeMacro(
   ['value', 'reverse', 'case_sensitive', 'attribute'],
+  /**
+   * Sort `arr` with JavaScript's `arr.sort` function. If `reverse` is true,
+   * result will be reversed. Sort is case-insensitive by default, but setting
+   * `caseSens` to true makes it case-sensitive. If `attr` is passed, will
+   * compare `attr` from each item.
+   * @param {Array} arr
+   * @param {boolean} [reversed=false]
+   * @param {boolean} [caseSensitive=false]
+   * @param {string} [attribute]
+   * @returns {Array}
+   */
   function sortFilter (arr, reversed, caseSens, attr) {
     const reverse = reversed ? -1 : 1;
     caseSens = caseSens || false;
@@ -527,6 +721,11 @@ module.exports.sort = r.makeMacro(
     return array;
   });
 
+/**
+ * Convert an object to a string
+ * @param {*} obj
+ * @returns {string|SafeString}
+ */
 function string (obj) {
   return r.copySafeness(obj, obj);
 }
@@ -540,6 +739,15 @@ const lineBreaks = /\r\n/g;
 const abnormalBr = /\n\n\n+/g;
 const spaces = /\s+/gi;
 
+/**
+ * Analog of jinja's {@link http://jinja.pocoo.org/docs/templates/#striptags|striptags}.
+ * If `preserve_linebreaks` is false (default), strips SGML/XML tags and
+ * replaces adjacent whitespace with one space.  If `preserve_linebreaks` is
+ * true, normalizes whitespace, trying to preserve original linebreaks.
+ * @param {string} input
+ * @param {boolean} [preserveLinebreaks=false]
+ * @returns {string|SafeString}
+ */
 function striptags (input, preserveLinebreaks) {
   input = normalize(input, '');
   preserveLinebreaks = preserveLinebreaks || false;
@@ -559,6 +767,11 @@ function striptags (input, preserveLinebreaks) {
 
 module.exports.striptags = striptags;
 
+/**
+ * Make the first letter of the string uppercase.
+ * @param {string} str
+ * @returns {string|SafeString}
+ */
 function title (str) {
   str = normalize(str, '');
   const words = str.split(' ');
@@ -577,12 +790,30 @@ function title (str) {
 
 module.exports.title = title;
 
+/**
+ * Strip leading and trailing whitespace.
+ * @param {string} str
+ * @returns {string|SafeString}
+ */
 function trim (str) {
   return r.copySafeness(str, str.trim());
 }
 
 module.exports.trim = trim;
 
+/**
+ * Return a truncated copy of the string. The length is specified with the first
+ * parameter which defaults to 255. If the second parameter is true the filter
+ * will cut the text at length. Otherwise it will discard the last word. If the
+ * text was in fact truncated it will append an ellipsis sign ("...").
+ * A different ellipsis sign than "(...)"  can be specified using the third
+ * parameter.
+ * @param {string} input
+ * @param {number} [length=255]
+ * @param {boolean} [killwords=false]
+ * @param {string} [end='...']
+ * @returns {string|SafeString}
+ */
 function truncate (input, length, killwords, end) {
   let res = normalize(input, '');
   length = length || 255;
@@ -604,6 +835,10 @@ function truncate (input, length, killwords, end) {
 
 module.exports.truncate = truncate;
 
+/**
+ * Convert the string to upper case.
+ * @param {string} str
+ */
 function upper (str) {
   str = normalize(str, '');
   return str.toUpperCase();
@@ -611,6 +846,12 @@ function upper (str) {
 
 module.exports.upper = upper;
 
+/**
+ * Escape strings for use in URLs, using UTF-8 encoding.
+ * Accepts both dictionaries and regular strings as well as pairwise iterables.
+ * @param {any} obj
+ * @returns {string}
+ */
 function urlencode (obj) {
   const enc = encodeURIComponent;
   if (lib.isString(obj)) {
@@ -642,6 +883,13 @@ const tldRe = /\.(?:org|net|com)(?::|\/|$)/;
 const spaceRe = /^\s+$/;
 const splitRe = /(\s+)/;
 
+/**
+ * Convert URLs in plain text into clickable links.
+ * @param {string} str
+ * @param {number} [length=Infinity]
+ * @param {boolean} [nofollow=false]
+ * @returns {string}
+ */
 function urlize (str, length, nofollow) {
   if (Number.isNaN(length)) {
     length = Number.Infinity;
@@ -699,6 +947,10 @@ function urlize (str, length, nofollow) {
 
 module.exports.urlize = urlize;
 
+/**
+ * Count and output the number of words in a string.
+ * @param {string} str
+ */
 function wordcount (str) {
   str = normalize(str, '');
   const words = (str) ? str.match(/\w+/g) : null;
@@ -707,6 +959,13 @@ function wordcount (str) {
 
 module.exports.wordcount = wordcount;
 
+/**
+ * Convert a value into a floating point number. If the conversion fails 0.0 is
+ * returned.
+ * This default can be overridden by using the first parameter.
+ * @param {string} val
+ * @param {any} def
+ */
 function float (val, def) {
   const res = parseFloat(val);
   return (Number.isNaN(res)) ? def : res;
@@ -716,6 +975,15 @@ module.exports.float = float;
 
 const intFilter = r.makeMacro(
   ['value', 'default', 'base'],
+  /**
+   * Convert the value into an integer.
+   * If the conversion fails 0 is returned. You can override this default using
+   * the first parameter. You can also override the default base (10) in the
+   * second parameter.
+   * @param {string} value
+   * @param {*} defaultValue
+   * @param {number} [base=10]
+   */
   function doInt (value, defaultValue, base = 10) {
     const res = Number.parseInt(value, base);
     return (Number.isNaN(res)) ? defaultValue : res;
@@ -727,3 +995,5 @@ module.exports.int = intFilter;
 // Aliases
 module.exports.d = module.exports.default;
 module.exports.e = module.exports.escape;
+
+/** @typedef {import("./lib.js").TemplateError} TemplateError */
