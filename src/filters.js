@@ -405,6 +405,12 @@ module.exports.random = random;
  * @returns {function(array, string, *): array}
  */
 function getSelectOrReject (expectedTestResult) {
+  /**
+   * @param {Array} arr
+   * @param {string} [testName]
+   * @param {any} [secondArg]
+   * @returns {Array}
+   */
   function filter (arr, testName, secondArg) {
     let _arr;
 
