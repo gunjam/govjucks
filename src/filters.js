@@ -250,10 +250,6 @@ module.exports.groupby = groupby;
  * @returns
  */
 function indent (str, width, indentfirst) {
-  if (!this.env.opts.preserveWhiteSpace) {
-    return str;
-  }
-
   str = normalize(str, '');
 
   if (str.length === 0) {
