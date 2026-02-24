@@ -1,35 +1,22 @@
 'use strict';
 
 const assert = require('node:assert/strict');
-const path = require('node:path');
+const fs = require('node:fs');
 const os = require('node:os');
-const {
-  after, before, describe, it
-} = require('node:test');
+const path = require('node:path');
+const { after, before, describe, it } = require('node:test');
 const govjucks = require('../index');
-const fs = require('fs-extra');
-
-function rmdir (dirPath) {
-  fs.emptyDirSync(dirPath);
-  fs.rmdirSync(dirPath);
-}
 
 describe('govjucks.configure', () => {
   let tempdir;
 
   before(() => {
-    try {
-      tempdir = fs.mkdtempSync(path.join(os.tmpdir(), 'templates'));
-      fs.emptyDirSync(tempdir);
-    } catch (e) {
-      rmdir(tempdir);
-      throw e;
-    }
+    tempdir = fs.mkdtempSync(path.join(os.tmpdir(), 'templates'));
   });
 
   after(() => {
     govjucks.reset();
-    rmdir(tempdir);
+    fs.rmSync(tempdir, { recursive: true, force: true });
   });
 
   it('should cache templates by default', () => {
