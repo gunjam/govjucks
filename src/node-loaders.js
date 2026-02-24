@@ -9,13 +9,6 @@ let chokidar;
 class FileSystemLoader extends Loader {
   constructor (searchPaths, opts) {
     super();
-    if (typeof opts === 'boolean') {
-      console.log(
-        '[govjucks] Warning: you passed a boolean as the second ' +
-        'argument to FileSystemLoader, but it now takes an options ' +
-        'object. See http://mozilla.github.io/govjucks/api.html#filesystemloader'
-      );
-    }
 
     opts = opts || {};
     this.pathsToNames = {};
