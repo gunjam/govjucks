@@ -1,24 +1,18 @@
----
-layout: subpage
-title: API
----
-{% raw %}
-
 # API
 
 The API for govjucks covers rendering templates, adding filters and
 extensions, customizing template loading, and more.
 
 ## User-Defined Templates Warning
-
-  govjucks does not sandbox execution so **it is not safe to run
+> [!WARNING]
+> govjucks does not sandbox execution so **it is not safe to run
   user-defined templates or inject user-defined content into template
   definitions**. On the server, you can expose attack vectors for
   accessing sensitive data and remote code execution. On the client,
   you can expose cross-site scripting vulnerabilities even for
   precompiled templates (which can be mitigated with a strong
   [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy)). See
-  [this issue](https://github.com/gunjam/govjucks-docs/issues/17) for
+  [this issue](https://github.com/mozilla/nunjucks-docs/issues/17) for
   more information.
 
 ## Simple API
@@ -26,10 +20,10 @@ extensions, customizing template loading, and more.
 If you don't need deep customization of the system, you can use this simple
 higher-level API for loading and rendering templates.
 
-{% endraw %}
-{% api %}
-render
+## `render()`
+```js
 govjucks.render(name, [context], [callback])
+```
 
 Renders the template named **name** with the **context** hash. If
 **callback** is provided, it will be called when done with any
@@ -41,18 +35,18 @@ See the warning about **not allowing [users to define their own
 templates](#user-defined-templates-warning).**
 
 ```js
-var res = govjucks.render('foo.html');
+const res = govjucks.render('foo.html');
 
-var res = govjucks.render('foo.html', { username: 'James' });
+const res = govjucks.render('foo.html', { username: 'James' });
 
 govjucks.render('async.html', function(err, res) {
 });
 ```
-{% endapi %}
 
-{% api %}
-renderString
+### `renderString()`
+```js
 govjucks.renderString(str, context, [callback])
+```
 
 Same as [`render`](#render), but renders a raw string instead of
 loading a template.
@@ -60,31 +54,26 @@ loading a template.
 The same warning about **not allowing [users to define their own
 templates](#user-defined-templates-warning)** applies.
 
-
-{% raw %}
 ```js
-var res = govjucks.renderString('Hello {{ username }}', { username: 'James' });
+const res = govjucks.renderString('Hello {{ username }}', { username: 'James' });
 ```
-{% endraw %}
-{% endapi %}
 
-{% api %}
-compile
+### `compile()`
+```js
 govjucks.compile(str, [env], [path])
+```
 
 Compile the given string into a reusable govjucks Template object.
 
-{% raw %}
 ```js
-var template = govjucks.compile('Hello {{ username }}');
+const template = govjucks.compile('Hello {{ username }}');
 template.render({ username: 'James' });
 ```
-{% endraw %}
-{% endapi %}
 
-{% api %}
-configure
+### `configure()`
+```js
 govjucks.configure([path], [opts]);
+```
 
 Tell govjucks that your templates live at **path** and flip any
 feature on or off with the **opts** hash. You can provide both
@@ -130,15 +119,14 @@ govjucks.configure('views', {
     watch: true
 });
 
-var env = govjucks.configure('views');
+const env = govjucks.configure('views');
 // do stuff with env
 ```
 
-{% endapi %}
-
-{% api %}
-installJinjaCompat
+### `installJinjaCompat()`
+```js
 govjucks.installJinjaCompat()
+```
 
 This installs experimental support for more consistent Jinja
 compatibility by adding Pythonic APIs to the environment. While
@@ -168,10 +156,10 @@ you.
 You can manually handle it if you want, which allows you to specify
 custom template loaders.
 
-{% endraw %}
-{% api %}
-constructor
+### constructor
+```js
 new Environment([loaders], [opts])
+```
 
 The constructor takes a list of **loaders** and a hash of
 configuration parameters as **opts**. If **loaders** is null, it
@@ -201,22 +189,22 @@ explicitly passed into the `Environment` constructor.
 
 ```js
 // the FileSystemLoader is available if in node
-var env = new govjucks.Environment(new govjucks.FileSystemLoader('views'));
+const env = new govjucks.Environment(new govjucks.FileSystemLoader('views'));
 
-var env = new govjucks.Environment(new govjucks.FileSystemLoader('views'),
+const env = new govjucks.Environment(new govjucks.FileSystemLoader('views'),
                           { autoescape: false });
 
-var env = new govjucks.Environment([new govjucks.FileSystemLoader('views'),
+const env = new govjucks.Environment([new govjucks.FileSystemLoader('views'),
                            new MyCustomLoader()]);
 
 // the WebLoader is available if in the browser
-var env = new govjucks.Environment(new govjucks.WebLoader('/views'));
+const env = new govjucks.Environment(new govjucks.WebLoader('/views'));
 ```
-{% endapi %}
 
-{% api %}
-render
+### `render()`
+```js
 env.render(name, [context], [callback])
+```
 
 Render the template named **name** with the optional **context** hash.
 If **callback** is supplied, call it when done with any errors and the
@@ -224,93 +212,98 @@ result (see [asynchronous support](#asynchronous-support)), otherwise
 return the rendered string.
 
 ```js
-var res = govjucks.render('foo.html');
+const res = govjucks.render('foo.html');
 
-var res = govjucks.render('foo.html', { username: 'James' });
+const res = govjucks.render('foo.html', { username: 'James' });
 
 govjucks.render('async.html', function(err, res) {
 });
 ```
 
-{% endapi %}
-
-{% api %}
-renderString
+### `renderString()`
+```js
 env.renderString(src, [context], [callback])
+```
 
 Same as [`render`](#render1), but renders a raw string instead of
 loading a template.
 
-{% raw %}
 ```js
-var res = govjucks.renderString('Hello {{ username }}', { username: 'James' });
+const res = govjucks.renderString('Hello {{ username }}', { username: 'James' });
 ```
-{% endraw %}
-{% endapi %}
 
-{% api %}
-addFilter
+### `addFilter()`
+```js
 env.addFilter(name, func, [async])
+```
 
 Add a custom filter named **name** which calls **func** whenever
 invoked. If the filter needs to be async, **async** must be `true`
 (see [asynchronous support](#asynchronous-support)). Returns `env` for further method chaining. See
 [Custom Filters](#custom-filters).
 
-{% endapi %}
 
-{% api %}
-getFilter
+### `getFilter()`
+```js
 env.getFilter(name)
-Get the filter, which is just a function, named **name**.
-{% endapi %}
+```
 
-{% api %}
-addExtension
+Get the filter, which is just a function, named **name**.
+
+
+### `addExtension()`
+```js
 env.addExtension(name, ext)
+```
 
 Add the custom extension **ext** named **name**. **ext** is an object
 with a few specific methods that are called by the extension system. Returns `env` for further method chaining.
 See [Custom Tags](#custom-tags).
 
-{% endapi %}
 
-{% api %}
-removeExtension
+### `removeExtension()`
+```js
 env.removeExtension(name)
+```
 
 Remove a previously added custom extension named **name**.
 
-{% endapi %}
-
-{% api %}
-getExtension
+### `getExtension()`
+```js
 env.getExtension(name)
+```
+
 Get an extension named **name**.
-{% endapi %}
 
-{% api %}
-hasExtension
+### `hasExtension()`
+```js
 env.hasExtension(name)
-Return true if a custom extension named **name** has been added.
-{% endapi %}
+```
 
-{% api %}
-addGlobal
+Return true if a custom extension named **name** has been added.
+
+
+### `addGlobal()`
+```js
 env.addGlobal(name, value)
+```
+
 Add a global value that will be available to all templates. Note: this will overwrite any existing global called `name`.
 Returns `env` for further method chaining.
-{% endapi %}
 
-{% api %}
-getGlobal
+
+### `getGlobal()`
+```js
 env.getGlobal(name)
-Get a global named **name**.
-{% endapi %}
+```
 
-{% api %}
-getTemplate
+Get a global named **name**.
+
+
+### `getTemplate()`
+```js
 env.getTemplate(name, [eagerCompile], [callback])
+```
 
 Retrieve the template named **name**. If **eagerCompile** is `true`,
 compile it now instead of on render. If **callback** is supplied, call
@@ -320,18 +313,18 @@ The builtin loaders do not require this. See
 [asynchronous support](#asynchronous-support) and [loaders](#loader).
 
 ```js
-var tmpl = env.getTemplate('page.html');
+const tmpl = env.getTemplate('page.html');
 
-var tmpl = env.getTemplate('page.html', true);
+const tmpl = env.getTemplate('page.html', true);
 
 env.getTemplate('from-async-loader.html', function(err, tmpl) {
 });
 ```
-{% endapi %}
 
-{% api %}
-express
+### express
+```js
 env.express(app)
+```
 
 Install govjucks as the rendering engine for the express **app**.
 After doing this, you can use express normally. Note that you can do
@@ -339,18 +332,16 @@ this automatically with the simple API call [`configure`](#configure)
 by passing in the app as the **express** option. Returns `env` for further method chaining.
 
 ```js
-var app = express();
+const app = express();
 env.express(app);
 
-app.get('/', function(req, res) {
-    res.render('index.html');
+app.get('/', (req, res) => {
+  res.render('index.html');
 });
 ```
-{% endapi %}
 
-{% api %}
-opts.autoescape
-env.opts.autoescape
+### `opts.autoescape`
+`env.opts.autoescape`
 
 You can use this boolean property to see if autoescaping is turned on
 globally or not. This may be helpful in creating advanced filtering
@@ -358,11 +349,13 @@ that do HTML manipulation. Normally you should simply return a
 SafeString (to be documented) if one was passed in, so the output will
 copy the safeness of the input, but this property is helpful in rare
 circumstances.
-{% endapi %}
 
-{% api %}
 'load' event
-env.on('load', function(name, source, loader))
+```js
+env.on('load', function (name, source, loader) {
+  ...
+});
+```
 
 The 'load' event gets emitted whenever a Loader retrieves the source of a
 template. It can be listened to in order to determine template dependencies
@@ -374,9 +367,7 @@ at runtime. The arguments emitted to the callback are:
   * **path** *(String)* The full path to the template
   * **noCache** *(Bool)* If `true`, the template wasn't cached.
 * **loader** The Loader instance that triggered the event.
-{% endapi %}
 
-{% raw %}
 
 ## Template
 
@@ -386,10 +377,11 @@ you, but you can easily use it yourself. If you don't connect a
 template with an environment, you can't include or inherit any other
 templates.
 
-{% endraw %}
-{% api %}
-constructor
+
+### constructor
+```js
 new Template(src, [env], [path], [eagerCompile])
+```
 
 The constructor takes a template string **src**, an optional
 `Environment` instance **env** to use for loading other templates, a
@@ -397,27 +389,22 @@ string **path** describing the location/path for debugging purposes,
 and a boolean **eagerCompile** which, if `true`, kicks off compilation
 immediately instead of waiting until the template is rendered.
 
-{% raw %}
 ```js
-var tmpl = new govjucks.Template('Hello {{ username }}');
+const tmpl = new govjucks.Template('Hello {{ username }}');
 
 tmpl.render({ username: "James" }); // -> "Hello James"
 ```
-{% endraw %}
 
-{% endapi %}
-
-{% api %}
-render
+### `render()`
+```js
 tmpl.render(context, [callback])
+```
 
 Renders the template with the optional **context** hash. If
 **callback** is supplied, call it when done with any errors and the
 result (see [asynchronous support](#asynchronous-support)), otherwise
 return the rendered string.
 
-{% endapi %}
-{% raw %}
 
 ## Loader
 
@@ -425,10 +412,10 @@ A loader is an object that takes a template name and loads it from a
 source, such as the filesystem or network. The following two builtin
 loaders exist, each for different contexts.
 
-{% endraw %}
-{% api %}
-FileSystemLoader
+### FileSystemLoader
+```js
 new FileSystemLoader([searchPaths], [opts])
+```
 
 This is only available to node. It will load templates from the
 filesystem, using the **searchPaths** array as paths to look for
@@ -444,14 +431,13 @@ templates live, and it defaults to the current working directory.
 
 ```js
 // Loads templates from the "views" folder
-var env = new govjucks.Environment(new govjucks.FileSystemLoader('views'));
+const env = new govjucks.Environment(new govjucks.FileSystemLoader('views'));
 ```
 
-{% endapi %}
-
-{% api %}
-NodeResolveLoader
+### NodeResolveLoader
+```js
 new NodeResolveLoader([opts])
+```
 
 As the name suggests, this is also only available in node. It will load
 templates from the filesystem using node's
@@ -459,11 +445,11 @@ templates from the filesystem using node's
 
 **opts** is an object which takes the same properties as
 [`FileSystemLoader`](#filesystemloader).
-{% endapi %}
 
-{% api %}
-WebLoader
+### WebLoader
+```js
 new WebLoader([baseURL], [opts])
+```
 
 This is only available in the browser. **baseURL** is the URL to load
 templates from (must be the same domain), and it defaults to the
@@ -486,10 +472,8 @@ production, this should always be the case. See
 
 ```js
 // Load templates from /views
-var env = new govjucks.Environment(new govjucks.WebLoader('/views'))
+const env = new govjucks.Environment(new govjucks.WebLoader('/views'))
 ```
-{% endapi %}
-{% raw %}
 
 ### Writing a Loader
 
@@ -517,7 +501,7 @@ need to extend the `Loader` class. This gives you `emit` method that
 can fire events. You need to call it
 
 ```js
-var MyLoader = govjucks.Loader.extend({
+const MyLoader = govjucks.Loader.extend({
     init: function() {
         // setup a process which watches templates here
         // and call `this.emit('update', name)` when a template
@@ -542,7 +526,7 @@ Just add an `async: true` property to your loader and it will be used
 asynchronously.
 
 ```js
-var MyLoader = govjucks.Loader.extend({
+const MyLoader = govjucks.Loader.extend({
     async: true,
 
     getSource: function(name, callback) {
@@ -620,8 +604,8 @@ production, which simplifies the setup. However, you're going to want
 something that automatically recompiles templates while developing
 unless you want to manually recompile them after every change.
 
-1. For development, use the [grunt](https://github.com/jlongster/grunt-govjucks) or
-[gulp](https://github.com/sindresorhus/gulp-govjucks) tasks to watch your template
+1. For development, use the [grunt](https://github.com/jlongster/grunt-nunjucks) or
+[gulp](https://github.com/sindresorhus/gulp-nunjucks) tasks to watch your template
 directory for changes and automatically [precompile](#precompiling) them into a js file
 2. Load [govjucks-slim.js](files/govjucks-slim.js) and `templates.js`, or whatever you named
 the precompiled js file, with either a script tag or a module loader.
@@ -671,10 +655,10 @@ it will get the extensions and filters from it. You should share the
 same `Environment` object between the client and server to keep
 everything in sync.
 
-{% endraw %}
-{% api %}
-precompile
+### `precompile()`
+```js
 govjucks.precompile(path, [opts])
+```
 
 Precompile a file or directory at **path**. **opts** is a hash with any of the following options:
 
@@ -693,7 +677,7 @@ Precompile a file or directory at **path**. **opts** is a hash with any of the f
     * **opts**: object of all the above options
 
 ```js
-var env = new govjucks.Environment();
+const env = new govjucks.Environment();
 
 // extensions must be known at compile-time
 env.addExtension('MyExtension', new MyExtension());
@@ -705,16 +689,14 @@ env.addFilter('asyncFilter', function(val, cb) {
 
 govjucks.precompile('/dir/to/views', { env: env });
 ```
-{% endapi %}
 
-{% api %}
-precompileString
+### `precompileString()`
+```js
 govjucks.precompileString(str, [opts])
+```
 
 Exactly the same as [`precompile`](#precompile), but compiles a raw string.
 
-{% endapi %}
-{% raw %}
 
 ## Asynchronous Support
 
@@ -722,7 +704,7 @@ You only need to read this section if you are interested in
 asynchronous rendering. There is no performance benefit to this, it is
 solely to allow custom filters and extensions to make async calls. If
 you don't care about this, you should simply use the normal API like
-`var res = env.render('foo.html');`. There's no need to force the
+`const res = env.render('foo.html');`. There's no need to force the
 `callback` on you, and it's why it's optional in all the rendering
 functions.
 
@@ -742,8 +724,8 @@ you should precompile your templates and never use HTTP in production.
 If you are using anything async, you need to use the async API like this:
 
 ```js
-govjucks.render('foo.html', function(err, res) {
-   // check err and handle result
+govjucks.render('foo.html', function (err, res) {
+  // check err and handle result
 });
 ```
 
@@ -776,7 +758,7 @@ To deactivate it, all you have to do is pass the `autoescape` option as
 `false` to the `Environment` object.
 
 ```js
-var env = govjucks.configure('/path/to/templates', { autoescape: false });
+const env = govjucks.configure('/path/to/templates', { autoescape: false });
 ```
 
 ## Customizing Syntax
@@ -786,7 +768,7 @@ blocks, and comments, you can specify different tokens as the `tags`
 option:
 
 ```js
-var env = govjucks.configure('/path/to/templates', {
+const env = govjucks.configure('/path/to/templates', {
   tags: {
     blockStart: '<%',
     blockEnd: '%>',
@@ -816,11 +798,11 @@ first argument and any arguments passed to the filter as the other
 arguments, in order.
 
 ```js
-var govjucks = require('govjucks');
-var env = new govjucks.Environment();
+const govjucks = require('govjucks');
+const env = new govjucks.Environment();
 
-env.addFilter('shorten', function(str, count) {
-    return str.slice(0, count || 5);
+env.addFilter('shorten', function (str, count) {
+  return str.slice(0, count || 5);
 });
 ```
 
@@ -847,8 +829,8 @@ All keyword arguments are passed in as a hash as the last argument.
 This is a filter `foo` that uses keyword arguments:
 
 ```js
-env.addFilter('foo', function(num, x, y, kwargs) {
-   return num + (kwargs.bar || 10);
+env.addFilter('foo', function (num, x, y, kwargs) {
+  return num + (kwargs.bar || 10);
 })
 ```
 
@@ -870,14 +852,14 @@ Asynchronous filters receive a callback to resume rendering, and are
 created by passing `true` as the third argument to `addFilter`.
 
 ```js
-var env = govjucks.configure('views');
+const env = govjucks.configure('views');
 
-env.addFilter('lookup', function(name, callback) {
-    db.getItem(name, callback);
+env.addFilter('lookup', function (name, callback) {
+  db.getItem(name, callback);
 }, true);
 
-env.renderString('{{ item|lookup }}', function(err, res) {
-    // do something with res
+env.renderString('{{ item|lookup }}', function (err, res) {
+  // do something with res
 });
 ```
 
@@ -895,8 +877,8 @@ with the template.
 
 Note: When precompiling, **you must install the extensions at
 compile-time**. You have to use the [precompiling API](#api1) (or the
-[grunt](https://github.com/jlongster/grunt-govjucks) or
-[gulp](https://github.com/sindresorhus/gulp-govjucks) tasks) instead of
+[grunt](https://github.com/jlongster/grunt-nunjucks) or
+[gulp](https://github.com/sindresorhus/gulp-nunjucks) tasks) instead of
 the script. You'll want to create an [`Environment`](#environment)
 object, install your extensions, and pass it to the precompiler.
 
@@ -929,7 +911,7 @@ you'll want to use:
 
 The parser API needs to be more documented, but for now read the above
 and check out the example below. You can also look at the
-[source](https://github.com/gunjam/govjucks/blob/master/govjucks/src/parser.js).
+[source](https://github.com/gunjam/govjucks/blob/master/src/parser.js).
 
 The most common usage is to process the content within some tags at
 runtime. It's like filters, but on steroids because you aren't
@@ -1017,12 +999,10 @@ Template rendering is paused until you call the callback to resume.
 The `run` function from the above example would now look like:
 
 ```js
-this.run = function(context, url, body, errorBody, callback) {
+this.run = function (context, url, body, errorBody, callback) {
    // do async stuff and then call callback(err, res)
 };
 ```
 
 If you create anything interesting, make sure to
 [add it to the wiki!](https://github.com/gunjam/govjucks/wiki/Custom-Tags)
-
-{% endraw %}

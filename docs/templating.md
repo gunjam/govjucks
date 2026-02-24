@@ -1,13 +1,8 @@
----
-layout: subpage
-title: Templates
----
-{% raw %}
-
 # Templating
 
 This is an overview of the templating features available in Govjucks.
 
+> [!NOTE]
 > Govjucks is essentially a port of
 > [jinja2](http://jinja.pocoo.org/docs/), so you can read their
 > [docs](http://jinja.pocoo.org/docs/templates/) if you find anything
@@ -16,14 +11,15 @@ This is an overview of the templating features available in Govjucks.
 
 ## User-Defined Templates Warning
 
-  govjucks does not sandbox execution so **it is not safe to run
+> [!WARNING]
+> govjucks does not sandbox execution so **it is not safe to run
   user-defined templates or inject user-defined content into template
   definitions**. On the server, you can expose attack vectors for
   accessing sensitive data and remote code execution. On the client,
   you can expose cross-site scripting vulnerabilities even for
   precompiled templates (which can be mitigated with a strong
   [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy)). See
-  [this issue](https://github.com/gunjam/govjucks-docs/issues/17) for
+  [this issue](https://github.com/mozilla/nunjucks-docs/issues/17) for
   more information.
 
 ## File Extensions
@@ -38,12 +34,13 @@ include recognition of the `.njk` extension.
 
 Plugins are available in various editors to support the `jinja` syntax highlighting of Govjucks.
 
-* atom <https://github.com/alohaas/language-govjucks>
+* atom <https://github.com/alohaas/language-nunjucks>
 * vim <https://github.com/niftylettuce/vim-jinja>
-* brackets <https://github.com/axelboc/govjucks-brackets>
-* sublime <https://github.com/mogga/sublime-govjucks/blob/master/Govjucks.tmLanguage>
+* brackets <https://github.com/axelboc/nunjucks-brackets>
+* sublime <https://github.com/mogga/sublime-nunjucks/blob/master/Nunjucks.tmLanguage>
 * emacs <http://web-mode.org>
-* vscode <https://github.com/ronnidc/vscode-govjucks>
+* vscode <https://github.com/ronnidc/vscode-nunjucks>
+* zed <https://github.com/stormwarning/zed-nunjucks>
 
 ## Variables
 
@@ -228,7 +225,7 @@ You can also use if as an [inline expression](#if-expression).
 > [`asyncEach`](#asynceach))
 
 ```js
-var items = [{ title: "foo", id: 1 }, { title: "bar", id: 2}];
+const items = [{ title: "foo", id: 1 }, { title: "bar", id: 2}];
 ```
 
 ```jinja
@@ -249,7 +246,7 @@ contents of the optional `else` clause would instead be rendered.
 You can also iterate over objects/hashes:
 
 ```js
-var food = {
+const food = {
   'ketchup': '5 tbsp',
   'mustard': '1 tbsp',
   'pickle': '0 tbsp'
@@ -269,7 +266,7 @@ ES iterators are supported, like the new builtin Map and Set. But also
 anything implementing the iterable protocol.
 
 ```js
-var fruits = new Map([
+const fruits = new Map([
   ["banana", "yellow"],
   ["apple", "red"],
   ["peach", "pink"]
@@ -285,7 +282,7 @@ var fruits = new Map([
 Additionally, Govjucks will unpack arrays into variables:
 
 ```js
-var points = [[0, 1, 2], [5, 6, 7], [12, 13, 14]];
+const points = [[0, 1, 2], [5, 6, 7], [12, 13, 14]];
 ```
 
 ```jinja
@@ -329,7 +326,7 @@ asynchronously inside the loop.
 
 ```js
 // If you are using a custom loader that is async, you need asyncEach
-var env = new govjucks.Environment(AsyncLoaderFromDatabase, opts);
+const env = new govjucks.Environment(AsyncLoaderFromDatabase, opts);
 ```
 ```jinja
 <h1>Posts</h1>
@@ -1959,5 +1956,3 @@ Count and output the number of words in a string:
 Alternatively, it's easy to [read the JavaScript
 code](https://github.com/gunjam/govjucks/blob/master/govjucks/src/filters.js)
 that implements these filters.
-
-{% endraw %}

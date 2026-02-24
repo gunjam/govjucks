@@ -1,10 +1,3 @@
----
-layout: subpage
-title: FAQ
-pageid: faq
----
-{% raw %}
-
 # Questions Asked Frequently Enough
 
 ## Can I use govjucks in node and the browser/client-side?
@@ -19,7 +12,7 @@ It is not necessary to precompile on the server because templates are
 compiled then cached the first time they are individually loaded for rendering.
 The compiled template will then remained cached in memory until the server restarts.
 
-You can choose never to cache by setting [configure](api.html#configure)'s `noCache` option to `true`.
+You can choose never to cache by setting [configure](api.md#configure)'s `noCache` option to `true`.
 
 ## Can I use the same templates between govjucks and jinja2? What are the differences?
 
@@ -36,7 +29,7 @@ features, it should be easy to make templates compatible.
 
 Govjucks has experimental support for installing APIs into the
 templating environment to help with Jinja compatibility. See
-[installJinjaCompat](api.html#installjinjacompat).
+[installJinjaCompat](api.md#installjinjacompat).
 
 Additionally, there are few jinja2 features not implemented in govjucks:
 
@@ -48,5 +41,3 @@ Additionally, there are few jinja2 features not implemented in govjucks:
 * Line statements: `# for item in seq`
 
 Lastly, any custom Python filters and extensions will have to be written in JavaScript.
-
-{% endraw %}

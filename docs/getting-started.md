@@ -1,20 +1,16 @@
----
-layout: subpage
-pageid: getting-started
----
-
 # Getting Started
 
 ## User-Defined Templates Warning
 
-  govjucks does not sandbox execution so **it is not safe to run
+> [!WARNING]
+> govjucks does not sandbox execution so **it is not safe to run
   user-defined templates or inject user-defined content into template
   definitions**. On the server, you can expose attack vectors for
   accessing sensitive data and remote code execution. On the client,
   you can expose cross-site scripting vulnerabilities even for
   precompiled templates (which can be mitigated with a strong
   [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy)). See
-  [this issue](https://github.com/gunjam/govjucks-docs/issues/17) for
+  [this issue](https://github.com/mozilla/nunjucks-docs/issues/17) for
   more information.
 
 ## When Using Node...
@@ -63,7 +59,7 @@ Simply include govjucks with a `script` tag on the page:
 or load it as an AMD module:
 
 ```js
-define(['govjucks'], function(govjucks) {
+define(['govjucks'], function (govjucks) {
 });
 ```
 
@@ -71,7 +67,7 @@ define(['govjucks'], function(govjucks) {
 > production! There are [grunt](https://github.com/jlongster/grunt-govjucks)
 > and [gulp](https://github.com/sindresorhus/gulp-govjucks) tasks to help with
 > that. Read more about optimal client-side configurations in [Browser
-> Usage](api.html#browser-usage).
+> Usage](api.md#browser-usage).
 
 ## Usage
 
@@ -100,15 +96,15 @@ probably want it to be absolute, like `'/views'`.
 Using express? Simply pass your express app into `configure`:
 
 ```js
-var app = express();
+const app = express();
 
 govjucks.configure('views', {
-    autoescape: true,
-    express: app
+  autoescape: true,
+  express: app
 });
 
 app.get('/', function(req, res) {
-    res.render('index.html');
+  res.render('index.html');
 });
 ```
 
@@ -124,5 +120,5 @@ production.
 
 ## More Information
 
-That's only the tip of the iceberg. See [API](api.html) for API docs
-and [Templating](templating.html) about the templating language.
+That's only the tip of the iceberg. See [API](api.md) for API docs
+and [Templating](templating.md) about the templating language.
