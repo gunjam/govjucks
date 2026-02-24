@@ -16,6 +16,16 @@ summary(() => {
     });
   });
 
+  group('indent - indent first', () => {
+    bench('govjucks', () => {
+      gIndent('Test\nTest\nTest\nTest\nTest', 4, true);
+    });
+
+    bench('nunjucks', () => {
+      nIndent('Test\nTest\nTest\nTest\nTest', 4, true);
+    });
+  });
+
   group('indent - 8 spaces', () => {
     bench('govjucks', () => {
       gIndent('Test\nTest\nTest\nTest\nTest', 8);
@@ -23,6 +33,16 @@ summary(() => {
 
     bench('nunjucks', () => {
       nIndent('Test\nTest\nTest\nTest\nTest', 8);
+    });
+  });
+
+  group('indent - no new lines', () => {
+    bench('govjucks', () => {
+      gIndent('TestTestTestTestTest');
+    });
+
+    bench('nunjucks', () => {
+      nIndent('TestTestTestTestTest');
     });
   });
 });
