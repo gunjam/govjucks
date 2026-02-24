@@ -1,43 +1,34 @@
-name: Tests
+name: Node.js CI
 
 on:
   push:
     branches:
-      - '**'
-  pull_request:
-    branches:
       - master
-    paths:
-      - '**/*.js'
-      - 'package.json'
-      - '**/*.njk'
-      - '**/*.yml'
-      - 'tests/**/*.html'
+    paths-ignore:
+      - '*.md'
+  pull_request:
+    paths-ignore:
+      - '*.md'
 
 jobs:
-  tests:
+  test:
     runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        node-version: [11.x, 10.x, 8.x]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: ['>=20.19.0', 22, 24]
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - uses: actions/cache@v2
-        id: cache-node-modules
-        with:
-          path: node_modules
-          key: ${{ matrix.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package.json') }}
       - run: npm install
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-      - run: npm test
-      # Commented out until this action is added in organization settings
-      # - name: Report coverage
-      #   if: success()
-      #   uses: codecov/codecov-action@v1
+      - env:
+          TMP_DIR: ${{ runner.temp }}
+        run: npm test
+      - run: npm run lint
+
+        env:
+          CI: true
