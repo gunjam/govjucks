@@ -1,6 +1,6 @@
 'use strict';
 
-const path = require('path');
+const path = require('node:path');
 const govjucks = require('../..');
 const express = require('express');
 
@@ -12,24 +12,23 @@ govjucks.configure(path.join(__dirname, 'views'), {
 });
 
 // app
-
 app.use(express.static(__dirname));
 
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   res.locals.user = 'hello';
   next();
 });
 
-app.get('/', function (req, res) {
+app.get('/', (req, res) => {
   res.render('index.html', {
     username: 'James Long <strong>copyright</strong>'
   });
 });
 
-app.get('/about', function (req, res) {
+app.get('/about', (req, res) => {
   res.render('about.html');
 });
 
-app.listen(4000, function () {
+app.listen(4_000, () => {
   console.log('Express server running on http://localhost:4000');
 });
