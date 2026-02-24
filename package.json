@@ -27,7 +27,7 @@
     }
   },
   "engines": {
-    "node": ">= 6.9.0"
+    "node": ">=20.19.0"
   },
   "scripts": {
     "codecov": "codecov",
