@@ -1,12 +1,14 @@
 import { summary, bench, run, group } from 'mitata';
-import { Environment } from '../../src/environment.js';
+import { Environment as GEnvironment } from '../../src/environment.js';
+import { Environment as NEnvironment } from 'nunjucks/src/environment.js';
 import gFilters from '../../src/filters.js';
 import nFilters from 'nunjucks/src/filters.js';
 
-const env = new Environment();
+const gEnv = new GEnvironment();
+const nEnv = new NEnvironment();
 
-const gReject = gFilters.reject.bind({ env });
-const nReject = nFilters.reject.bind({ env });
+const gReject = gFilters.reject.bind({ env: gEnv });
+const nReject = nFilters.reject.bind({ env: nEnv });
 
 summary(() => {
   group('reject', () => {

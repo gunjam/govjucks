@@ -60,6 +60,7 @@ class Environment extends EmitterObj {
     this.opts.throwOnUndefined = !!opts.throwOnUndefined;
     this.opts.trimBlocks = !!opts.trimBlocks;
     this.opts.lstripBlocks = !!opts.lstripBlocks;
+    // this.opts.preserveWhiteSpace = !!(opts.preserveWhiteSpace ?? true);
 
     this.loaders = [];
 
@@ -91,6 +92,17 @@ class Environment extends EmitterObj {
     this.asyncFilters = [];
     this.extensions = new NullObject();
     this.extensionsList = [];
+
+    // if (this.opts.preserveWhiteSpace === false) {
+    //   this.opts.trimBlocks = true;
+    //   this.opts.lstripBlocks = true;
+    //   this.extensionsList.push({
+    //     preprocess (src) {
+    //       src = src.replace(/[\r\n]+/g, '\n').replace(/^\s+|\s+$/gm, '');
+    //       return src;
+    //     }
+    //   });
+    // }
 
     for (const [name, filter] of Object.entries(filters)) {
       this.addFilter(name, filter);
