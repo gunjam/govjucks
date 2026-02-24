@@ -1,59 +1,91 @@
 #!/usr/bin/env node
+'use strict';
 
-const { program } = require('commander');
+const { parseArgs } = require('node:util');
 const precompile = require('../src/precompile').precompile;
 const Environment = require('../src/environment').Environment;
-const lib = require('../src/lib');
 
-let cmdpath = null;
+/** @type {import('node:util').ParseArgsOptionsConfig} */
+const options = {
+  force: {
+    type: "boolean",
+    short: "f",
+  },
+  filters: {
+    type: "string",
+    short: "a",
+  },
+  name: {
+    type: 'string',
+    short: "n",
+  },
+  include: {
+    type: 'string',
+    short: "i",
+    default: ['\\\\.html$', '\\\\.jinja$'],
+    multiple: true,
+  },
+  exclude: {
+    type: 'string',
+    short: "x",
+    default: [],
+    multiple: true,
+  },
+  wrapper: {
+    type: 'string',
+    short: "w",
+  },
+  help: {
+    type: 'boolean',
+    short: "h",
+  },
+};
 
-program
-  .storeOptionsAsProperties(false)
-  .passCommandToAction(false);
+const helpMessage = `Usage: precompile [-f|--force] [-a|--filters <filters>] [-n|--name <name>] [-i|--include <regex>] [-x|--exclude <regex>] [-w|--wrapper <wrapper>] <path>
 
-program
-  .name('precompile')
-  .usage('[-f|--force] [-a|--filters <filters>] [-n|--name <name>] [-i|--include <regex>] [-x|--exclude <regex>] [-w|--wrapper <wrapper>] <path>')
-  .arguments('<path>')
-  .helpOption('-?, -h, --help', 'Display this help message')
-  .option('-f, --force', 'Force compilation to continue on error')
-  .option('-a, --filters <filters>', 'Give the compiler a comma-delimited list of asynchronous filters, required for correctly generating code')
-  .option('-n, --name <name>', 'Specify the template name when compiling a single file')
-  .option('-i, --include <regex>', 'Include a file or folder which match the regex but would otherwise be excluded. You can use this flag multiple times', concat, ['\\.html$', '\\.jinja$'])
-  .option('-x, --exclude <regex>', 'Exclude a file or folder which match the regex but would otherwise be included. You can use this flag multiple times', concat, [])
-  .option('-w, --wrapper <wrapper>', 'Load a external plugin to change the output format of the precompiled templates (for example, "-w custom" will load a module named "govjucks-custom")')
-  .action(function (path) {
-    cmdpath = path;
-  })
-  .parse(process.argv);
+Options:
+  -f, --force              Force compilation to continue on error
+  -a, --filters <filters>  Give the compiler a comma-delimited list of asynchronous filters, required for correctly
+                           generating code
+  -n, --name <name>        Specify the template name when compiling a single file
+  -i, --include <regex>    Include a file or folder which match the regex but would otherwise be excluded. You can use
+                           this flag multiple times (default: ["\\\\.html$","\\\\.jinja$"])
+  -x, --exclude <regex>    Exclude a file or folder which match the regex but would otherwise be included. You can use
+                           this flag multiple times (default: [])
+  -w, --wrapper <wrapper>  Load a external plugin to change the output format of the precompiled templates (for example,
+                           "-w custom" will load a module named "govjucks-custom")
+  --h, --help              Display this help message`;
 
-function concat(value, previous) {
-  return previous.concat(value);
+const { values, positionals } = parseArgs({ options, allowPositionals: true });
+
+if (values.help || values.holp) {
+  console.log(helpMessage);
+  process.exit(0);
 }
 
-if (cmdpath == null) {
-  program.outputHelp();
+if (positionals.length === 0) {
+  console.log(helpMessage);
   console.error('\nerror: no path given');
   process.exit(1);
 }
 
 const env = new Environment([]);
 
-const opts = program.opts();
-
-lib.each([].concat(opts.filters).join(',').split(','), function (name) {
-  env.addFilter(name.trim(), function () {}, true);
-});
-
-if (opts.wrapper) {
-  opts.wrapper = require('govjucks-' + opts.wrapper).wrapper;
+if (values.filters) {
+  for (const filter of values.filters.split(',')) {
+    env.addFilter(filter.trim(), function () {}, true);
+  }
 }
 
-console.log(precompile(cmdpath, {
+if (values.wrapper) {
+  values.wrapper = require('govjucks-' + opts.wrapper).wrapper;
+}
+
+console.log(precompile(positionals[0], {
   env : env,
-  force : opts.force,
-  name : opts.name,
-  wrapper: opts.wrapper,
-  include : [].concat(opts.include),
-  exclude : [].concat(opts.exclude)
+  force : values.force,
+  name : values.name,
+  wrapper: values.wrapper,
+  include : values.include,
+  exclude : values.exclude,
 }));

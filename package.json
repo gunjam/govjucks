@@ -4,8 +4,7 @@
   "version": "0.1.0",
   "author": "James Long <longster@gmail.com>",
   "dependencies": {
-    "asap": "^2.0.3",
-    "commander": "^5.1.0",
+    "asap": "^2.0.6",
     "fastfall": "^1.5.1"
   },
   "type": "commonjs",
