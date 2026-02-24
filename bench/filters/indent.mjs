@@ -25,16 +25,6 @@ summary(() => {
       nIndent('Test\nTest\nTest\nTest\nTest', 8);
     });
   });
-
-  group('indent - no new lines', () => {
-    bench('govjucks', () => {
-      gIndent('TestTestTestTestTest');
-    });
-
-    bench('nunjucks', () => {
-      nIndent('TestTestTestTestTest');
-    });
-  });
 });
 
 run();

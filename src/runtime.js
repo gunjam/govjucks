@@ -5,7 +5,6 @@ const NullObject = require('./null-object');
 
 const arrayFrom = Array.from;
 const kKeywords = Symbol('keywordArgs');
-// const kSafeString = Symbol('isSafe');
 
 class Frame {
   /**
@@ -224,11 +223,6 @@ SafeString.prototype = Object.create(String.prototype, {
     writable: true,
     configurable: true,
     value: 0
-  },
-  __safe: {
-    writable: false,
-    configurable: false,
-    value: true
   }
 });
 SafeString.prototype.valueOf = function valueOf () {
@@ -243,8 +237,8 @@ SafeString.prototype.toString = function toString () {
  * @param {any} val
  * @returns {boolean}
  */
-SafeString.isSafeString = function isSafeString (val) {
-  return val?.__safe === true;
+SafeString.isSafeString = function isSafeString (val = '') {
+  return val instanceof SafeString;
 };
 
 function copySafeness (dest, target) {

@@ -257,7 +257,7 @@ function indent (str, width, indentfirst) {
   }
 
   const lines = str.split('\n');
-  const sp = width ? ' '.repeat(width) : '    ';
+  const sp = ' '.repeat(width || 4);
   const nl = '\n' + sp;
   let res = indentfirst === true ? sp + lines[0] : lines[0];
 
@@ -268,62 +268,6 @@ function indent (str, width, indentfirst) {
 
   return r.copySafeness(str, res);
 }
-// function indent (str, width, indentfirst) {
-//   str = normalize(str, '');
-
-//   if (str.length === 0) {
-//     return str;
-//   }
-
-//   const sp = width ? ' '.repeat(width) : '    ';
-//   const nl = '\n' + sp;
-
-//   let res = indentfirst ? sp : '';
-//   let index = str.indexOf('\n');
-//   let p = 0;
-
-//   if (index === -1) {
-//     return r.copySafeness(str, `${res}${str}`);
-//   }
-
-//   while (index > -1) {
-//     res += str.slice(p, index) + nl;
-//     p = index + 1;
-//     index = str.indexOf('\n', p);
-//   }
-
-//   res += str.slice(p, str.length);
-//   return r.copySafeness(str, res);
-// }
-
-// const newLinePattern = /\n/g;
-
-// function indent (str, width, indentfirst) {
-//   str = normalize(str, '');
-
-//   if (str.length === 0) {
-//     return str;
-//   }
-
-//   const sp = width ? ' '.repeat(width) : '    ';
-//   const nl = '\n' + sp;
-//   let res = indentfirst ? sp : '';
-
-//   if (!newLinePattern.test(str)) {
-//     return r.copySafeness(str, `${res}${str}`);
-//   }
-
-//   let start = 0;
-
-//   do {
-//     const i = newLinePattern.lastIndex - 1;
-//     res += str.slice(start, i) + nl;
-//     start = newLinePattern.lastIndex;
-//   } while (newLinePattern.test(str));
-
-//   res += str.slice(start);
-//   return r.copySafeness(str, res);
-// }
 
 module.exports.indent = indent;
 
