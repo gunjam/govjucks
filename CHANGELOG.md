@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### New features
+
+* Adding map filter based on the [Jinja implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.map). [#8](https://github.com/gunjam/govjucks/pull/8) @gunjam
+
 ## v0.1.0 (First release)
 
 This is the first release since forking nunjucks, a lot of work has been done

@@ -600,6 +600,60 @@ describe('filter', () => {
     finish(done);
   });
 
+  describe('map', () => {
+    it('filter', (t, done) => {
+      equal('{{ titles | map("lower") | join(", ") }}', {
+        titles: [
+          'MY PAGE',
+          'NEXT PAGE',
+        ]
+      }, 'my page, next page');
+
+      equal('{{ titles | map("truncate", 2, true, "_") | join(", ")  }}', {
+        titles: [
+          'LOOOOOOOOOOOONG, LOOOOOOOOOOOONG',
+          'LOOOOOOOOOOOONG, LOOOOOOOOOOOONG',
+        ]
+      }, 'LO_, LO_');
+
+      assert.throws(() => render('{{ titles | map() }}', { titles: ['A'] }), {
+        message: /Template render error: missing filter name/
+      });
+
+      finish(done);
+    });
+
+    it('attribute', (t, done) => {
+      equal('{{ users | map(attribute="username") | join(", ") }}', {
+        users: [
+          { username: 'John' },
+          { username: 'Jim' },
+          { username: undefined }
+        ]
+      }, 'John, Jim, undefined');
+
+      equal('{{ users | map(attribute="username", default="Anonymous") | join(", ") }}', {
+        users: [
+          { username: 'John' },
+          { username: 'Jim' },
+          {},
+        ]
+      }, 'John, Jim, Anonymous');
+
+      assert.throws(() => render('{{ users | map(default="Anonymous") | join(", ") }}', {
+        users: [
+          { username: 'John' },
+          { username: 'Jim' },
+          {},
+        ]
+      }), {
+        message: /Template render error: missing "attribute" keyword argument/
+      });
+
+      finish(done);
+    });
+  });
+
   it('nl2br', (t, done) => {
     equal('{{ null | nl2br }}', '');
     equal('{{ undefined | nl2br }}', '');

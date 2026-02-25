@@ -989,6 +989,43 @@ const intFilter = r.makeMacro(
 
 module.exports.int = intFilter;
 
+module.exports.map = function map (...args) {
+  const kwargs = args[args.length - 1];
+
+  if (r.isKeywordArgs(kwargs)) {
+    const value = args[0];
+    const len = value.length;
+    const arr = new Array(len);
+    const attribute = kwargs.attribute;
+    const defaultValue = kwargs.default;
+
+    if (!attribute) {
+      throw new lib.TemplateError('missing "attribute" keyword argument');
+    }
+    for (let i = 0; i < len; i++) {
+      arr[i] = value[i]?.[attribute] ?? defaultValue;
+    }
+    return arr;
+  }
+
+  const filterName = args[1];
+
+  if (!filterName) {
+    throw new lib.TemplateError('missing filter name');
+  }
+
+  const value = args[0];
+  const len = value.length;
+  const arr = new Array(len);
+  const filter = this.env.getFilter(filterName).bind(this);
+  const filterArgs = args.slice(2);
+  for (let i = 0; i < len; i++) {
+    arr[i] = filter(value[i], ...filterArgs);
+  }
+
+  return arr;
+};
+
 // Aliases
 module.exports.d = module.exports.default;
 module.exports.e = module.exports.escape;
