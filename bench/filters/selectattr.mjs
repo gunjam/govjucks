@@ -7,24 +7,24 @@ import nFilters from 'nunjucks/src/filters.js';
 const gEnv = new GEnvironment();
 const nEnv = new NEnvironment();
 
-const gRejectAttr = gFilters.rejectattr.bind({ env: gEnv });
-const nRejectAttr = nFilters.rejectattr.bind({ env: nEnv });
+const gSelectAttr = gFilters.selectattr.bind({ env: gEnv });
+const nSelectAttr = nFilters.selectattr.bind({ env: nEnv });
 
 summary(() => {
-  group('rejectattr', () => {
+  group('selectattr', () => {
     bench('govjucks', () => {
-      gRejectAttr([{ a: 1 }, { b: 1 }, { a: 1 }, { b: 1 }, { a: 1 }, { b: 1 }], 'b');
+      gSelectAttr([{ a: 1 }, { b: 1 }, { a: 1 }, { b: 1 }, { a: 1 }, { b: 1 }], 'b');
     });
 
     bench('nunjucks', () => {
-      nRejectAttr([{ a: 1 }, { b: 1 }, { a: 1 }, { b: 1 }, { a: 1 }, { b: 1 }], 'b');
+      nSelectAttr([{ a: 1 }, { b: 1 }, { a: 1 }, { b: 1 }, { a: 1 }, { b: 1 }], 'b');
     });
   });
 
   // Not supported in nunjucks
-  group('rejectattr - with test', () => {
+  group('selectattr - with test', () => {
     bench('govjucks', () => {
-      gRejectAttr([{ a: 1 }, { b: 1 }, { b: 2 }, { b: 1 }, { a: 1 }, { b: 1 }], 'b', 'odd');
+      gSelectAttr([{ a: 1 }, { b: 1 }, { b: 2 }, { b: 1 }, { a: 1 }, { b: 1 }], 'b', 'odd');
     });
   });
 });

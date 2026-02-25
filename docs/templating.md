@@ -1479,7 +1479,7 @@ If no test is specified, each object will be evaluated as a boolean.
 0
 ```
 
-### rejectattr (only the single-argument form)
+### rejectattr
 
 Filter a sequence of objects by applying a test to the specified attribute
 of each object, and rejecting the objects with the test succeeding.
@@ -1493,11 +1493,15 @@ If no test is specified, the attribute’s value will be evaluated as a boolean.
 ```jinja
 {% set foods = [{tasty: true}, {tasty: false}, {tasty: true}]%}
 {{ foods | rejectattr("tasty") | length }}
+
+{% set people = [{age: 30}, {age: 21}, {age: 23}]%}
+{{ people | rejectattr("age", "odd") | length }}
 ```
 
 **Output**
 
 ```jinja
+1
 1
 ```
 
@@ -1688,7 +1692,7 @@ If no test is specified, each object will be evaluated as a boolean.
 12345
 ```
 
-### selectattr (only the single-argument form)
+### selectattr
 
 Filter a sequence of objects by applying a test to the specified attribute
 of each object, and only selecting the objects with the test succeeding.
@@ -1702,11 +1706,15 @@ If no test is specified, the attribute’s value will be evaluated as a boolean.
 ```jinja
 {% set foods = [{tasty: true}, {tasty: false}, {tasty: true}]%}
 {{ foods | selectattr("tasty") | length }}
+
+{% set people = [{age: 30}, {age: 21}, {age: 23}]%}
+{{ people | selectattr("age", "odd") | length }}
 ```
 
 **Output**
 
 ```jinja
+2
 2
 ```
 

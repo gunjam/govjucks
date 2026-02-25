@@ -441,13 +441,18 @@ module.exports.reject = getSelectOrReject(false);
  * boolean.
  * @param {Array<object>} arr
  * @param {string} attr
+ * @param {string} testName
+ * @param {any} secondArg
  * @returns {Array<object>}
  */
-function rejectattr (arr, attr) {
-  return arr.filter((item) => !item[attr]);
-}
+module.exports.rejectattr = function rejectattr (arr, attr, testName, secondArg) {
+  if (!testName) {
+    return arr.filter((v) => !v[attr]);
+  }
 
-module.exports.rejectattr = rejectattr;
+  const test = this.env.getTest(testName).bind(this);
+  return arr.filter((item) => !test(item[attr], secondArg));
+};
 
 module.exports.select = getSelectOrReject(true);
 
@@ -461,13 +466,18 @@ module.exports.select = getSelectOrReject(true);
  * boolean.
  * @param {Array<object>} arr
  * @param {string} attr
+ * @param {string} testName
+ * @param {any} secondArg
  * @returns {Array<object>}
  */
-function selectattr (arr, attr) {
-  return arr.filter((item) => !!item[attr]);
-}
+module.exports.selectattr = function selectattr (arr, attr, testName, secondArg) {
+  if (!testName) {
+    return arr.filter((v) => v[attr]);
+  }
 
-module.exports.selectattr = selectattr;
+  const test = this.env.getTest(testName).bind(this);
+  return arr.filter((item) => test(item[attr], secondArg));
+};
 
 /**
  * Replace one item with another. The first item is the item to be

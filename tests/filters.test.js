@@ -657,6 +657,18 @@ describe('filter', () => {
     equal('{{ foods | rejectattr("tasty") | length }}', {
       foods
     }, '1');
+
+    const people = [{
+      age: 30
+    }, {
+      age: 21
+    }, {
+      age: 23
+    }];
+    equal('{{ people | rejectattr("age", "odd") | length }}', {
+      people
+    }, '1');
+
     finish(done);
   });
 
@@ -687,6 +699,18 @@ describe('filter', () => {
     equal('{{ foods | selectattr("tasty") | length }}', {
       foods
     }, '2');
+
+    const people = [{
+      age: 30
+    }, {
+      age: 21
+    }, {
+      age: 23
+    }];
+    equal('{{ people | selectattr("age", "odd") | length }}', {
+      people
+    }, '2');
+
     finish(done);
   });
 
