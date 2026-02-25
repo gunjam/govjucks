@@ -1421,6 +1421,40 @@ Convert string to all lower case:
 foobar
 ```
 
+### map
+
+Return a new list after apply a filter to every item in the input list:
+
+**Input**
+
+```jinja
+{{ ["A", "B", "C"] | map("lower") | join("") }}
+{{ ["LONGSTRING", "VERYLONGSTRING"] | map("truncate", 2, true, "_") | join("") }}
+```
+
+**Output**
+
+```jinja
+abc
+LO_VE_
+```
+
+Or, given a list of objects, return a list of attribute values:
+
+**Input**
+
+```jinja
+{{ [{msg: "Hello"}, {msg: "World"}] | map(attribute="msg") | join(" ") }}
+{{ [{msg: "Hello"}, {}] | map(attribute="msg", default="missing") | join(" ") }}
+```
+
+**Output**
+
+```jinja
+Hello World
+Hello Missing
+```
+
 ### nl2br
 
 Replace new lines with `<br />` HTML elements:
