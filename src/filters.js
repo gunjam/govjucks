@@ -2,8 +2,11 @@
 
 const lib = require('./lib');
 const r = require('./runtime');
+const { format } = require('node:util');
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
+
+module.exports.format = format;
 
 /**
  * If value is nullish or false, return the default value, otherwise return the
