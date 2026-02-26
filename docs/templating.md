@@ -1146,6 +1146,25 @@ This default can be overridden by using the first parameter.
 
 Enforce HTML escaping. This will probably double escape variables.
 
+### format
+
+Apply the given values to a printf-style format string, maps directly to the
+[Node.js format util](https://nodejs.org/docs/latest-v24.x/api/util.html#utilformatformat-args).
+
+**Input**
+
+```jinja
+{% set greeting = "Hello" %}
+{% set name = "World" %}
+{{ "%s, %s!" | format(greeting, name) }}
+```
+
+**Output**
+
+```jinja
+Hello, World!
+```
+
 ### groupby
 
 Group a sequence of objects by a common attribute:

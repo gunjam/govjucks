@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### New features
+
+* Adding a printf style format filter, like [Jinja2](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.format).
+  Maps directly to the [Node.js format util](https://nodejs.org/docs/latest-v24.x/api/util.html#utilformatformat-args),
+  so may not behave exactly like the python equivalent.
+
+
 ## v0.1.0 (First release)
 
 This is the first release since forking nunjucks, a lot of work has been done
