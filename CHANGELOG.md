@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### New features
+
+* Adding a file size format filter which matches the [Jinja2 implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.filesizeformat).
+
+
 ## v0.1.0 (First release)
 
 This is the first release since forking nunjucks, a lot of work has been done

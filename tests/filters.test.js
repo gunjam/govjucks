@@ -229,6 +229,40 @@ describe('filter', () => {
     finish(done);
   });
 
+  it('filesizeformat', (t, done) => {
+    // Decimal
+    equal('{{ size | filesizeformat }}', { size: 1 }, '1 B');
+    equal('{{ size | filesizeformat }}', { size: 999 }, '999 B');
+    equal('{{ size | filesizeformat }}', { size: 1_000 }, '1.0 kB');
+    equal('{{ size | filesizeformat }}', { size: 1_000 * 1_000 }, '1.0 MB');
+    equal('{{ size | filesizeformat }}', { size: 1_000 * 1_000 * 1_000 }, '1.0 GB');
+    equal('{{ size | filesizeformat }}', { size: 1_000 * 1_000 * 1_000 * 1_000 }, '1.0 TB');
+    equal('{{ size | filesizeformat }}', { size: 1_000 * 1_000 * 1_000 * 1_000 * 1_000 }, '1.0 PB');
+    equal('{{ size | filesizeformat }}', { size: 1_000 * 1_000 * 1_000 * 1_000 * 1_000 * 1_000 }, '1.0 EB');
+    equal('{{ size | filesizeformat }}', { size: 1_000 * 1_000 * 1_000 * 1_000 * 1_000 * 1_000 * 1_000 }, '1.0 ZB');
+    equal('{{ size | filesizeformat }}', { size: 1_000 * 1_000 * 1_000 * 1_000 * 1_000 * 1_000 * 1_000 * 1_000 }, '1.0 YB');
+    equal('{{ size | filesizeformat }}', { size: 1_500 * 1_000 * 1_000 }, '1.5 GB');
+
+    // Binary
+    equal('{{ size | filesizeformat(true) }}', { size: 1 }, '1 B');
+    equal('{{ size | filesizeformat(true) }}', { size: 1_023 }, '1023 B');
+    equal('{{ size | filesizeformat(true) }}', { size: 1_024 }, '1.0 KiB');
+    equal('{{ size | filesizeformat(true) }}', { size: 1_024 * 1_024 }, '1.0 MiB');
+    equal('{{ size | filesizeformat(true) }}', { size: 1_024 * 1_024 * 1_024 }, '1.0 GiB');
+    equal('{{ size | filesizeformat(true) }}', { size: 1_024 * 1_024 * 1_024 * 1_024 }, '1.0 TiB');
+    equal('{{ size | filesizeformat(true) }}', { size: 1_024 * 1_024 * 1_024 * 1_024 * 1_024 }, '1.0 PiB');
+    equal('{{ size | filesizeformat(true) }}', { size: 1_024 * 1_024 * 1_024 * 1_024 * 1_024 * 1_024 }, '1.0 EiB');
+    equal('{{ size | filesizeformat(true) }}', { size: 1_024 * 1_024 * 1_024 * 1_024 * 1_024 * 1_024 * 1_024 }, '1.0 ZiB');
+    equal('{{ size | filesizeformat(true) }}', { size: 1_024 * 1_024 * 1_024 * 1_024 * 1_024 * 1_024 * 1_024 * 1_024 }, '1.0 YiB');
+    equal('{{ size | filesizeformat(true) }}', { size: 1_536 * 1_024 * 1_024 }, '1.5 GiB');
+
+    // String
+    equal('{{ size | filesizeformat }}', { size: '1000' }, '1.0 kB');
+    equal('{{ size | filesizeformat(true) }}', { size: '1024' }, '1.0 KiB');
+
+    finish(done);
+  });
+
   it('first', (t, done) => {
     equal('{{ [1,2,3] | first }}', '1');
     finish(done);
