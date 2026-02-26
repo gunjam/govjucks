@@ -6,6 +6,7 @@
 
 * Adding map filter based on the [Jinja implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.map). [#8](https://github.com/gunjam/govjucks/pull/8) @gunjam
 * Added support for passing tests into the selectattr and rejectattr filters. This brings it inline with the [Jinja implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.selectattr). [#9](https://github.com/gunjam/govjucks/pull/9) @gunjam
+* Adding a file size format filter which matches the [Jinja implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.filesizeformat). [#10](https://github.com/gunjam/govjucks/pull/10) @gunjam
 
 ## v0.1.0 (First release)
 
