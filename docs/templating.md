@@ -1103,6 +1103,27 @@ Marks return value as markup string
 &lt;html&gt;
 ```
 
+### filesizeformat
+
+Format the input value into a ‘human-readable’ file size, defaults to decimal
+sizes (kB, MB) passing true as a paramter will use binary (KiB, MiB). 
+
+**Input**
+
+```jinja
+{{ 100 | filesizeformat }}
+{{ 1024 | filesizeformat(true) }}
+{{ "1500000" | filesizeformat }}
+```
+
+**Output**
+
+```jinja
+100 B
+1.0 KiB
+1.5 MB
+```
+
 ### first
 
 Get the first item in an array or the first letter if it's a string:
