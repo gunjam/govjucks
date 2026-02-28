@@ -1079,4 +1079,71 @@ describe('filter', () => {
     equal('{{ nothing | wordcount }}', '');
     finish(done);
   });
+
+  it('xmlattr', (t, done) => {
+    equal(
+      '{{ { class: "input", id: "name" } | xmlattr }}',
+      ' class="input" id="name"'
+    );
+
+    equal(
+      '{{ { number: 5, missing: undefined, "null": null } | xmlattr }}',
+      ' number="5"'
+    );
+
+    equal(
+      '{{ { boolean: true, boolean2: false } | xmlattr }}',
+      ' boolean="true" boolean2="false"'
+    );
+
+    equal(
+      '{{ { escaped: "< > & \\" \' \\\\" } | xmlattr }}',
+      ' escaped="&lt; &gt; &#38; &#34; &#39; &#92;"'
+    );
+
+    equal(
+      '{{ { "<&\\"\'\\\\": "escaped" } | xmlattr }}',
+      ' &lt;&#38;&#34;&#39;&#92;="escaped"'
+    );
+
+    equal(
+      '{{ { class: "input" } | xmlattr(true) }}',
+      ' class="input"'
+    );
+
+    equal(
+      '{{ { class: "input" } | xmlattr(false) }}',
+      'class="input"'
+    );
+
+    assert.throws(() => {
+      render('{{ { "bad key": "value" } | xmlattr }}');
+    }, {
+      name: 'Template render error',
+      message: /Template render error: Invalid attribute name: "bad key", cannot contain \[ \/>=\]/
+    });
+
+    assert.throws(() => {
+      render('{{ { "bad=key": "value" } | xmlattr }}');
+    }, {
+      name: 'Template render error',
+      message: /Template render error: Invalid attribute name: "bad=key", cannot contain \[ \/>=\]/
+    });
+
+    assert.throws(() => {
+      render('{{ { "bad/key": "value" } | xmlattr }}');
+    }, {
+      name: 'Template render error',
+      message: /Template render error: Invalid attribute name: "bad\/key", cannot contain \[ \/>=\]/
+    });
+
+    assert.throws(() => {
+      render('{{ { "bad>key": "value" } | xmlattr }}');
+    }, {
+      name: 'Template render error',
+      message: /Template render error: Invalid attribute name: "bad>key", cannot contain \[ \/>=\]/
+    });
+
+    finish(done);
+  });
 });
