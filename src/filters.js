@@ -989,6 +989,41 @@ const intFilter = r.makeMacro(
 
 module.exports.int = intFilter;
 
+/**
+ * Format a file size into a human readable format. Uses a decimal format by
+ * default, but passing true in the binary parameter will use a binary format.
+ * @param {number} value
+ * @param {boolean} [binary=false]
+ */
+function filesizeformat (value, binary = false) {
+  let size = Math.abs(value);
+  let thresh;
+  let units;
+
+  if (binary) {
+    thresh = 1_024;
+    units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB', 'RiB', 'QiB'];
+  } else {
+    thresh = 1_000;
+    units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'RB', 'QB'];
+  }
+
+  if (size < thresh) {
+    return `${value} B`;
+  }
+
+  let unitIndex = 0;
+
+  while (size >= thresh && unitIndex < units.length - 1) {
+    size /= thresh;
+    unitIndex++;
+  }
+
+  return `${size.toFixed(1)} ${units[unitIndex]}`;
+}
+
+module.exports.filesizeformat = filesizeformat;
+
 // Aliases
 module.exports.d = module.exports.default;
 module.exports.e = module.exports.escape;
