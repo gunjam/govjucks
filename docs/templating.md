@@ -1953,6 +1953,37 @@ Count and output the number of words in a string:
 2
 ```
 
+### xmlattr
+
+Create a string of XML attribute key value pairs from an input object. The
+string is rendered with a leading space unless `autospace` is set to `false`.
+
+Attribute values are automatically escaped, attributes with `null` and
+`undefined` values are ignored.
+
+Keys containing a space, `/` solidus, `>` greater-than sign, or `=` equals
+sign will throw a `TemplateError`.
+
+> [!WARNING]
+> User input should not be used to generate attribute keys, unless validated
+  first.
+
+**Input**
+
+```jinja
+<input{{ { name: "my-input", disabled: true } | xmlattr }} type="text">
+<div{{ { missing: undefined, id: "item-%d" | format(5) } | xmlattr }}></div>
+<br {{ { "autospace": "off" } | xmlattr(false) }}>
+```
+
+**Output**
+
+```jinja
+<input name="my-input" disabled="true" type="text">
+<div id="item-5"></div>
+<br autospace="off">
+```
+
 Alternatively, it's easy to [read the JavaScript
-code](https://github.com/gunjam/govjucks/blob/master/govjucks/src/filters.js)
+code](https://github.com/gunjam/govjucks/blob/master/src/filters.js)
 that implements these filters.

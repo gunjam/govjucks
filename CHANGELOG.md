@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### New features
+
+* Adding xmlattr filter that matches [the Jinja2 implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.xmlattr).
+
+
 ## v0.1.0 (First release)
 
 This is the first release since forking nunjucks, a lot of work has been done
