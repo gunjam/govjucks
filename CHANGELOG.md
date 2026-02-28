@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### New features
+
+* Added support for passing tests into the selectattr and rejectattr filters. This brings it more inline with the [Jinja2 implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.selectattr).
+
 ## v0.1.0 (First release)
 
 This is the first release since forking nunjucks, a lot of work has been done
