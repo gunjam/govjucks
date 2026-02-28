@@ -10,6 +10,7 @@
 * Adding a printf style format filter, like [Jinja](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.format).
   Maps directly to the [Node.js format util](https://nodejs.org/docs/latest-v24.x/api/util.html#utilformatformat-args),
   so may not behave exactly like the python equivalent. [#11](https://github.com/gunjam/govjucks/pull/11) @gunjam
+* Adding xmlattr filter that matches the [Jinja implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.xmlattr). [#12](https://github.com/gunjam/govjucks/pull/12) @gunjam
 
 ## v0.1.0 (First release)
 
