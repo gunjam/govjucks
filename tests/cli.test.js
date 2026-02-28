@@ -13,7 +13,7 @@ if (process.platform === 'win32') {
 }
 
 function execPrecompile (args, cb) {
-  execFile(precompileBin, args, { cwd: rootDir }, cb);
+  execFile(precompileBin, args, { cwd: rootDir, shell: true }, cb);
 }
 
 describe('precompile cli', () => {
