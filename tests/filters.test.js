@@ -2,7 +2,9 @@
 
 const assert = require('node:assert/strict');
 const { describe, it } = require('node:test');
+const { format } = require('node:util');
 const { equal, finish, render } = require('./util');
+const filters = require('../src/filters');
 const lib = require('../src/lib');
 const r = require('../src/runtime');
 
@@ -242,6 +244,12 @@ describe('filter', () => {
   it('forceescape', (t, done) => {
     equal('{{ str | forceescape }}', { str: r.markSafe('<html>') }, '&lt;html&gt;');
     equal('{{ "<html>" | safe | forceescape }}', '&lt;html&gt;');
+    finish(done);
+  });
+
+  it('format', (t, done) => {
+    equal('{{ "%s, %s!" | format(greeting, name) }}', { greeting: 'Hello', name: 'World' }, 'Hello, World!');
+    assert.equal(filters.format, format);
     finish(done);
   });
 
