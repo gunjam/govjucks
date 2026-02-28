@@ -32,7 +32,7 @@
   "scripts": {
     "codecov": "codecov",
     "lint": "eslint src tests",
-    "test:unit": "NODE_PATH=tests/test-node-pkgs node --test",
+    "test:unit": "node --env-file=.test.env --test",
     "test:coverage": "c8 npm run test:unit",
     "test": "npm run lint && npm run test:coverage"
   },
