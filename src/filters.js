@@ -1074,6 +1074,43 @@ function filesizeformat (value, binary = false) {
 
 module.exports.filesizeformat = filesizeformat;
 
+const invalidKey = /[ />=]/;
+
+/**
+ * Create a string of XML attribute key value pairs from an input object.
+ * @param {Record<string, any>} obj Object map of attribute keys and values
+ * @param {boolean} [autospace=true] Render with leading space (default: true)
+ * @throws {lib.TemplateError}
+ * @returns {string}
+ */
+function xmlattr (obj, autospace = true) {
+  let attrs = autospace ? ' ' : '';
+  let first = true;
+
+  for (const attribute in obj) {
+    const value = obj[attribute];
+
+    if (Object.prototype.hasOwnProperty.call(obj, attribute) &&
+      value !== undefined &&
+      value !== null) {
+      const attrStr = attribute.toString();
+
+      if (invalidKey.test(attrStr)) {
+        throw new lib.TemplateError(
+          `Invalid attribute name: "${attrStr}", cannot contain [ />=]`
+        );
+      }
+
+      attrs += `${first ? '' : ' '}${lib.escape(attrStr)}="${lib.escape(value.toString())}"`;
+      first &&= false;
+    }
+  }
+
+  return new r.SafeString(attrs);
+}
+
+module.exports.xmlattr = xmlattr;
+
 // Aliases
 module.exports.d = module.exports.default;
 module.exports.e = module.exports.escape;
