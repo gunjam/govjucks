@@ -1421,6 +1421,59 @@ Convert string to all lower case:
 foobar
 ```
 
+### max
+
+Return the largest value in an array of numbers or strings.
+
+For strings the comparison is case-insensitive by default, but can be made
+case-sensitive by setting `case_sensitive` as `true`.
+
+`max` can also be used on lists of objects by specifying a property to compare
+with the `attribute` parameter.
+
+**Input**
+
+```jinja
+{{ [4, 2, 5, 1, 0] | max }}
+---
+{{ ["cat", "Dog", "Bird"] | max }}
+{{ ["cat", "Dog", "Bird"] | max(true) }}
+{{ ["cat", "Dog", "Bird"] | max(case_sensitive=true) }}
+---
+{%- set data = [{ animal: "cat" }, { animal: "Dog" }, { animal: "Bird" }] %}
+{{ data | max(attribute="animal") | dump | safe }}
+{{ data | max(true, "animal") | dump | safe }}
+```
+
+**Output**
+
+```jinja
+5
+---
+Dog
+cat
+cat
+---
+{"animal":"Dog"}
+{"animal":"cat"}
+```
+
+### min
+
+Same as `max` but returns the smallest value instead.
+
+**Input**
+
+```jinja
+{{ [4, 2, 5, 1, 0] | min }}
+```
+
+**Output**
+
+```jinja
+0
+```
+
 ### nl2br
 
 Replace new lines with `<br />` HTML elements:
