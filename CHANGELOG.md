@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### New features
+
+* Adding min & max filters which match the [Jinja2 min](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.min)
+  and [Jinja2 max](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.max) versions.
+
 ## v0.1.0 (First release)
 
 This is the first release since forking nunjucks, a lot of work has been done

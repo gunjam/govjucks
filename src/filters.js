@@ -989,6 +989,73 @@ const intFilter = r.makeMacro(
 
 module.exports.int = intFilter;
 
+/** @param {boolean} check */
+function minMax (check) {
+  /**
+   * @param {number[] | string[] | Record<string, number>[] | Record<string, string>[]} array
+   * @param {boolean} [caseSensitive=false]
+   * @param {string} [attribute]
+   */
+  function find (array, caseSensitive, attribute) {
+    caseSensitive ??= false;
+
+    let min = array[0];
+    let minCompare = attribute ? min?.[attribute] : min;
+    minCompare = !caseSensitive && typeof minCompare === 'string'
+      ? minCompare.toLowerCase()
+      : minCompare;
+
+    for (let i = 1, len = array.length; i < len; i++) {
+      let vc = attribute ? array[i]?.[attribute] : array[i];
+      if (caseSensitive) {
+        if ((vc < minCompare) === check) {
+          min = array[i];
+          minCompare = vc;
+        }
+      } else {
+        vc = typeof vc === 'string' ? vc.toLowerCase() : vc;
+        if ((vc < minCompare) === check) {
+          min = array[i];
+          minCompare = vc;
+        }
+      }
+    }
+
+    return min;
+  }
+
+  return r.makeMacro(['value', 'case_sensitive', 'attribute'], find);
+}
+
+/**
+ * Get the smallest item in a list of strings or numbers. For strings the
+ * comparison is case-insensitive by default, but can be made case-sensitive by
+ * passing `true` as the `caseSensitive` argument.
+ *
+ * For lists of objects, the `attribute` argument can be used to specify a
+ * property to compare.
+ * @param {number[] | string[] | Record<string, number>[] | Record<string, string>[]} array
+ * @param {boolean} [caseSensitive=false]
+ * @param {string} [attribute]
+ */
+const min = minMax(true);
+
+/**
+ * Get the largest item in a list of strings or numbers. For strings the
+ * comparison is case-insensitive by default, but can be made case-sensitive by
+ * passing `true` as the `caseSensitive` argument.
+ *
+ * For lists of objects, the `attribute` argument can be used to specify a
+ * property to compare.
+ * @param {number[] | string[] | Record<string, number>[] | Record<string, string>[]} array
+ * @param {boolean} [caseSensitive=false]
+ * @param {string} [attribute]
+ */
+const max = minMax(false);
+
+module.exports.min = min;
+module.exports.max = max;
+
 // Aliases
 module.exports.d = module.exports.default;
 module.exports.e = module.exports.escape;

@@ -600,6 +600,118 @@ describe('filter', () => {
     finish(done);
   });
 
+  it('max', (t, done) => {
+    // Numbers
+    equal('{{ [5, 4, 1, 3, 8, 2] | max }}', '8');
+    equal('{{ [5, 4.3, 1, 8.5, 8, 2] | max }}', '8.5');
+
+    // Strings
+    equal('{{ ["AC", "aa", "BB", "ba", "AB"] | max }}', 'BB');
+
+    // Case-sensitive (a > A)
+    equal('{{ ["AC", "aa", "BB", "ba", "AB"] | max(true) }}', 'ba');
+    equal('{{ ["AC", "aa", "BB", "ba", "AB"] | max(case_sensitive=true) }}', 'ba');
+
+    // Attribute
+    equal('{{ data | max(false, "prop") | dump | safe }}', {
+      data: [
+        { prop: 5 },
+        { prop: 4 },
+        { prop: 1 },
+        { prop: 3 },
+        { prop: 8 },
+        { prop: 2 }
+      ]
+    }, '{"prop":8}');
+    equal('{{ data | max(attribute="prop") | dump | safe }}', {
+      data: [
+        { prop: 5 },
+        { prop: 4 },
+        { prop: 1 },
+        { prop: 3 },
+        { prop: 8 },
+        { prop: 2 }
+      ]
+    }, '{"prop":8}');
+
+    equal('{{ data | max(false, "prop") | dump | safe }}', {
+      data: [
+        { prop: 'AC' },
+        { prop: 'aa' },
+        { prop: 'BB' },
+        { prop: 'ba' },
+        { prop: 'AB' }
+      ]
+    }, '{"prop":"BB"}');
+    equal('{{ data | max(attribute="prop") | dump | safe }}', {
+      data: [
+        { prop: 'AC' },
+        { prop: 'aa' },
+        { prop: 'BB' },
+        { prop: 'ba' },
+        { prop: 'AB' }
+      ]
+    }, '{"prop":"BB"}');
+
+    finish(done);
+  });
+
+  it('min', (t, done) => {
+    // Numbers
+    equal('{{ [5, 4, 1, 3, 8, 2] | min }}', '1');
+    equal('{{ [5, 4.3, 1, 8.5, 8, 2] | min }}', '1');
+
+    // Strings
+    equal('{{ ["AC", "aa", "BB", "ba", "AB"] | min }}', 'aa');
+
+    // Case-sensitive (A < a)
+    equal('{{ ["AC", "aa", "BB", "ba", "AB"] | min(true) }}', 'AB');
+    equal('{{ ["AC", "aa", "BB", "ba", "AB"] | min(case_sensitive=true) }}', 'AB');
+
+    // Attribute
+    equal('{{ data | min(false, "prop") | dump | safe }}', {
+      data: [
+        { prop: 5 },
+        { prop: 4 },
+        { prop: 1 },
+        { prop: 3 },
+        { prop: 8 },
+        { prop: 2 }
+      ]
+    }, '{"prop":1}');
+    equal('{{ data | min(attribute="prop") | dump | safe }}', {
+      data: [
+        { prop: 5 },
+        { prop: 4 },
+        { prop: 1 },
+        { prop: 3 },
+        { prop: 8 },
+        { prop: 2 }
+      ]
+    }, '{"prop":1}');
+
+    equal('{{ data | min(false, "prop") | dump | safe }}', {
+      data: [
+        { prop: 'AC' },
+        { prop: 'aa' },
+        { prop: 'BB' },
+        { prop: 'ba' },
+        { prop: 'AB' }
+      ]
+    }, '{"prop":"aa"}');
+    equal('{{ data | min(attribute="prop") | dump | safe }}', {
+      data: [
+        { prop: 'AC' },
+        { prop: 'aa' },
+        { prop: 'BB' },
+        { prop: 'ba' },
+        { prop: 'AB' }
+      ]
+    }, '{"prop":"aa"}');
+
+    finish(done);
+  });
+
   it('nl2br', (t, done) => {
     equal('{{ null | nl2br }}', '');
     equal('{{ undefined | nl2br }}', '');
