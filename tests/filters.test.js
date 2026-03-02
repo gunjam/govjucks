@@ -1142,6 +1142,33 @@ describe('filter', () => {
     finish(done);
   });
 
+  it('tojson', (t, done) => {
+    equal('{{ "foo bar baz" | tojson }}', '"foo bar baz"');
+    equal('{{ true | tojson }}', 'true');
+    equal('{{ false | tojson }}', 'false');
+    equal('{{ null | tojson }}', 'null');
+    equal('{{ 5 | tojson }}', '5');
+    equal('{{ undefined | tojson }}', '');
+    equal('{{ nothing | tojson }}', '');
+    equal('{{ [5, "test", true] | tojson }}', '[5,"test",true]');
+
+    const obj = {
+      property: 'value',
+      nested: { property: 'value' }
+    };
+    equal('{{ obj | tojson }}', { obj }, '{"property":"value","nested":{"property":"value"}}');
+    equal('{{ obj | tojson(2) }}', { obj }, `{
+  "property": "value",
+  "nested": {
+    "property": "value"
+  }
+}`);
+
+    // Escaping
+    equal('{{ "& \' < >" | tojson }}', '"\\u0026 \\u0027 \\u003c \\u003e"');
+    finish(done);
+  });
+
   it('trim', (t, done) => {
     equal('{{ "  foo " | trim }}', 'foo');
     equal('{{ str | trim }}', {

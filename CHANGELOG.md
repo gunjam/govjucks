@@ -13,6 +13,7 @@
 * Adding xmlattr filter that matches the [Jinja implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.xmlattr). [#12](https://github.com/gunjam/govjucks/pull/12) @gunjam
 * Adding min & max filters which match the [Jinja min](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.min)
   and [Jinja max](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.max) versions. [#14](https://github.com/gunjam/govjucks/pull/14) @gunjam
+* Adding tojson filter based on the [Jinja implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.tojson). [#15](https://github.com/gunjam/govjucks/pull/15) @gunjam
 
 ## v0.1.0 (First release)
 
