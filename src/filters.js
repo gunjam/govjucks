@@ -1178,6 +1178,25 @@ const max = minMax(false);
 module.exports.min = min;
 module.exports.max = max;
 
+/**
+ * Stringfy an input value using `JSON.stringify()` and escape it for use
+ * within a `<script>` tag. Values that are `undefined` will return an empty
+ * string.
+ * @param {any} value Input value
+ * @param {number} [indent] Number of spaces to indent the JSON string.
+ * @returns {string} Escaped JSON string.
+ */
+function tojson (value, indent) {
+  if (value === undefined) {
+    return '';
+  }
+
+  const spaces = indent ? ' '.repeat(indent) : '';
+  return new r.SafeString(lib.escapeJSON(JSON.stringify(value, null, spaces)));
+}
+
+module.exports.tojson = tojson;
+
 // Aliases
 module.exports.d = module.exports.default;
 module.exports.e = module.exports.escape;

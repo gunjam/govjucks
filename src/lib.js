@@ -57,6 +57,50 @@ const escapeFunction = (string) => {
 
 module.exports.escape = escapeFunction;
 
+const JSONescapeRegExp = /[&'<>]/g;
+/**
+ * Escapes stringfied JSON so it cane safely rendered within a `<script>` tag
+ * @param {string} string
+ * @returns {string} escaped string
+ */
+const escapeJSON = (string) => {
+  let escaped = '';
+  let start = 0;
+
+  while (JSONescapeRegExp.test(string)) {
+    const i = JSONescapeRegExp.lastIndex - 1;
+
+    switch (string.charCodeAt(i)) {
+      // &
+      case 38: {
+        escaped += string.slice(start, i) + '\\u0026';
+        break;
+      }
+      // '
+      case 39: {
+        escaped += string.slice(start, i) + '\\u0027';
+        break;
+      }
+      // <
+      case 60: {
+        escaped += string.slice(start, i) + '\\u003c';
+        break;
+      }
+      // >
+      case 62: {
+        escaped += string.slice(start, i) + '\\u003e';
+        break;
+      }
+    }
+
+    start = JSONescapeRegExp.lastIndex;
+  }
+
+  return escaped + string.slice(start);
+};
+
+module.exports.escapeJSON = escapeJSON;
+
 function _prettifyError (path, withInternals, err) {
   if (!err.Update) {
     // not one of ours, cast it

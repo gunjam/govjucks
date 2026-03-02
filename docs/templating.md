@@ -1955,6 +1955,51 @@ Make the first letter of the string uppercase:
 Foo Bar Baz
 ```
 
+### tojson
+
+Serialize an input value to a JSON string, escape any special characters and
+mark it as safe.
+
+The returned string is safe to use in `<script>` tags and in HTML, except in
+attribute values that use double quotes - either use single quotes or the
+`| escape` filter.
+
+You can use the indent argument to set the number of spaces for formatting.
+
+**Input**
+
+```jinja
+{{ "foo bar baz" | tojson }}
+{%- set str = '""</script><script>alert("hello")</script>' %}
+<script>
+  const str = {{ str | tojson }}
+</script>
+{{ undefined | tojson }}
+{%- set obj = {
+  property: "value",
+  nested: { property: "value" }
+} %}
+{{ obj | tojson }}
+{{ obj | tojson(2) }}
+```
+
+**Output**
+
+```jinja
+"foo bar baz"
+<script>
+  const str = "\"\"\u003c/script\u003e\u003cscript\u003ealert(\"hello\")\u003c/script\u003e"
+</script>
+
+{"property":"value","nested":{"property":"value"}}
+{
+  "property": "value",
+  "nested": {
+    "property": "value"
+  }
+}
+```
+
 ### trim
 
 Strip leading and trailing whitespace:
