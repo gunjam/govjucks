@@ -767,11 +767,12 @@ class Compiler {
    */
   _compileFrameSet (name, id, resolveUp) {
     const resolve = resolveUp ? 'true' : 'false';
-    if (name.toString().indexOf('.') === -1) {
-      this._emitLine(`frame.setShallow("${name}", ${id}, ${resolve});`);
+    const varName = name instanceof nodes.Node ? name.value : name;
+    if (varName.toString().indexOf('.') === -1) {
+      this._emitLine(`frame.setShallow("${varName}", ${id}, ${resolve});`);
     } else {
-      const parts = name.split('.');
-      this._emitLine(`frame.setDeep("${name}", ${id}, [${parts.join(', ')}], ${resolve});`);
+      const parts = varName.split('.');
+      this._emitLine(`frame.setDeep("${varName}", ${id}, [${parts.join(', ')}], ${resolve});`);
     }
   }
 
@@ -881,6 +882,9 @@ class Compiler {
     const i = this._tmpid();
     const len = this._tmpid();
     const arr = this._tmpid();
+    const loopVar = this._tmpid();
+    const reArr = node.recursive && this._tmpid();
+
     frame = frame.push();
 
     this._emitLine('frame = frame.push();');
@@ -889,6 +893,7 @@ class Compiler {
     this._compileExpression(node.arr, frame);
     this._emitLine(';');
 
+    this._emitLine(`let ${len}${node.arr instanceof nodes.Array ? `= ${arr}.length` : ''};`);
     this._emit(`if(${arr}) {`);
     this._emitLine(arr + ' = runtime.fromIterator(' + arr + ');');
 
@@ -897,11 +902,18 @@ class Compiler {
     if (node.name instanceof nodes.Array) {
       this._emitLine(`let ${i};`);
 
-      // The object could be an arroy or object. Note that the
+      // The object could be an array or object. Note that the
       // body of the loop is duplicated for each condition, but
       // we are optimizing for speed over size.
       this._emitLine(`if(Array.isArray(${arr})) {`);
-      this._emitLine(`var ${len} = ${arr}.length;`);
+      this._emitLine(`${len} = ${arr}.length;`);
+      if (node.recursive) {
+        this._emitLine(`${this.buffer} += runtime.LoopContext.recurse(${arr}, (${loopVar}, ${reArr}) => {`);
+        this._emitLine(`let ${this.buffer} = '';`);
+      } else {
+        this._emitLine(`const ${loopVar} = new runtime.LoopContext(${arr}, 0)`);
+      }
+      this._emitLine(`frame.setShallow("loop", ${loopVar})`);
       this._emitLine(`for(${i}=0; ${i} < ${arr}.length; ${i}++) {`);
 
       // Bind each declared var
@@ -913,52 +925,82 @@ class Compiler {
         frame.set(child.value, tid);
       }
 
-      this._emitLoopBindings(i, len);
       this._withScopedSyntax(() => {
         this.compile(node.body, frame);
       });
+
+      this._emitLine(`${loopVar}.iterate()`);
       this._emitLine('}');
+      if (node.recursive) {
+        this._emitLine(`return ${this.buffer};`);
+        this._emitLine('});');
+      }
 
       this._emitLine('} else {');
       // Iterate over the key/values of an object
       const [key, val] = node.name.children;
+      const keys = this._tmpid();
       const k = this._tmpid();
       const v = this._tmpid();
       frame.set(key.value, k);
       frame.set(val.value, v);
-
+      this._emitLine(`const ${keys} = Object.keys(${reArr || arr});`);
+      if (node.recursive) {
+        this._emitLine(`${this.buffer} += runtime.LoopContext.recurse(${keys}, (${loopVar}, ${reArr}) => {`);
+        this._emitLine(`let ${this.buffer} = '';`);
+      } else {
+        this._emitLine(`const ${loopVar} = new runtime.LoopContext(${keys}, 0)`);
+      }
       this._emitLine(`${i} = -1;`);
-      this._emitLine(`var ${len} = Object.keys(${arr}).length;`);
+      this._emitLine(`${len} = ${keys}.length;`);
+      this._emitLine(`frame.setShallow("loop", ${loopVar})`);
       this._emitLine(`for(var ${k} in ${arr}) {`);
       this._emitLine(`${i}++;`);
       this._emitLine(`var ${v} = ${arr}[${k}];`);
       this._compileFrameSet(key.value, k, false);
       this._compileFrameSet(val.value, v, false);
 
-      this._emitLoopBindings(i, len);
       this._withScopedSyntax(() => {
         this.compile(node.body, frame);
       });
+
+      this._emitLine(`${loopVar}.iterate()`);
       this._emitLine('}');
+
+      if (node.recursive) {
+        this._emitLine(`return ${this.buffer};`);
+        this._emitLine('});');
+      }
 
       this._emitLine('}');
     } else {
       // Generate a typical array iteration
       const v = this._tmpid();
       frame.set(node.name.value, v);
-
-      this._emitLine(`var ${len} = ${arr}.length;`);
+      if (!(node.arr instanceof nodes.Array)) {
+        this._emitLine(`${len} = ${arr}.length;`);
+      }
+      if (node.recursive) {
+        this._emitLine(`${this.buffer} += runtime.LoopContext.recurse(${arr}, (${loopVar}, ${reArr}) => {`);
+        this._emitLine(`let ${this.buffer} = '';`);
+      } else {
+        this._emitLine(`const ${loopVar} = new runtime.LoopContext(${arr}, 0)`);
+      }
+      this._emitLine(`frame.setShallow("loop", ${loopVar})`);
       this._emitLine(`for(var ${i}=0; ${i} < ${arr}.length; ${i}++) {`);
-      this._emitLine(`var ${v} = ${arr}[${i}];`);
+      this._emitLine(`const ${v} = ${reArr || arr}[${i}];`);
       this._compileFrameSet(node.name.value, v, false);
-
-      this._emitLoopBindings(i, len);
 
       this._withScopedSyntax(() => {
         this.compile(node.body, frame);
       });
 
+      this._emitLine(`${loopVar}.iterate()`);
       this._emitLine('}');
+      if (node.recursive) {
+        this._emitLine(`return ${this.buffer};`);
+        this._emitLine('});');
+      }
     }
 
     this._emitLine('}');
@@ -984,6 +1026,7 @@ class Compiler {
     const i = this._tmpid();
     const len = this._tmpid();
     const arr = this._tmpid();
+    const loop = this._tmpid();
     const asyncMethod = parallel ? 'asyncAll' : 'asyncEach';
     frame = frame.push();
 
@@ -993,6 +1036,9 @@ class Compiler {
     this._compileExpression(node.arr, frame);
     this._emitLine(');');
 
+    this._emitLine(`${loop} = new runtime.LoopContext(${arr} ?? [], 0);`);
+    this._emitLine(`console.log(${loop})`);
+    this._emitLine(`frame.setShallow("loop", ${loop})`);
     if (node.name instanceof nodes.Array) {
       const arrayLen = node.name.children.length;
       this._emit(`runtime.${asyncMethod}(${arr}, ${arrayLen}, function(`);
@@ -1015,8 +1061,6 @@ class Compiler {
       frame.set(id, id);
     }
 
-    this._emitLoopBindings(i, len);
-
     this._withScopedSyntax(() => {
       let buf;
       if (parallel) {
@@ -1024,6 +1068,8 @@ class Compiler {
       }
 
       this.compile(node.body, frame);
+
+      this._emitLine(`${loop}.iterate()`);
       this._emitLine('next(' + i + (buf ? ',' + buf : '') + ');');
 
       if (parallel) {

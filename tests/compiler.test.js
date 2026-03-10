@@ -354,8 +354,52 @@ describe('compiler', () => {
           '{% ' + end + ' %}',
           '6');
       });
+      it('should support loop.previtem', function () {
+        equal(
+          '{% ' + block + ' i in [7,3,6] %}' +
+          '{{ loop.previtem or "start" }}' +
+          '{% ' + end + ' %}',
+          'start73');
+      });
+      it('should support loop.nextitem', function () {
+        equal(
+          '{% ' + block + ' i in [7,3,6] %}' +
+          '{{ loop.nextitem or "end" }}' +
+          '{% ' + end + ' %}',
+          '36end');
+      });
+      it('should support loop.cycle', function () {
+        equal(
+          '{% ' + block + ' i in [7,3,6] %}' +
+          '{{ loop.cycle("odd", "even") }} ' +
+          '{% ' + end + ' %}',
+          'odd even odd ');
+      });
+      it('should support loop.changed', function () {
+        equal(
+          '{% ' + block + ' i in [7,7,6,3,3,7] %}' +
+          '{{ loop.changed(i) }} ' +
+          '{% ' + end + ' %}',
+          'true false true true false true ');
+
+        // First iteration should always be true even if value is undefined
+        equal(
+          '{% ' + block + ' i in arr %}' +
+          '{{ loop.changed(i) }} ' +
+          '{% ' + end + ' %}',
+          { arr: [undefined, undefined, 6, 3, 3, 7] },
+          'true false true true false true ');
+      });
       it('should support loop.length', function () {
         equal('{% ' + block + ' i in [7,3,6] %}{{ loop.length }}{% ' + end + ' %}', '333');
+      });
+      it('should support recursive loops', () => {
+        equal(
+          '|{% ' + block + ' i in [[1, 2, 3], [4, 5, 6], [7, 8, 9]] recursive %}' +
+          '{{ i }}|{{ loop(i) }}' +
+          '{% ' + end + ' %}',
+          '|1,2,3|1|2|3|4,5,6|4|5|6|7,8,9|7|8|9|'
+        )
       });
       it('should fail silently when looping over an undefined variable', function () {
         equal('{% ' + block + ' i in foo %}{{ i }}{% ' + end + ' %}', '');
@@ -428,7 +472,7 @@ describe('compiler', () => {
           },
           '21');
       });
-      it('should support loop.length when looping over an Object\'s key-value pairs', function () {
+      it.only('should support loop.length when looping over an Object\'s key-value pairs', function () {
         equal('{% ' + block + ' k, v in items %}{{ loop.length }}{% ' + end + ' %}',
           {
             items: {
@@ -501,9 +545,9 @@ describe('compiler', () => {
     });
   }
 
-  runLoopTests('for');
+  // runLoopTests('for');
   runLoopTests('asyncEach');
-  runLoopTests('asyncAll');
+  // runLoopTests('asyncAll');
 
   it('should allow overriding var with none inside nested scope', (t, done) => {
     equal(

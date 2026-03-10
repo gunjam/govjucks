@@ -5,6 +5,9 @@ const NullObject = require('./null-object');
 
 const arrayFrom = Array.from;
 const kKeywords = Symbol('keywordArgs');
+const kLastChanged = Symbol('kLastChanged');
+const kCallable = Symbol('kCallable');
+const kRecursive = Symbol('kRecursive');
 
 class Frame {
   /**
@@ -348,7 +351,7 @@ function callWrap (func, name, context, args) {
  * @throws {ReferenceError|TypeError}
  */
 function assertFunction (func, name) {
-  if (typeof func !== 'function') {
+  if (typeof func !== 'function' && !func?.[kCallable]) {
     if (!func) {
       throw new ReferenceError(`Unable to call \`${name}\`, which is undefined or falsey`);
     }
@@ -386,50 +389,51 @@ function handleError (error, lineno, colno) {
 
 function asyncEach (arr, dimen, iter, cb) {
   if (Array.isArray(arr)) {
-    const len = arr.length;
+    const loop = new LoopContext(arr, 0);
 
     lib.asyncIter(arr, function iterCallback (item, i, next) {
       switch (dimen) {
         case 1:
-          iter(item, i, len, next);
+          iter(item, i, loop, next);
           break;
         case 2:
-          iter(item[0], item[1], i, len, next);
+          iter(item[0], item[1], i, loop, next);
           break;
         case 3:
-          iter(item[0], item[1], item[2], i, len, next);
+          iter(item[0], item[1], item[2], i, loop, next);
           break;
         default:
-          item.push(i, len, next);
+          item.push(i, loop, next);
           iter.apply(this, item);
       }
     }, cb);
   } else {
-    lib.asyncFor(arr, function iterCallback (key, val, i, len, next) {
-      iter(key, val, i, len, next);
+    lib.asyncFor(arr, function iterCallback (key, val, i, loop, next) {
+      iter(key, val, i, loop, next);
     }, cb);
   }
 }
 
 function asyncAll (arr, dimen, func, cb) {
   let finished = 0;
-  let len;
+  let loop;
   let outputArr;
 
   function done (i, output) {
     finished++;
+    loop.iterate();
     outputArr[i] = output;
 
-    if (finished === len) {
+    if (finished === loop.length) {
       cb(null, outputArr.join(''));
     }
   }
 
   if (Array.isArray(arr)) {
-    len = arr.length;
-    outputArr = new Array(len);
+    loop = new LoopContext(arr, 0);
+    outputArr = new Array(loop.length);
 
-    if (len === 0) {
+    if (loop.length === 0) {
       cb(null, '');
     } else {
       for (let i = 0; i < arr.length; i++) {
@@ -437,31 +441,31 @@ function asyncAll (arr, dimen, func, cb) {
 
         switch (dimen) {
           case 1:
-            func(item, i, len, done);
+            func(item, i, loop, done);
             break;
           case 2:
-            func(item[0], item[1], i, len, done);
+            func(item[0], item[1], i, loop, done);
             break;
           case 3:
-            func(item[0], item[1], item[2], i, len, done);
+            func(item[0], item[1], item[2], i, loop, done);
             break;
           default:
-            item.push(i, len, done);
+            item.push(i, loop, done);
             func.apply(this, item);
         }
       }
     }
   } else {
     const keys = Object.keys(arr || {});
-    len = keys.length;
-    outputArr = new Array(len);
+    loop = new LoopContext(keys, 0);
+    outputArr = new Array(loop.length);
 
-    if (len === 0) {
+    if (loop.length === 0) {
       cb(null, '');
     } else {
       for (let i = 0; i < keys.length; i++) {
         const k = keys[i];
-        func(k, arr[k], i, len, done);
+        func(k, arr[k], i, loop, done);
       }
     }
   }
@@ -476,6 +480,156 @@ function fromIterator (arr) {
   }
   return arr;
 }
+
+// function loopCall (_, arr) {
+//   if (!this[kRecursive]) {
+//     throw lib.TemplateError('loop must recursive to call loop');
+//   }
+//   console.log("called loop", arr);
+//   recursive(arr, this[kCallable]);
+// }
+// function recursive (arr, cb) {
+//   const iterable = fromIterator(arr);
+//   if (iterable[Symbol.iterator]) {
+//     cb(iterable, cb);
+//   }
+// }
+
+
+
+// function loopCycle (...items) {
+//   return items[this.index0 % items.length];
+// }
+
+// function loopChanged (val) {
+//   const changed = !(kLastChanged in this) || this[kLastChanged] !== val;
+//   this[kLastChanged] = val;
+//   return changed;
+// }
+
+// function loopCall (_, arr) {
+  // const cb = this[kCallable];
+  // if (!cb) {
+  //   throw lib.TemplateError('loop must recursive to call loop');
+  // }
+  // if (arr?.[Symbol.iterator]) {
+  //   const loop = loopObject(cb);
+  //   cb(loop, arr);
+  // }
+// }
+
+// function loopObject (cb) {
+//   const obj = new NullObject();
+//   obj.call = loopCall;
+//   obj[kCallable] = cb;
+//   obj.cycle = loopCycle;
+//   obj.changed = loopChanged;
+//   return obj;
+// }
+
+// function recursive (arr, cb) {
+  // const loop = loopObject(cb);
+  // cb(loop, arr);
+// }
+
+
+class LoopContext {
+  [kCallable] = false;
+
+  #arr = null;
+  #cb = null;
+  #changed = {};
+  length = 0;
+  index0 = 0;
+  index = 1;
+  depth0 = 0;
+  depth = 1;
+
+  constructor (arr, depth, cb) {
+    console.log(arr)
+    if (cb) {
+      this[kCallable] = true;
+      this.#cb = cb
+    }
+    this.#arr = arr;
+    this.length = arr.length;
+    console.log('length', arr.length)
+    this.depth0 = depth ?? 0;
+    this.depth = this.depth0 + 1;
+  }
+
+  get revindex0 () {
+    return this.length - this.index0 - 1;
+  }
+
+  get revindex () {
+    return this.length - this.index0;
+  }
+
+  get first () {
+    return this.index0 === 0;
+  }
+
+  get last () {
+    return this.index === this.length;
+  }
+
+  get previtem () {
+    return this.#arr[this.index0 - 1];
+  }
+
+  get nextitem () {
+    return this.#arr[this.index];
+  }
+
+  cycle (...items) {
+    return items[this.index0 % items.length];
+  }
+
+  changed (val) {
+    const changed = this.#changed !== val;
+    this.#changed = val;
+    return changed;
+  }
+
+  call (_, arr) {
+    if (!this.#cb) {
+      throw lib.TemplateError('loop must recursive to call loop');
+    }
+    if (arr?.[Symbol.iterator]) {
+      const loop = new LoopContext(arr, this.depth0 + 1, this.#cb);
+      return this.#cb(loop, arr);
+    }
+  }
+
+  iterate () {
+    this.index0++;
+    this.index++;
+  }
+
+  static recurse (arr, cb) {
+    console.log(arr, cb);
+    const loop = new LoopContext(arr, 0, cb);
+    return cb(loop, arr);
+  }
+}
+
+
+
+const barry = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+
+let output = '';
+
+// LoopContext.recurse(barry, (loop, arr) => {
+//   for (const thing of arr) {
+//     console.log(thing);
+//     output += thing;
+//     loop.call({}, thing);
+//     loop.iterate();
+//   }
+// });
+
+// console.log(output);
 
 module.exports = {
   Frame,
@@ -496,7 +650,10 @@ module.exports = {
   asyncEach,
   asyncAll,
   inOperator: lib.inOperator,
-  fromIterator
+  fromIterator,
+  LoopContext,
+  kRecursive,
+  kCallable,
 };
 
 /** @typedef {object} KeywordArgs macro keyword arguments object */

@@ -1,5 +1,7 @@
 'use strict';
 
+const runtime = require('./runtime');
+
 const ObjProto = Object.prototype;
 
 const escapeRegExp = /["&'<>\\]/g;
@@ -376,15 +378,16 @@ module.exports.asyncIter = asyncIter;
  */
 function asyncFor (obj, iter, cb) {
   const keys = Object.keys(obj ?? {});
-  const len = keys.length;
-  let i = -1;
+  const loop = new runtime.LoopContext(keys, 0);
+  loop.index0 = -1;
+  loop.index = 0;
 
   function next () {
-    i++;
-    const k = keys[i];
+    loop.iterate();
+    const k = keys[loop.index];
 
-    if (i < len) {
-      iter(k, obj[k], i, len, next);
+    if (loop.index < loop.length) {
+      iter(k, obj[k], loop.index, loop, next);
     } else {
       cb();
     }

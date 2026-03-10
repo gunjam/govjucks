@@ -189,6 +189,7 @@ class Parser extends Obj {
     }
 
     node.arr = this.parseExpression();
+    node.recursive = this.skipSymbol('recursive');
     this.advanceAfterBlockEnd(forTok.value);
 
     node.body = this.parseUntilBlocks(endBlock, 'else');
