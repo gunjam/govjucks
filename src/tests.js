@@ -3,6 +3,17 @@
 const SafeString = require('./runtime').SafeString;
 
 /**
+ * Returns `true` if the input is a boolean, otherwise `false`.
+ * @param { any } value
+ * @returns { boolean }
+ */
+function boolean (value) {
+  return typeof value === 'boolean';
+}
+
+exports.boolean = boolean;
+
+/**
  * Returns `true` if the object is a function, otherwise `false`.
  * @param { any } value
  * @returns { boolean }
@@ -75,6 +86,17 @@ function even (value) {
 exports.even = even;
 
 /**
+ * Returns `true` if the input is `false`, otherwise `false`.
+ * @param { any } value
+ * @returns { boolean }
+ */
+function isFalse (value) {
+  return value === false;
+}
+
+exports.false = isFalse;
+
+/**
  * Returns `true` if the value is falsy - if I recall correctly, '', 0, false,
  * undefined, NaN or null. I don't know if we should stick to the default JS
  * behavior or attempt to replicate what Python believes should be falsy (i.e.,
@@ -87,6 +109,28 @@ function falsy (value) {
 }
 
 exports.falsy = falsy;
+
+/**
+ * Returns `true` if a filter exists for the given name, otherwise `false`.
+ * @param { string } value
+ * @returns { boolean }
+ */
+function filter (value) {
+  return this.env.hasFilter(value);
+}
+
+exports.filter = filter;
+
+/**
+ * Returns `true` if a value is a float, otherwise `false`.
+ * @param { any } value
+ * @returns { boolean }
+ */
+function float (value) {
+  return Number(value) && !Number.isInteger(value);
+}
+
+exports.float = float;
 
 /**
  * Returns `true` if the operand (one) is greater or equal to the test's
@@ -116,6 +160,34 @@ exports.greaterthan = greaterthan;
 
 // alias
 exports.gt = exports.greaterthan;
+
+/**
+ * Returns `true` if a value is in an object, otherwise `false`.
+ * @param { any } value
+ * @returns { boolean }
+ */
+function inArr (value, arr) {
+  if (Array.isArray(arr)) {
+    return arr.includes(value);
+  }
+  if (arr instanceof Map || arr instanceof Set) {
+    return arr.has(value);
+  }
+  return typeof arr === 'object' && (value in arr);
+}
+
+exports.in = inArr;
+
+/**
+ * Returns `true` if a value is an integer, otherwise `false`.
+ * @param { any } value
+ * @returns { boolean }
+ */
+function integer (value) {
+  return Number.isInteger(value);
+}
+
+exports.integer = integer;
 
 /**
  * Returns `true` if the operand (one) is less than or equal to the test's
@@ -213,6 +285,28 @@ function string (value) {
 }
 
 exports.string = string;
+
+/**
+ * Returns `true` if a test exists for the given name, otherwise `false`.
+ * @param { string } value
+ * @returns { boolean }
+ */
+function test (value) {
+  return this.env.hasTest(value);
+}
+
+exports.test = test;
+
+/**
+ * Returns `true` if the input is `true`, otherwise `false`.
+ * @param { any } value
+ * @returns { boolean }
+ */
+function isTrue (value) {
+  return value === true;
+}
+
+exports.true = isTrue;
 
 /**
  * Returns `true` if the value is not in the list of things considered falsy:
