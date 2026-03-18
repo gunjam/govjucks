@@ -170,6 +170,10 @@ class Environment extends EmitterObj {
     return this;
   }
 
+  hasFilter (name) {
+    return name && (name in this.filters);
+  }
+
   getFilter (name) {
     if (!this.filters[name]) {
       throw new Error('filter not found: ' + name);
@@ -180,6 +184,10 @@ class Environment extends EmitterObj {
   addTest (name, func) {
     this.tests[name] = func;
     return this;
+  }
+
+  hasTest (name) {
+    return name && (name in this.tests);
   }
 
   getTest (name) {
