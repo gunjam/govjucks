@@ -5,6 +5,31 @@ const { describe, it } = require('node:test');
 const { equal, render } = require('./util');
 
 describe('tests', () => {
+  it('boolean should detect booleans', () => {
+    const boolTrue = render('{{ foo is boolean }}', {
+      foo: true
+    });
+    const notBoolTrue = render('{{ foo is not boolean }}', {
+      foo: true
+    });
+    const boolFalse = render('{{ foo is boolean }}', {
+      foo: false
+    });
+    const string = render('{{ foo is boolean }}', {
+      foo: 'true'
+    });
+    const notString = render('{{ foo is not boolean }}', {
+      foo: 'true'
+    });
+    const missing = render('{{ foo is boolean }}');
+    assert.equal(boolTrue, 'true');
+    assert.equal(notBoolTrue, 'false');
+    assert.equal(boolFalse, 'true');
+    assert.equal(string, 'false');
+    assert.equal(notString, 'true');
+    assert.equal(missing, 'false');
+  });
+
   it('callable should detect callability', () => {
     const callable = render('{{ foo is callable }}', {
       foo () {
@@ -124,11 +149,49 @@ describe('tests', () => {
     }
   });
 
+  it('false should detect whether or not a value is false', () => {
+    const zero = render('{{ 0 is false }}');
+    const boolFalse = render('{{ false is false }}');
+    const boolTrue = render('{{ true is false }}');
+    const pancakes = render('{{ "pancakes" is not false }}');
+    assert.equal(zero, 'false');
+    assert.equal(boolFalse, 'true');
+    assert.equal(boolTrue, 'false');
+    assert.equal(pancakes, 'true');
+  });
+
   it('falsy should detect whether or not a value is falsy', () => {
     const zero = render('{{ 0 is falsy }}');
     const pancakes = render('{{ "pancakes" is not falsy }}');
     assert.equal(zero, 'true');
     assert.equal(pancakes, 'true');
+  });
+
+  it('filter should detect whether or not a value is a filter', () => {
+    const zero = render('{{ 0 is filter }}');
+    const filter = render('{{ "upper" is filter }}');
+    const pancakes = render('{{ "pancakes" is not filter }}');
+    assert.equal(zero, 'false');
+    assert.equal(filter, 'true');
+    assert.equal(pancakes, 'true');
+  });
+
+  it('float should detect whether or not a value is a float', () => {
+    const zero = render('{{ 0 is float }}');
+    const onePointOne = render('{{ 1.1 is float }}');
+    const pancakes = render('{{ "pancakes" is not float }}');
+    assert.equal(zero, 'false');
+    assert.equal(onePointOne, 'true');
+    assert.equal(pancakes, 'true');
+  });
+
+  it('true should detect whether or not a value is true', () => {
+    const nullTruthy = render('{{ null is true }}');
+    const trueTrue = render('{{ true is true }}');
+    const pancakesNotTrue = render('{{ "pancakes" is not true }}');
+    assert.equal(nullTruthy, 'false');
+    assert.equal(trueTrue, 'true');
+    assert.equal(pancakesNotTrue, 'true');
   });
 
   it('truthy should detect whether or not a value is truthy', () => {
@@ -173,12 +236,56 @@ describe('tests', () => {
     assert.equal(four, 'false');
   });
 
+  it('in should detect a value is in an array', () => {
+    const fiveIn = render('{{ 5 is in([1, 2, 3, 4, 5]) }}');
+    const sixIn = render('{{ 6 is in([1, 2, 3, 4, 5]) }}');
+    const fourVal = render('{{ 4 is not in(arr) }}', { arr: [1, 2, 3, 4, 5] });
+    const map = render('{{ "key" is in(map) }}', {
+      map: new Map([['key', 'value']])
+    });
+    const mapNo = render('{{ "key" is in(map) }}', {
+      map: new Map([['test', 'value']])
+    });
+    const set = render('{{ "item" is in(set) }}', {
+      set: new Set(['item'])
+    });
+    const setNo = render('{{ "item" is in(set) }}', {
+      set: new Set(['pie'])
+    });
+    const obj = render('{{ "key" is in(obj) }}', {
+      obj: { key: 'value' }
+    });
+    const objNo = render('{{ "key" is in(obj) }}', {
+      obj: {}
+    });
+    const missing = render('{{ 4 is in(arr) }}');
+    assert.equal(fiveIn, 'true');
+    assert.equal(sixIn, 'false');
+    assert.equal(fourVal, 'false');
+    assert.equal(map, 'true');
+    assert.equal(mapNo, 'false');
+    assert.equal(set, 'true');
+    assert.equal(setNo, 'false');
+    assert.equal(obj, 'true');
+    assert.equal(objNo, 'false');
+    assert.equal(missing, 'false');
+  });
+
+  it('integer should detect whether or not a value is an integer', () => {
+    const zero = render('{{ 0 is integer }}');
+    const onePointOne = render('{{ 1.1 is integer }}');
+    const pancakes = render('{{ "pancakes" is not integer }}');
+    assert.equal(zero, 'true');
+    assert.equal(onePointOne, 'false');
+    assert.equal(pancakes, 'true');
+  });
+
   it('iterable should detect that a generator is iterable', (t, done) => {
     let iterable;
     try {
       /* eslint-disable-next-line no-eval */
       iterable = eval('(function* iterable() { yield true; })()');
-    } catch (e) {
+    } catch {
       return this.skip(); // Browser does not support generators
     }
     equal('{{ fn is iterable }}', { fn: iterable }, 'true');
@@ -244,5 +351,14 @@ describe('tests', () => {
   it('upper should detect whether or not a string is uppercased', () => {
     assert.equal(render('{{ "FOOBAR" is upper }}'), 'true');
     assert.equal(render('{{ "Foobar" is upper }}'), 'false');
+  });
+
+  it('test should detect whether or not a value is a test', () => {
+    const zero = render('{{ 0 is test }}');
+    const test = render('{{ "falsy" is test }}');
+    const pancakes = render('{{ "pancakes" is not test }}');
+    assert.equal(zero, 'false');
+    assert.equal(test, 'true');
+    assert.equal(pancakes, 'true');
   });
 });
