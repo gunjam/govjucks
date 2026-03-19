@@ -2052,6 +2052,39 @@ Truncate to 6 characters and replace "..." with a  "?":
 foo ba ?
 ```
 
+### unique
+
+Return a new array containing only unique values from the input array. Case
+insensitive by default so "A" is equivalent to "a". You can enable case
+sensitivity by passing `true` as the first parameter.
+
+You can filter an array of objects using the `attribute` parameter.
+
+**Input**
+
+```jinja
+{% set list = [
+  { value: 3 },
+  { value: 2 },
+  { value: 4 },
+  { value: 1 },
+  { value: 2 }
+] %}
+{{ ["b", "A", "a", "b"] | unique | join }}
+{{ ["b", "A", "a", "b"] | unique(true) | join }}
+{% for item in list | unique(attribute="value") -%}
+  {{ item.value }}
+{%- endfor %}
+```
+
+**Output**
+
+```jinja
+bA
+bAa
+3241
+```
+
 ### upper
 
 Convert the string to upper case:
