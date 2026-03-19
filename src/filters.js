@@ -1197,6 +1197,42 @@ function tojson (value, indent) {
 
 module.exports.tojson = tojson;
 
+/**
+ * Return a new array containing only unique values from the input array.
+ * @param {Array} array
+ * @param {boolean} [caseSensitive=false]
+ * @param {string} [attribute]
+*/
+const unique = r.makeMacro(
+  ['value', 'case_sensitive', 'attribute'],
+  /**
+   * @param {Array} array
+   * @param {boolean} [caseSensitive=false]
+   * @param {string} [attribute]
+   */
+  function (array, caseSensitive, attribute) {
+    if (caseSensitive && !attribute) {
+      const set = new Set(array);
+      return [...set];
+    }
+
+    const set = new Set();
+    const arr = [];
+
+    for (let i = 0, len = array.length; i < len; i++) {
+      const val = attribute ? array[i][attribute] : array[i];
+      const key = !caseSensitive && typeof val === 'string' ? val.toLowerCase() : val;
+      if (!set.has(key)) {
+        arr.push(array[i]);
+        set.add(key);
+      }
+    }
+    return arr;
+  }
+);
+
+module.exports.unique = unique;
+
 // Aliases
 module.exports.d = module.exports.default;
 module.exports.e = module.exports.escape;

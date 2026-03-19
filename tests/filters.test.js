@@ -1219,6 +1219,31 @@ describe('filter', () => {
     finish(done);
   });
 
+  it('unique', (t, done) => {
+    equal('{{ ["b", "A", "a", "b"]|unique|join }}', 'bA');
+    equal('{{ ["b", "A", "a", "b"]|unique(true)|join }}', 'bAa');
+    equal('{{ items|unique(attribute="value")|dump|safe }}', {
+      items: [
+        { value: 3 },
+        { value: 2 },
+        { value: 4 },
+        { value: 1 },
+        { value: 2 }
+      ]
+    }, '[{"value":3},{"value":2},{"value":4},{"value":1}]');
+    equal('{{ items|unique(case_sensitive=true, attribute="value")|dump|safe }}', {
+      items: [
+        { value: 'c' },
+        { value: 'B' },
+        { value: 'd' },
+        { value: 'a' },
+        { value: 'a' },
+        { value: 'b' }
+      ],
+    }, '[{"value":"c"},{"value":"B"},{"value":"d"},{"value":"a"},{"value":"b"}]');
+    finish(done);
+  });
+
   it('urlencode', (t, done) => {
     equal('{{ "&" | urlencode }}', '%26');
     equal('{{ arr | urlencode | safe }}', {
