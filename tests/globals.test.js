@@ -4,6 +4,8 @@ const assert = require('node:assert');
 const { describe, it } = require('node:test');
 const { equal, finish, render } = require('./util');
 const { Environment } = require('../src/environment');
+const { SafeString } = require('../src/runtime');
+const globals = require('../src/globals');
 
 describe('global', () => {
   it('should have range', (t, done) => {
@@ -58,6 +60,57 @@ describe('global', () => {
       'foobar|baz|');
 
     finish(done);
+  });
+
+  describe('lipsum', () => {
+    it('should have lipsum', (t, done) => {
+      const html = render('{{ lipsum() }}');
+      assert.ok(SafeString.isSafeString(globals().lipsum()));
+      assert.ok(html.startsWith('<p>'));
+      assert.ok(html.endsWith('</p>'));
+      finish(done);
+    });
+
+    it('should have no <p> tags when html is false', (t, done) => {
+      const string = render('{{ lipsum(html=false) }}');
+      assert.ok(typeof string === 'string');
+      assert.ok(!string.startsWith('<p>'));
+      assert.ok(!string.endsWith('</p>'));
+      finish(done);
+    });
+
+    it('should render the correct number of lines', (t, done) => {
+      const none = render('{{ lipsum(n=0, html=false) }}');
+      assert.equal(none, '');
+
+      for (let n = 1; n <= 50; n++) {
+        const lines = render(`{{ lipsum(n=${n}, html=false) }}`);
+        assert.equal(lines.match(/\n/g)?.length ?? 0, (n - 1) * 2);
+      }
+      finish(done);
+    });
+
+    it('should render the correct min words', (t, done) => {
+      for (let i = 0; i < 5; i++) {
+        const m = globals.randomBetween(20, 99);
+        for (let i = 0; i < 10; i++) {
+          const lines = render(`{{ lipsum(n=1, min=${m}, html=false) }}`);
+          assert.ok(lines.match(/ /g).length >= m - 1);
+        }
+      }
+      finish(done);
+    });
+
+    it('should render the correct max words', (t, done) => {
+      for (let i = 0; i < 5; i++) {
+        const m = globals.randomBetween(21, 100);
+        for (let i = 0; i < 10; i++) {
+          const lines = render(`{{ lipsum(n=1, max=${m}, html=false) }}`);
+          assert.ok(lines.match(/ /g).length < m);
+        }
+      }
+      finish(done);
+    });
   });
 
   it('should allow addition of globals', (t, done) => {
