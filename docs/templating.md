@@ -914,6 +914,31 @@ it is called except for the first time.
 
 If `tags` was `["food", "beer", "dessert"]`, the above example would output `food, beer, dessert`.
 
+### lipsum([n=5], [html=true], [min=20], [max=100])
+
+You can generate placeholder "lorem ipsum" text using the `lipsum` function. By
+default this will produce 5 paragraphs of html content with a minium of 20 and
+maximum of 100 words per paragraph. You can disable html output by setting
+`html` to `false` to remove the `<p>` tags, and set the number of lines with
+`n` and the number of words generated with the `min` and `max` parameters.
+
+```jinja
+{{ lipsum(1) }}
+```
+
+```html
+<p>Hac ornare ligula congue integer sociosqu non porttitor nullam et tempus
+mollis. Erat luctus per urna quisque commodo, luctus vehicula placerat massa.</p>
+```
+
+```jinja
+{{ lipsum(n=1, html=false, min=10, max=15) }}
+```
+
+```html
+Hac ipsum molestie facilisis gravida tellus aliquam aliquet nonummy arcu.
+```
+
 ## Builtin Filters
 
 Govjucks has ported most of [jinja's filters](http://jinja.pocoo.org/docs/dev/templates/#builtin-filters), and has a few of its own:

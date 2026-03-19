@@ -15,6 +15,7 @@
   and [Jinja max](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.max) versions. [#14](https://github.com/gunjam/govjucks/pull/14) @gunjam
 * Adding tojson filter based on the [Jinja implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.tojson). [#15](https://github.com/gunjam/govjucks/pull/15) @gunjam
 * Added unique filter based on the [Jinja implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.tojson). [#16](https://github.com/gunjam/govjucks/pull/16) @gunjam
+* Added lipsum global function based on the [Jinja implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-globals.lipsum). [#18](https://github.com/gunjam/govjucks/pull/18) @gunjam
 
 ## v0.1.0 (First release)
 
