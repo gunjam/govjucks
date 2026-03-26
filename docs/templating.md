@@ -1436,6 +1436,8 @@ c
 
 Return the length of an array or string, or the number of keys in an object:
 
+Aliases: `count`.
+
 **Input**
 
 ```jinja

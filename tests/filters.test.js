@@ -614,6 +614,11 @@ describe('filter', () => {
         equal('{{ set | length }}', { set }, '2');
       }
     });
+    it('should have alias of count', () => {
+      equal('{{ str | count }}', {
+        str: 'blah'
+      }, '4');
+    });
   });
 
   it('list', (t, done) => {

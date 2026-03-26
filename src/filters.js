@@ -329,7 +329,7 @@ function lengthFilter (val) {
 }
 
 module.exports.length = lengthFilter;
-
+module.exports.count = lengthFilter;
 /**
  * Convert the value into a list.
  * If it was a string the returned list will be a list of characters.
