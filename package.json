@@ -5,7 +5,8 @@
   "author": "James Long <longster@gmail.com>",
   "dependencies": {
     "asap": "^2.0.6",
-    "fastfall": "^1.5.1"
+    "fastfall": "^1.5.1",
+    "is-plain-obj": "^4.1.0"
   },
   "type": "commonjs",
   "devDependencies": {
