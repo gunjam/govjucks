@@ -145,7 +145,7 @@ class Environment extends EmitterObj {
   }
 
   hasExtension (name) {
-    return !!this.extensions[name];
+    return Object.hasOwn(this.extensions, name);
   }
 
   addGlobal (name, value) {
@@ -171,7 +171,7 @@ class Environment extends EmitterObj {
   }
 
   hasFilter (name) {
-    return name && (name in this.filters);
+    return Object.hasOwn(this.filters, name);
   }
 
   getFilter (name) {
@@ -187,7 +187,7 @@ class Environment extends EmitterObj {
   }
 
   hasTest (name) {
-    return name && (name in this.tests);
+    return Object.hasOwn(this.tests, name);
   }
 
   getTest (name) {
