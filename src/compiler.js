@@ -1102,10 +1102,22 @@ class Compiler {
       currFrame = new Frame();
     }
 
-    this._emitLines(`function ${funcId}(${funcArgs.join(', ')}) {`);
+    // Check if this macro is at the top, if so all nest macros should
+    // reference the top macro frame.
+    const isTopLevelMacro = !(currFrame.parent?.get('isMacro'));
+    currFrame.set('isMacro', true);
+
+    this._emitLine(`function ${funcId}(${funcArgs.join(', ')}) {`);
+    this._emitLine('const callerFrame = frame;');
+
+    if (keepFrame) {
+      this._emitLine(`frame = ${isTopLevelMacro ? 'frame.push(true);' : 'topFrame.push(true);'}`);
+    } else {
+      this._emitLine('frame = new runtime.Frame();');
+      if (isTopLevelMacro) this._emitLine('const topFrame = frame;');
+    }
+
     this._emitLines(
-      'const callerFrame = frame;',
-      'frame = ' + ((keepFrame) ? 'frame.push(true);' : 'new runtime.Frame();'),
       'const kwArgs = arguments[arguments.length - 1];',
       'if (runtime.isKeywordArgs(kwArgs)) {'
     );
@@ -1138,7 +1150,11 @@ class Compiler {
       this.compile(node.body, currFrame);
     });
 
-    this._emitLine('frame = ' + ((keepFrame) ? 'frame.pop();' : 'callerFrame;'));
+    if (isTopLevelMacro) {
+      this._emitLine('frame = ' + ((keepFrame) ? 'frame.pop();' : 'callerFrame;'));
+    } else {
+      this._emitLine('frame = ' + ((keepFrame) ? 'topFrame.pop();' : 'callerFrame;'));
+    }
     this._emitLine(`return new runtime.SafeString(${bufferId});`);
     this._emitLine('}');
     this._popBuffer();
