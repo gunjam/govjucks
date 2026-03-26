@@ -17,6 +17,7 @@
 * Added unique filter based on the [Jinja implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-filters.tojson). [#16](https://github.com/gunjam/govjucks/pull/16) @gunjam
 * Added lipsum global function based on the [Jinja implementation](https://jinja.palletsprojects.com/en/stable/templates/#jinja-globals.lipsum). [#18](https://github.com/gunjam/govjucks/pull/18) @gunjam
 * Add alias of `count` to `length` filter. [#21](https://github.com/gunjam/govjucks/pull/21) @gunjam
+* Added tests that are in Jinja but missing from nunjucks. Add missing test documentation. [#17](https://github.com/gunjam/govjucks/pull/17) @gunjam
 
 ## v0.1.0 (First release)
 
