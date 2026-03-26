@@ -81,9 +81,23 @@ They are called with a pipe operator (`|`) and can take arguments.
 The third example shows how you can chain filters. It would display
 "Bar", by first replacing "foo" with "bar" and then capitalizing it.
 
-Govjucks comes with several
-[builtin filters](#builtin-filters), and you can
+Govjucks comes with several [builtin filters](#builtin-filters), and you can
 [add your own](api#custom-filters) as well.
+
+## Tests
+
+As well as filters, there are also “tests” that can be used to test
+a variable in an expression. Like filters, tests are functions but they are
+called using `is` and can also take arguments. If there is only one argument you
+don't need to include the parentheses:
+
+```jinja
+{% if number is greaterthan 3 %}{% endif %}
+{% if number is greaterthan(3) %}{% endif %}
+```
+
+Govjucks comes with several [builtin tests](#builtin-tests), and you can
+[add your own](api#custom-tests) as well.
 
 ## Template Inheritance
 
@@ -1454,7 +1468,6 @@ Aliases: `count`.
 1
 ```
 
-
 ### list
 
 Convert the value into a list.
@@ -2189,7 +2202,6 @@ Truncate URL text by a given number:
 <a href="http://mozilla.github.io/">http://moz</a>
 ```
 
-
 ### wordcount
 
 Count and output the number of words in a string:
@@ -2240,3 +2252,266 @@ first.**
 Alternatively, it's easy to [read the JavaScript
 code](https://github.com/gunjam/govjucks/blob/master/src/filters.js)
 that implements these filters.
+
+## Builtin tests
+
+### boolean
+
+Returns true if the input var is a boolean.
+
+```jinja
+{% if foo is boolean %}
+```
+
+### callable
+
+Returns true if the input is “callable”, eg: a function.
+
+```jinja
+{% if foo is callable %}
+```
+
+### defined
+
+Returns true if the input is defined, either in the context or with a
+`{% set% }` call.
+
+```jinja
+{% if foo is defined %}
+```
+
+### divisibleby
+
+Check if a number is disivible by another.
+
+```jinja
+{% if foo is divisibleby 3 %}
+{% if foo is divisibleby(3) %}
+```
+
+## escaped
+
+Checked if the value is escaped, for example has been passed through the
+`| escape` filter.
+
+```jinja
+{% if foo is escaped %}
+```
+
+## eq
+
+Same as `==`.
+
+Aliases: `equalto`, `sameas`.
+
+```jinja
+{% if foo is eq "bar" %}
+{% if foo is equalto "bar" %}
+{% if foo is sameas "bar" %}
+```
+
+## even
+
+True if the input is an even number.
+
+```jinja
+{% if number is even %}
+```
+
+## false
+
+True if the input is equal to boolean `false`.
+
+```jinja
+{% if bool is false %}
+```
+
+## falsy
+
+Returns `true` if the value is JavaScript falsy: `''`, `0`, `false`,
+`undefined`, `NaN` or `null`.
+
+```jinja
+{% if value is falsy %}
+```
+
+## filter
+
+Check if a named filter exists, useful if a filter may be optionally available.
+
+```jinja
+{% if "markdown" is filter %}
+  {{ value | markdown }}
+{% else %}
+  {{ value }}
+{% endif %}
+```
+
+## float
+
+True if a number is a float.
+
+```jinja
+{% if number is float %}
+```
+
+## ge
+
+True if a number is a greater than or equal to another. Same as `a >= b`.
+
+```jinja
+{% if number is ge 8 %}
+```
+
+## gt
+
+True if a number is a greater than another. Same as `a > b`.
+
+Aliases: `greaterthan`.
+
+```jinja
+{% if number is gt 7 %}
+{% if number is greaterthan 7 %}
+```
+
+## in
+
+Check if a value is in an iterable, such as an Array, Set or Map, or that a key
+is in an object.
+
+```jinja
+{% if "key" is in obj %}
+{% if 5 is in arr %}
+```
+
+## integer
+
+True if the value is an integer.
+
+```jinja
+{% if 4 is integer %}
+```
+ ## iterable
+ 
+ True if a value is an iterable, such as an Array, Set or Map, or has a
+ `[Symbol.iterator]()` [method](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#the_iterable_protocol).
+
+## le
+
+True if a number is a less than or equal to another. Same as `a <= b`.
+
+```jinja
+{% if number is le 8 %}
+```
+
+## lower
+
+True if a string is in lowercase.
+
+```jinja
+{% if "string" is lower %}
+```
+
+## lt
+
+True if a number is a less than another. Same as `a < b`.
+
+Aliase: `lessthan`.
+
+```jinja
+{% if number is lt 8 %}
+{% if number is lessthan 8 %}
+```
+
+## mapping
+
+True if a value is an object or Map.
+
+```jinja
+{% if obj is mapping %}
+```
+
+## ne
+
+True if a value is not equal to another. Same as `a != b`.
+
+```jinja
+{% if foo is ne bar %}
+```
+
+## null
+
+True if a value is `null`.
+
+```jinja
+{% if val is null %}
+```
+
+## number
+
+True if a value is a number.
+
+```jinja
+{% if val is number %}
+```
+
+## odd
+
+True if a number is odd.
+
+```jinja
+{% if num is odd %}
+```
+
+## odd
+
+True if a number is odd.
+
+```jinja
+{% if num is odd %}
+```
+
+## string
+
+True if a value is a string.
+
+```jinja
+{% if val is string %}
+```
+
+## test
+
+Check if a test exists for a given name, useful if a test is optionally
+available.
+
+```jinja
+{% if "loud" is test %}
+  {% if value is loud %}
+    {{ value | upper }}
+  {% else %}
+    {{ value | lower }}
+  {% endif %}
+{% else %}
+  {{ value }}
+{% endif %}
+```
+
+## undefined
+
+Check if a variable is `undefined`.
+
+```jinja
+{% if var is undefined %}
+```
+
+## upper
+
+Check if a string is in uppercase.
+
+```jinja
+{% if str is uppercase %}
+```
+
+You can also [read the JavaScript
+code](https://github.com/gunjam/govjucks/blob/master/govjucks/src/tests.js)
+that implements the tests.
