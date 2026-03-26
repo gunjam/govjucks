@@ -11,6 +11,7 @@
 ### Fixes
 * `in` operator should return `false` rather than throw on `undefined` values, consistent with Jinja. [#22](https://github.com/gunjam/govjucks/pull/22) @gunjam
 * Inline `if` with no `else` should return `undefined` when the expression is falsy, matching the [Jinja if behavior](https://jinja.palletsprojects.com/en/stable/templates/#if-expression). [#19](https://github.com/gunjam/govjucks/pull/19) @gunjam
+* Macro can overwrite the caller function body in another macro. [#20](https://github.com/gunjam/govjucks/pull/20) @gunjam
 
 ## v0.2.0
 
