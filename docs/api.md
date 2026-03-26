@@ -251,6 +251,40 @@ env.getFilter(name)
 Get the filter, which is just a function, named **name**.
 
 
+### `hasFilter()`
+```js
+env.hasFilter(name)
+```
+
+Returns `true` if the filter named **name** exists.
+
+
+### `addTest()`
+```js
+env.addTest(name, func)
+```
+
+Add a custom test named **name** which calls **func** whenever
+invoked. Returns `env` for further method chaining. See
+[Custom Tests](#custom-tests).
+
+
+### `getTest()`
+```js
+env.getTest(name)
+```
+
+Get the test, which is just a function, named **name**.
+
+
+### `hasTest()`
+```js
+env.hasFilter(name)
+```
+
+Returns `true` if the test named **name** exists.
+
+
 ### `addExtension()`
 ```js
 env.addExtension(name, ext)
@@ -812,10 +846,35 @@ is used:
 
 ```jinja
 {# Show the first 5 characters #}
-A message for you: {{ message|shorten }}
+A message for you: {{ message | shorten }}
 
 {# Show the first 20 characters #}
-A message for you: {{ message|shorten(20) }}
+A message for you: {{ message | shorten(20) }}
+```
+
+## Custom Tests
+
+To add a custom test, use the `Environment` method `addTest`.
+A test can be used as an expression in `if` block and like a filter is simply a
+function where the left value is passed as the argument and any on the right are
+passed as the second, third, etc. in order.
+
+```js
+const govjucks = require('govjucks');
+const env = new govjucks.Environment();
+
+env.addTest('factorof', function (factor, num) {
+  return num % factor === 0;
+});
+```
+
+This adds a test `factorof` which is true if the left value is a factor of the
+right's:
+
+```jinja
+{% if num is factorof 12 %}
+  {{ num }}
+{% endif %}
 ```
 
 ### Keyword/Default Arguments
