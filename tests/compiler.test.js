@@ -1012,6 +1012,25 @@ describe('compiler', () => {
     finish(done);
   });
 
+  it('should compile macros which do not overwrite the frame of a calling macro', (t, done) => {
+    // See: https://github.com/mozilla/nunjucks/issues/1469
+    equal(
+      '{% macro page() %}' +
+      '<section class="page">' +
+      '{{ caller() | safe }}' +
+      '</section>' +
+      '{% endmacro %}' +
+      '{% macro test_page() %}' +
+      '{% set page_content = "foobar" %}' +
+      '{% call page() -%}' +
+      '{{ page_content | safe }}' +
+      '{%- endcall %}' +
+      '{% endmacro %}' +
+      '{{ test_page() | safe }}',
+      '<section class="page">foobar</section>');
+    finish(done);
+  });
+
   it('should compile macros that include other templates', (t, done) => {
     equal(
       '{% macro foo() %}{% include "include.njk" %}{% endmacro %}' +
