@@ -145,7 +145,7 @@ class Environment extends EmitterObj {
   }
 
   hasExtension (name) {
-    return !!this.extensions[name];
+    return Object.hasOwn(this.extensions, name);
   }
 
   addGlobal (name, value) {
@@ -170,6 +170,10 @@ class Environment extends EmitterObj {
     return this;
   }
 
+  hasFilter (name) {
+    return Object.hasOwn(this.filters, name);
+  }
+
   getFilter (name) {
     if (!this.filters[name]) {
       throw new Error('filter not found: ' + name);
@@ -180,6 +184,10 @@ class Environment extends EmitterObj {
   addTest (name, func) {
     this.tests[name] = func;
     return this;
+  }
+
+  hasTest (name) {
+    return Object.hasOwn(this.tests, name);
   }
 
   getTest (name) {
