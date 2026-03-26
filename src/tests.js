@@ -1,5 +1,6 @@
 'use strict';
 
+const isPlainObj = require('is-plain-obj').default;
 const SafeString = require('./runtime').SafeString;
 
 /**
@@ -361,10 +362,7 @@ exports.iterable = iterable;
  */
 function mapping (value) {
   // only maps and object hashes
-  return value !== null &&
-    typeof value === 'object' &&
-    !Array.isArray(value) &&
-    !(value instanceof Set);
+  return isPlainObj(value) || value instanceof Map;
 }
 
 exports.mapping = mapping;

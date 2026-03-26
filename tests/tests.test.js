@@ -3,6 +3,7 @@
 const assert = require('node:assert/strict');
 const { describe, it } = require('node:test');
 const { equal, render } = require('./util');
+const NullObject = require('../src/null-object');
 
 describe('tests', () => {
   it('boolean should detect booleans', () => {
@@ -131,22 +132,20 @@ describe('tests', () => {
   });
 
   it('mapping should detect Maps or hashes', () => {
-    /* global Map */
-    let map1, map2, mapOneIsMapping, mapTwoIsMapping;
-    if (typeof Map === 'undefined') {
-      this.skip();
-    } else {
-      map1 = new Map();
-      map2 = {};
-      mapOneIsMapping = render('{{ map is mapping }}', {
-        map: map1
-      });
-      mapTwoIsMapping = render('{{ map is mapping }}', {
-        map: map2
-      });
-      assert.equal(mapOneIsMapping, 'true');
-      assert.equal(mapTwoIsMapping, 'true');
-    }
+    // Map and plain/null objects
+    equal('{{ map is mapping }}', { map: new Map() }, 'true');
+    equal('{{ map is mapping }}', { map: {} }, 'true');
+    equal('{{ map is mapping }}', { map: new NullObject() }, 'true');
+
+    // Not valid mappings
+    equal('{{ map is mapping }}', { map: new Set() }, 'false');
+    equal('{{ map is mapping }}', { map: [] }, 'false');
+    equal('{{ map is mapping }}', { map: new Date() }, 'false');
+    equal('{{ map is mapping }}', { map: 'string' }, 'false');
+    equal('{{ map is mapping }}', { map: null }, 'false');
+    equal('{{ map is mapping }}', { map: undefined }, 'false');
+    equal('{{ map is mapping }}', { map: 1 }, 'false');
+    equal('{{ map is mapping }}', { map: true }, 'false');
   });
 
   it('false should detect whether or not a value is false', () => {
