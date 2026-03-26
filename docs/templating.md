@@ -844,6 +844,8 @@ Unlike javascript's ternary operator, the `else` is optional:
 {{ "true" if foo }}
 ```
 
+If `foo` is falsy, the output will be `undefined`.
+
 ### Function Calls
 
 If you have passed a javascript method to your template, you can call it like

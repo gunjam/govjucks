@@ -436,7 +436,7 @@ class Compiler {
     if (node.else_ !== null) {
       this.compile(node.else_, frame);
     } else {
-      this._emit('""');
+      this._emit('undefined');
     }
     this._emit(')');
   }
