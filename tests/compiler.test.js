@@ -260,6 +260,7 @@ describe('compiler', () => {
     equal(tmpl, {
       hungry: false
     }, 'Give me some water');
+    equal(tmpl, {}, 'Give me some water');
     equal('{{ "good" if not hungry }}',
       {
         hungry: false
@@ -726,6 +727,26 @@ describe('compiler', () => {
       'yes');
   });
 
+  it('should compile the "in" operator for Maps', function () {
+    equal('{% if 1 in map %}yes{% endif %}', { map: new Map([[1, 2]]) }, 'yes');
+    equal('{% if 1 in map %}yes{% endif %}', { map: new Map([[2, 3]]) }, '');
+    equal('{% if 1 not in map %}yes{% endif %}', { map: new Map([[1, 2]]) }, '');
+    equal('{% if 1 not in map %}yes{% endif %}', { map: new Map([[2, 3]]) }, 'yes');
+    equal('{% if "a" in vals %}yes{% endif %}',
+      { vals: new Map([['a', 'b']]) },
+      'yes');
+  });
+
+  it('should compile the "in" operator for Sets', function () {
+    equal('{% if 1 in set %}yes{% endif %}', { set: new Set([1, 2]) }, 'yes');
+    equal('{% if 1 in set %}yes{% endif %}', { set: new Set([2, 3]) }, '');
+    equal('{% if 1 not in set %}yes{% endif %}', { set: new Set([1, 2]) }, '');
+    equal('{% if 1 not in set %}yes{% endif %}', { set: new Set([2, 3]) }, 'yes');
+    equal('{% if "a" in vals %}yes{% endif %}',
+      { vals: new Set(['a', 'b']) },
+      'yes');
+  });
+
   it('should compile the "in" operator for objects', function () {
     equal('{% if "a" in obj %}yes{% endif %}',
       { obj: { a: true } },
@@ -737,6 +758,11 @@ describe('compiler', () => {
 
   it('should compile the "in" operator for strings', function () {
     equal('{% if "foo" in "foobar" %}yes{% endif %}', 'yes');
+  });
+
+  it('should compile the "in" operator for undefined', function () {
+    equal('{% if "foo" in missing %}yes{% else %}no{% endif %}', 'no');
+    equal('{% if "foo" not in missing %}yes{% endif %}', 'yes');
   });
 
   it('should throw an error when using the "in" operator on unexpected types', (t, done) => {
@@ -755,7 +781,21 @@ describe('compiler', () => {
     );
 
     render(
-      '{% if "a" in obj %}yes{% endif %}',
+      '{% if "a" in false %}yes{% endif %}',
+      {},
+      {
+        noThrow: true
+      },
+      function (err, res) {
+        assert.equal(res, undefined);
+        assert.match(err.message,
+          /Cannot use "in" operator to search for "a" in unexpected types\./
+        );
+      }
+    );
+
+    render(
+      '{% if "a" in null %}yes{% endif %}',
       {},
       {
         noThrow: true
