@@ -1777,13 +1777,27 @@ Round to the nearest whole number (which rounds down):
 **Input**
 
 ```jinja
-{{ 4 | round(0, "floor") }}
+{{ 4.9 | round(0, "floor") }}
 ```
 
 **Output**
 
 ```jinja
 4
+```
+
+Round to the nearest whole number (which rounds up):
+
+**Input**
+
+```jinja
+{{ 4.1 | round(0, "ceil") }}
+```
+
+**Output**
+
+```jinja
+5
 ```
 
 Specify the number of  digits to round:
