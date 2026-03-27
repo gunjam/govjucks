@@ -474,8 +474,12 @@ module.exports._assign = module.exports.extend = extend;
 function inOperator (key, val) {
   if (Array.isArray(val) || isString(val)) {
     return val.indexOf(key) !== -1;
-  } else if (isObject(val)) {
+  }
+  if (isObject(val)) {
     return key in val;
+  }
+  if (val === undefined) {
+    return false;
   }
   throw new Error('Cannot use "in" operator to search for "' +
     key + '" in unexpected types.');

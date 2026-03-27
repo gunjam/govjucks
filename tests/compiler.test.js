@@ -260,6 +260,7 @@ describe('compiler', () => {
     equal(tmpl, {
       hungry: false
     }, 'Give me some water');
+    equal(tmpl, {}, 'Give me some water');
     equal('{{ "good" if not hungry }}',
       {
         hungry: false
@@ -737,6 +738,11 @@ describe('compiler', () => {
 
   it('should compile the "in" operator for strings', function () {
     equal('{% if "foo" in "foobar" %}yes{% endif %}', 'yes');
+  });
+
+  it('should compile the "in" operator for undefined', function () {
+    equal('{% if "foo" in missing %}yes{% else %}no{% endif %}', 'no');
+    equal('{% if "foo" not in missing %}yes{% endif %}', 'yes');
   });
 
   it('should throw an error when using the "in" operator on unexpected types', (t, done) => {
