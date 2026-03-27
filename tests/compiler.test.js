@@ -287,6 +287,16 @@ describe('compiler', () => {
         food: 'beer'
       }, 'beer');
 
+    // Return `undefined` if expression is `false`
+    equal('{% set var = "good" if hungry %}{{ "undefined" if var is undefined }}',
+      {
+        hungry: false
+      }, 'undefined');
+    equal('{{ { missing: "good" if hungry, pizza: "pepperoni" } | dump | safe }}',
+      {
+        hungry: false
+      }, '{"pizza":"pepperoni"}');
+
     finish(done);
   });
 
