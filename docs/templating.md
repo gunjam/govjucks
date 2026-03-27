@@ -229,6 +229,20 @@ You can specify multiple conditions with `and` and `or`:
 {% endif %}
 ```
 
+You can check for the existance of a property or value in an object, array,
+Map, Set or string with the `in` operator:
+
+```jinja
+{% set fridge = ["milk", "eggs", "pizza"] %}
+{% if "pizza" in fridge %}
+  I am happy.
+{% endif %}
+
+{% if "zz" in "pizza" %}
+  I am sleepy.
+{% endif %}
+```
+
 You can also use if as an [inline expression](#if-expression).
 
 ### for
