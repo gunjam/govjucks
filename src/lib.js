@@ -462,6 +462,9 @@ function inOperator (key, val) {
   if (isObject(val)) {
     return key in val;
   }
+  if (val instanceof Map || val instanceof Set) {
+    return val.has(key);
+  }
   if (val === undefined) {
     return false;
   }
