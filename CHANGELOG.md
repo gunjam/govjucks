@@ -6,6 +6,10 @@
 
 * Consistently support dot paths in attribute arguments for all filters. [#26](https://github.com/gunjam/govjucks/pull/26) @gunjam
 * Add support for trailing commas in array and object literals. [#25](https://github.com/gunjam/govjucks/pull/25) @gunjam
+* Add support for Map and Set to `in` operator. [#22](https://github.com/gunjam/govjucks/pull/22) @gunjam
+
+### Fixes
+* `in` operator should return `false` rather than throw on `undefined` values, consistent with Jinja. [#22](https://github.com/gunjam/govjucks/pull/22) @gunjam
 
 ## v0.2.0
 
