@@ -163,6 +163,15 @@ describe('parser', function () {
             [nodes.Literal, 2],
             [nodes.Literal, 3]]]]);
 
+    // Trailing comma
+    isAST(parser.parse('{{ [1,2,3,] }}'),
+      [nodes.Root,
+        [nodes.Output,
+          [nodes.Array,
+            [nodes.Literal, 1],
+            [nodes.Literal, 2],
+            [nodes.Literal, 3]]]]);
+
     isAST(parser.parse('{{ (1,2,3) }}'),
       [nodes.Root,
         [nodes.Output,
@@ -172,6 +181,18 @@ describe('parser', function () {
             [nodes.Literal, 3]]]]);
 
     isAST(parser.parse('{{ {foo: 1, \'two\': 2} }}'),
+      [nodes.Root,
+        [nodes.Output,
+          [nodes.Dict,
+            [nodes.Pair,
+              [nodes.Symbol, 'foo'],
+              [nodes.Literal, 1]],
+            [nodes.Pair,
+              [nodes.Literal, 'two'],
+              [nodes.Literal, 2]]]]]);
+
+    // Trailing comma
+    isAST(parser.parse('{{ {foo: 1, \'two\': 2,} }}'),
       [nodes.Root,
         [nodes.Output,
           [nodes.Dict,

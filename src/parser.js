@@ -1175,7 +1175,20 @@ class Parser extends Obj {
         }
       }
 
+      if (node instanceof nodes.Array &&
+        type === lexer.TOKEN_COMMA &&
+        this.skip(lexer.TOKEN_RIGHT_BRACKET)) {
+        // If the next token is a `]` we're on a trailing comma so end.
+        break;
+      }
+
       if (node instanceof nodes.Dict) {
+        // If the next token is a `}` we're on a trailing comma so we don't need
+        // to look for the next key, just end.
+        if (type === lexer.TOKEN_COMMA && this.skip(lexer.TOKEN_RIGHT_CURLY)) {
+          break;
+        }
+
         // TODO: check for errors
         const key = this.parsePrimary();
 
