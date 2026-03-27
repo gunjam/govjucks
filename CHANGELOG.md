@@ -5,6 +5,7 @@
 ### New features
 
 * Consistently support dot paths in attribute arguments for all filters. [#26](https://github.com/gunjam/govjucks/pull/26) @gunjam
+* Add support for trailing commas in array and object literals. [#25](https://github.com/gunjam/govjucks/pull/25) @gunjam
 
 ## v0.2.0
 
