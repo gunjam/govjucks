@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### New features
+
+* Consistently support dot paths in attribute arguments for all filters. [#26](https://github.com/gunjam/govjucks/pull/26) @gunjam
+
 ## v0.2.0
 
 This release adds new filters and tests to close the feature parity gap between govjucks and Jina.
