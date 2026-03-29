@@ -1404,7 +1404,8 @@ be defined with an optional parameter:
 foo,bar,bear
 ```
 
-This  behaviour is applicable to arrays:
+You can join the common properties in an array of objects using the `attribute`
+parameter (dot paths are supported):
 
 **Input**
 
@@ -1519,13 +1520,14 @@ abc
 LO_VE_
 ```
 
-Or, given a list of objects, return a list of attribute values:
+Or, given a list of objects, return a list of attribute values (dot paths are
+supported):
 
 **Input**
 
 ```jinja
 {{ [{msg: "Hello"}, {msg: "World"}] | map(attribute="msg") | join(" ") }}
-{{ [{msg: "Hello"}, {}] | map(attribute="msg", default="missing") | join(" ") }}
+{{ [{msg: {body: "Hello"}}, {}] | map(attribute="msg.body", default="missing") | join(" ") }}
 ```
 
 **Output**
@@ -1544,6 +1546,8 @@ case-sensitive by setting `case_sensitive` as `true`.
 
 `max` can also be used on lists of objects by specifying a property to compare
 with the `attribute` parameter.
+
+Dot paths are supported.
 
 **Input**
 
@@ -1654,6 +1658,8 @@ of each object, and rejecting the objects with the test succeeding.
 This is the opposite of ```selectattr``` filter.
 
 If no test is specified, the attribute’s value will be evaluated as a boolean.
+
+Dot paths are supported.
 
 **Input**
 
@@ -1882,6 +1888,8 @@ This is the opposite to ```rejectattr```.
 
 If no test is specified, the attribute’s value will be evaluated as a boolean.
 
+Dot paths are supported.
+
 **Input**
 
 ```jinja
@@ -1991,6 +1999,22 @@ Output the sum of items in the array:
 
 ```jinja
 6
+```
+
+You can sum the values of object properties using the `attribute` parameter
+(dot paths are supported):
+
+**Input**
+
+```jinja
+{% set items = [{ price: 10 }, { num: 20 }, { num: 30 }] %}
+{{ items | sum("price") }}
+```
+
+**Output**
+
+```jinja
+60
 ```
 
 ### title
@@ -2113,6 +2137,8 @@ insensitive by default so "A" is equivalent to "a". You can enable case
 sensitivity by passing `true` as the first parameter.
 
 You can filter an array of objects using the `attribute` parameter.
+
+Dot paths are supported.
 
 **Input**
 
