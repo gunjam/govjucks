@@ -512,6 +512,26 @@ describe('filter', () => {
         }]
       },
       'foo,bar,bear');
+
+    equal('{{ items | join(",", "name.first") }}',
+      {
+        items: [{
+          name: {
+            first: 'foo'
+          }
+        },
+        {
+          name: {
+            first: 'bar'
+          }
+        },
+        {
+          name: {
+            first: 'bear'
+          }
+        }]
+      },
+      'foo,bar,bear');
     finish(done);
   });
 
@@ -682,6 +702,14 @@ describe('filter', () => {
         ]
       }, 'John, Jim, Anonymous');
 
+      equal('{{ users | map(attribute="user.name", default="Anonymous") | join(", ") }}', {
+        users: [
+          { user: { name: 'John' } },
+          { user: { name: 'Jim' } },
+          {},
+        ]
+      }, 'John, Jim, Anonymous');
+
       assert.throws(() => render('{{ users | map(default="Anonymous") | join(", ") }}', {
         users: [
           { username: 'John' },
@@ -748,6 +776,15 @@ describe('filter', () => {
         { prop: 'AB' }
       ]
     }, '{"prop":"BB"}');
+    equal('{{ data | max(attribute="nested.prop") | dump | safe }}', {
+      data: [
+        { nested: { prop: 'AC' } },
+        { nested: { prop: 'aa' } },
+        { nested: { prop: 'BB' } },
+        { nested: { prop: 'ba' } },
+        { nested: { prop: 'AB' } }
+      ]
+    }, '{"nested":{"prop":"BB"}}');
 
     finish(done);
   });
@@ -804,6 +841,16 @@ describe('filter', () => {
         { prop: 'AB' }
       ]
     }, '{"prop":"aa"}');
+
+    equal('{{ data | min(attribute="nested.prop") | dump | safe }}', {
+      data: [
+        { nested: { prop: 'AC' } },
+        { nested: { prop: 'aa' } },
+        { nested: { prop: 'BB' } },
+        { nested: { prop: 'ba' } },
+        { nested: { prop: 'AB' } }
+      ]
+    }, '{"nested":{"prop":"aa"}}');
 
     finish(done);
   });
@@ -877,6 +924,17 @@ describe('filter', () => {
       people
     }, '1');
 
+    const people2 = [{
+      stats: { age: 30 }
+    }, {
+      stats: { age: 21 }
+    }, {
+      stats: { age: 23 }
+    }];
+    equal('{{ people | rejectattr("stats.age", "odd") | dump | safe }}', {
+      people: people2
+    }, '[{"stats":{"age":30}}]');
+
     finish(done);
   });
 
@@ -918,6 +976,17 @@ describe('filter', () => {
     equal('{{ people | selectattr("age", "odd") | length }}', {
       people
     }, '2');
+
+    const people2 = [{
+      stats: { age: 30 }
+    }, {
+      stats: { age: 21 }
+    }, {
+      stats: { age: 23 }
+    }];
+    equal('{{ people | selectattr("stats.age", "odd") | dump | safe }}', {
+      people: people2
+    }, '[{"stats":{"age":21}},{"stats":{"age":23}}]');
 
     finish(done);
   });
@@ -1038,6 +1107,16 @@ describe('filter', () => {
           { value: 1 },
           { value: 2 },
           { value: 3 }
+        ]
+      },
+      '16');
+
+    equal('{{ items | sum("value.num", 10) }}',
+      {
+        items: [
+          { value: { num: 1 } },
+          { value: { num: 2 } },
+          { value: { num: 3 } }
         ]
       },
       '16');
@@ -1231,6 +1310,15 @@ describe('filter', () => {
         { value: 2 }
       ]
     }, '[{"value":3},{"value":2},{"value":4},{"value":1}]');
+    equal('{{ items|unique(attribute="nested.value")|dump|safe }}', {
+      items: [
+        { nested: { value: 3 } },
+        { nested: { value: 2 } },
+        { nested: { value: 4 } },
+        { nested: { value: 1 } },
+        { nested: { value: 2 } }
+      ]
+    }, '[{"nested":{"value":3}},{"nested":{"value":2}},{"nested":{"value":4}},{"nested":{"value":1}}]');
     equal('{{ items|unique(case_sensitive=true, attribute="value")|dump|safe }}', {
       items: [
         { value: 'c' },
