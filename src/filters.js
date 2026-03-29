@@ -284,9 +284,18 @@ module.exports.indent = indent;
 function join (arr, del, attr) {
   del = del || '';
 
-  let str = attr ? arr[0][attr] : arr[0];
+  if (attr) {
+    const getter = lib.getAttrGetter(attr);
+    let str = getter(arr[0]);
+    for (let i = 1, len = arr.length; i !== len; ++i) {
+      str += `${del}${getter(arr[i])}`;
+    }
+    return str;
+  }
+
+  let str = arr[0];
   for (let i = 1, len = arr.length; i !== len; ++i) {
-    str += `${del}${attr ? arr[i][attr] : arr[i]}`;
+    str += `${del}${arr[i]}`;
   }
   return str;
 }
@@ -449,12 +458,14 @@ module.exports.reject = getSelectOrReject(false);
  * @returns {Array<object>}
  */
 module.exports.rejectattr = function rejectattr (arr, attr, testName, secondArg) {
+  const getter = lib.getAttrGetter(attr);
+
   if (!testName) {
-    return arr.filter((v) => !v[attr]);
+    return arr.filter((item) => !getter(item));
   }
 
   const test = this.env.getTest(testName).bind(this);
-  return arr.filter((item) => !test(item[attr], secondArg));
+  return arr.filter((item) => !test(getter(item), secondArg));
 };
 
 module.exports.select = getSelectOrReject(true);
@@ -474,12 +485,14 @@ module.exports.select = getSelectOrReject(true);
  * @returns {Array<object>}
  */
 module.exports.selectattr = function selectattr (arr, attr, testName, secondArg) {
+  const getter = lib.getAttrGetter(attr);
+
   if (!testName) {
-    return arr.filter((v) => v[attr]);
+    return arr.filter(getter);
   }
 
   const test = this.env.getTest(testName).bind(this);
-  return arr.filter((item) => test(item[attr], secondArg));
+  return arr.filter((item) => test(getter(item), secondArg));
 };
 
 /**
@@ -663,8 +676,9 @@ module.exports.slice = slice;
 function sum (arr, attr, start) {
   let sum = start ?? 0;
   if (attr) {
+    const getter = lib.getAttrGetter(attr);
     for (let i = 0, len = arr.length; i !== len; ++i) {
-      sum += arr[i][attr];
+      sum += getter(arr[i]);
     }
     return sum;
   }
@@ -1015,8 +1029,11 @@ module.exports.map = function map (...args) {
     if (!attribute) {
       throw new lib.TemplateError('missing "attribute" keyword argument');
     }
+
+    const getter = lib.getAttrGetter(attribute);
+
     for (let i = 0; i < len; i++) {
-      arr[i] = value[i]?.[attribute] ?? defaultValue;
+      arr[i] = getter(value[i]) ?? defaultValue;
     }
     return arr;
   }
@@ -1120,15 +1137,16 @@ function minMax (check) {
    */
   function find (array, caseSensitive, attribute) {
     caseSensitive ??= false;
+    const getter = attribute && lib.getAttrGetter(attribute);
 
     let min = array[0];
-    let minCompare = attribute ? min?.[attribute] : min;
+    let minCompare = attribute ? getter(min) : min;
     minCompare = !caseSensitive && typeof minCompare === 'string'
       ? minCompare.toLowerCase()
       : minCompare;
 
     for (let i = 1, len = array.length; i < len; i++) {
-      let vc = attribute ? array[i]?.[attribute] : array[i];
+      let vc = attribute ? getter(array[i]) : array[i];
       if (caseSensitive) {
         if ((vc < minCompare) === check) {
           min = array[i];
@@ -1216,11 +1234,12 @@ const unique = r.makeMacro(
       return [...set];
     }
 
+    const getter = attribute && lib.getAttrGetter(attribute);
     const set = new Set();
     const arr = [];
 
     for (let i = 0, len = array.length; i < len; i++) {
-      const val = attribute ? array[i][attribute] : array[i];
+      const val = attribute ? getter(array[i]) : array[i];
       const key = !caseSensitive && typeof val === 'string' ? val.toLowerCase() : val;
       if (!set.has(key)) {
         arr.push(array[i]);
