@@ -248,42 +248,26 @@ function isObject (obj) {
 module.exports.isObject = isObject;
 
 /**
- * @param {string|number} attr
- * @returns {(string|number)[]}
- * @private
- */
-function _prepareAttributeParts (attr) {
-  if (!attr) {
-    return [];
-  }
-
-  if (typeof attr === 'string') {
-    return attr.split('.');
-  }
-
-  return [attr];
-}
-
-/**
  * @param {string}   attribute      Attribute value. Dots allowed.
  * @returns {function(Object): *}
  */
 function getAttrGetter (attribute) {
-  const parts = _prepareAttributeParts(attribute);
+  if (typeof attribute !== 'string' || attribute.indexOf('.') === -1) {
+    return (obj) => obj[attribute];
+  }
+
+  const parts = attribute.split('.');
 
   return function attrGetter (item) {
-    let _item = item;
-
     for (let i = 0, len = parts.length; i < len; i++) {
       // If item is not an object, and we still got parts to handle, it means
       // that something goes wrong. Just roll out to undefined in that case.
-      _item = _item?.[parts[i]];
-      if (_item === undefined) {
-        return _item;
+      item = item?.[parts[i]];
+      if (item === undefined) {
+        return item;
       }
     }
-
-    return _item;
+    return item;
   };
 }
 
