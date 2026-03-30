@@ -1,6 +1,32 @@
 # Changelog
 
-## Unreleased
+## v0.2.0
+
+This release adds new filters and tests to close the feature parity gap between govjucks and Jina.
+
+9 new filters:
+
+* [`map`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#map)
+* [`filesizeformat`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#filesizeformat)
+* [`format`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#format)
+* [`xmlattr`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#xmlattr)
+* [`min`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#min)
+* [`max`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#max)
+* [`tojson`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#tojson)
+* [`unique`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#unique)
+
+8 new tests and new [test documentation](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#builtin-tests).
+
+* [`boolean`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#boolean)
+* [`false`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#false) 
+* [`filter`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#filter-1) 
+* [`float`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#float-1) 
+* [`in`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#in)  
+* [`integer`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#integer) 
+* [`test`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#test) 
+* [`true`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#true)  
+
+New lorem ipsum text generating global function [`lipsum`](https://github.com/gunjam/govjucks/blob/master/docs/templating.md#lipsumn5-htmltrue-min20-max100).
 
 ### New features
 
