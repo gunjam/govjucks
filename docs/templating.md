@@ -2328,8 +2328,9 @@ True if the input is equal to boolean `false`.
 
 ## falsy
 
-Returns `true` if the value is JavaScript falsy: `''`, `0`, `false`,
-`undefined`, `NaN` or `null`.
+Returns `true` if the value is JavaScript
+[falsy](https://developer.mozilla.org/en-US/docs/Glossary/Falsy): `''`, `0`,
+`-0`, `-0n`, `false`, `undefined`, `NaN` or `null`.
 
 ```jinja
 {% if value is falsy %}
@@ -2494,6 +2495,25 @@ available.
 {% else %}
   {{ value }}
 {% endif %}
+```
+
+## true
+
+True if the input is equal to boolean `true`.
+
+```jinja
+{% if bool is true %}
+```
+
+## truthy
+
+Returns `true` if the value is JavaScript
+[truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy), which is
+all values except `''`, `0`, `-0`, `-0n`, `false`, `undefined`, `NaN` or
+`null`.
+
+```jinja
+{% if value is truthy %}
 ```
 
 ## undefined
