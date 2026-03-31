@@ -45,6 +45,10 @@ New lorem ipsum text generating global function [`lipsum`](https://github.com/gu
 * Add alias of `count` to `length` filter. [#21](https://github.com/gunjam/govjucks/pull/21) @gunjam
 * Added tests that are in Jinja but missing from nunjucks. Add missing test documentation. [#17](https://github.com/gunjam/govjucks/pull/17) @gunjam
 
+### Fixes
+
+* Macro can overwrite the caller function body in another macro. [#20](https://github.com/gunjam/govjucks/pull/20) @gunjam
+
 ## v0.1.0 (First release)
 
 This is the first release since forking nunjucks, a lot of work has been done
