@@ -1,7 +1,7 @@
 {
   "name": "govjucks",
   "description": "A powerful templating engine with inheritance, asynchronous control, and more (jinja2 inspired)",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "James Long <longster@gmail.com>",
   "dependencies": {
     "asap": "^2.0.6",
