@@ -1,6 +1,41 @@
 # Changelog
 
-## Unreleased
+## v0.3.0
+
+Govjucks now supports trailing commas in object and array literals, meaning the
+compiler will no longer error. No more confusing errors if you have one comma
+too many when using complex config objects in
+[GOV.UK Frontend](https://github.com/alphagov/govuk-frontend) component macros.
+
+All Govjucks filters now consistently support dot paths if they have attribute
+parameters. For example:
+
+```jinja
+{% set items = [{ item: { price: 10 } }, { item: { price: 20 } }] %}
+{{ items | sum("item.price") }}
+```
+
+Will output:
+
+```
+30
+```
+
+Documentation has been added for the `in` operator, and it now supports `Map`s
+and `Set`s.
+
+```jinja
+{% if "value" in mySet %}
+  value in Set
+{% elif "key" in myMap %}
+  key in Map
+{% endif %}
+```
+
+Finally, the follow 3 Nunjucks issues have been fixed in Govjucks:
+* Nested macro call with caller() misses context [mozilla#1469](https://github.com/mozilla/nunjucks/issues/1469)
+* Inline if should return undefined if there's no else [mozilla#1509](https://github.com/mozilla/nunjucks/issues/1509)
+* fix in operator [mozilla#1451](https://github.com/mozilla/nunjucks/pull/1451)
 
 ### New features
 
@@ -15,7 +50,7 @@
 
 ## v0.2.0
 
-This release adds new filters and tests to close the feature parity gap between govjucks and Jina.
+This release adds new filters and tests to close the feature parity gap between govjucks and Jinja.
 
 9 new filters:
 
