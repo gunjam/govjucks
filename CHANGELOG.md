@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.3.1
+
+Revert inline if change as it has a breaking effect on existing templates, will restore in a
+future breaking release version.
+
+### Reverted
+
+* Inline `if` with no `else` should return `undefined` when the expression is falsy, matching the [Jinja if behavior](https://jinja.palletsprojects.com/en/stabl
+
 ## v0.3.0
 
 Govjucks now supports trailing commas in object and array literals, meaning the
