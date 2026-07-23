@@ -1,6 +1,5 @@
 'use strict';
 
-const asap = require('asap');
 const waterfall = require('fastfall')();
 const lib = require('./lib');
 const compiler = require('./compiler');
@@ -17,7 +16,7 @@ const NullObject = require('./null-object');
 // If the user is using the async API, *always* call it
 // asynchronously even if the template was synchronous.
 function callbackAsap (cb, err, res) {
-  asap(() => {
+  setImmediate(() => {
     cb(err, res);
   });
 }
