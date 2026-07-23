@@ -5,6 +5,7 @@
 ### New features
 
 * Add DictLoader template loader similar to [jinja DictLoader](https://jinja.palletsprojects.com/en/stable/api/#jinja2.DictLoader). [#34](https://github.com/gunjam/govjucks/pull/34) @gunjam
+* Add FunctionLoader template loader similar to [jinja FunctionLoader](https://jinja.palletsprojects.com/en/stable/api/#jinja2.FunctionLoader). [#35](https://github.com/gunjam/govjucks/pull/35) @gunjam
 
 ## v0.3.1
 

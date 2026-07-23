@@ -271,11 +271,144 @@ class DictLoader extends Loader {
   }
 }
 
+/**
+ * A loader that uses a function to load the template. The function will receive
+ * the template name (and optional callback function if the `async` option is
+ * `true`) and must either return the source as a string or an object containing
+ * the source as `src` the file path as `path`, and a function of `upToDateFunc`
+ * that returns `true` if the source is up-to-date, or `false` if the cached
+ * template should be removed and loaded again. If the template cannot be found
+ * the loader function must return `null`.
+ *
+ * For async loaders the source may be passed back as the second parameter of
+ * the callback function (the first is for any errors), or returned as a
+ * `Promise`.
+ */
+class FunctionLoader extends Loader {
+  #fn;
+
+  /** @type {Map<string, import("./environment.js").Template>} */
+  #cache = new Map();
+
+  /** @type {Map<string, () => boolean>} */
+  #upToDateFns = new Map();
+
+  // Don't let environment add a cache as we have a getter to overlay logic
+  set cache (_) {}
+
+  // When environment tries to get a template from the loader cache, call the
+  // the upToDateFunc first to check if we need to get new source.
+  get cache () {
+    return {
+      get: (name) => {
+        if (this.#upToDateFns.get(name)?.() === false) {
+          this.cache.delete(name);
+          return undefined;
+        }
+        return this.#cache.get(name);
+      },
+      set: (name, template) => {
+        this.#cache.set(name, template);
+      },
+      delete: (name) => {
+        this.#cache.delete(name);
+      },
+      clear: () => {
+        this.#cache.clear();
+      },
+      has: (name) => {
+        return this.#cache.has(name);
+      },
+    };
+  }
+
+  /**
+   * @param {FunctionLoaderFunction} fn The function to load the template source.
+   * @param {FunctionLoaderOptions} opts Options.
+   */
+  constructor (fn, opts = {}) {
+    super();
+
+    if (!(fn instanceof Function)) {
+      throw new TypeError('Loader must be a function');
+    }
+
+    this.#fn = fn;
+    this.noCache = !!opts.noCache;
+    this.async = !!opts.async;
+  }
+
+  /**
+   * Get the source for a given template name.
+   * @param {string} name The name of the template to load.
+   * @param {Function} [cb] The callback function to call with the source.
+   * @returns {string | void} The template source when not aysnc.
+   */
+  getSource (name, cb) {
+    /** @param {FunctionLoaderSourceObject | string} src */
+    const toSourceObject = (src) => {
+      if (!src) {
+        return null;
+      }
+
+      let source;
+
+      if (typeof src === 'object') {
+        if (typeof src.upToDateFunc === 'function') {
+          this.#upToDateFns.set(name, src.upToDateFunc);
+        }
+
+        source = {
+          src: src.src,
+          path: src.path,
+          noCache: this.noCache
+        };
+      } else {
+        source = {
+          src,
+          path: name,
+          noCache: this.noCache
+        };
+      }
+
+      return source;
+    };
+
+    if (this.async) {
+      /** @type {FunctionLoaderFunctionCallback} */
+      const handler = (err, src) => {
+        try {
+          if (err) {
+            cb(err);
+            return;
+          }
+          const source = toSourceObject(src);
+          if (source) {
+            this.emit('load', name, source);
+          }
+          cb(null, source);
+        } catch (e) {
+          cb(e);
+        }
+      };
+
+      this.#fn(name, handler)?.then?.((src) => handler(null, src)).catch(cb);
+    } else {
+      const source = toSourceObject(this.#fn(name));
+      if (source) {
+        this.emit('load', name, source);
+      }
+      return source;
+    }
+  }
+}
+
 module.exports = {
   FileSystemLoader,
   PrecompiledLoader,
   NodeResolveLoader,
   DictLoader,
+  FunctionLoader,
 };
 
 /**
@@ -304,3 +437,30 @@ module.exports = {
  * @property {boolean} noCache If `true`, the system will avoid using a cache
  *   and templates will be recompiled every single time
  */
+
+/**
+ * @typedef {object} FunctionLoaderOptions
+ * @property {boolean} noCache If `true`, the system will avoid using a cache
+ *   and templates will be recompiled every single time
+ * @property {boolean} async Set to `true` if the loader function is async, it
+ *   will then receive a callback function in as the second parameter to pass
+ *   back the source, alternatively you can return a promise.
+ */
+
+/**
+ * @typedef {object} FunctionLoaderSourceObject
+ * @property {string} src Govjucks template source
+ * @property {string} path Full file path to template
+ * @property {() => boolean} upToDateFunc Function that returns a boolean value
+ *   indicating whether the template is up to date (can remain in cache)
+ */
+
+/**
+ * @callback FunctionLoaderFunction Function that loads a template
+ * @param {string} name Template name Template name
+ * @param {FunctionLoaderFunctionCallback} [callback] Optional callback function
+ *   to pass back the source
+ * @returns {string | FunctionLoaderSourceObject | null | Promise<string | FunctionLoaderSourceObject | null> | void}
+ */
+
+/** @typedef {(err: Error | null, src: string | FunctionLoaderSourceObject | null) => void} FunctionLoaderFunctionCallback */
