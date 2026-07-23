@@ -159,10 +159,68 @@ class NodeResolveLoader extends Loader {
   }
 }
 
+/**
+ * A loader that uses a function to load the template. The function will receive
+ * the template name and must either return the source as a string or `null` if
+ * the template could not be loaded.
+ *
+ * @example
+ * ```javascript
+ * function loaderFn(name) {
+ *   return getTemplateSource(name);
+ * }
+
+ * const loader = new FunctionLoader(loaderFn);
+ * ```
+ */
+class FunctionLoader extends Loader {
+  #fn;
+
+  /**
+   *
+   * @param {Function} fn The function to load the template source.
+   * @param {FunctionLoaderOptions} opts Options.
+   */
+  constructor (fn, opts = {}) {
+    super();
+
+    if (!(fn instanceof Function)) {
+      throw new TypeError('Loader must be a function');
+    }
+
+    this.#fn = fn;
+    this.noCache = !!opts.noCache;
+  }
+
+  getSource (name) {
+    let src;
+
+    try {
+      src = this.#fn(name);
+    } catch (e) {
+      return null;
+    }
+
+    if (!src) {
+      return null;
+    }
+
+    const source = {
+      src,
+      path: name,
+      noCache: this.noCache
+    };
+
+    this.emit('load', name, source);
+    return source;
+  }
+}
+
 module.exports = {
   FileSystemLoader,
   PrecompiledLoader,
   NodeResolveLoader,
+  FunctionLoader,
 };
 
 /**
@@ -177,6 +235,12 @@ module.exports = {
  * @property {boolean} watch If `true`, the system will automatically update
  *   templates. To use watch, make sure optional dependency chokidar is
  *   installed. when they are changed on the filesystem
+ * @property {boolean} noCache If `true`, the system will avoid using a cache
+ *   and templates will be recompiled every single time
+ */
+
+/**
+ * @typedef {object} FunctionLoaderOptions
  * @property {boolean} noCache If `true`, the system will avoid using a cache
  *   and templates will be recompiled every single time
  */

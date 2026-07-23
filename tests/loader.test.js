@@ -3,7 +3,7 @@
 const assert = require('node:assert/strict');
 const { describe, it } = require('node:test');
 const { Environment } = require('../src/environment');
-const { FileSystemLoader, NodeResolveLoader } = require('../src/node-loaders');
+const { FileSystemLoader, NodeResolveLoader, FunctionLoader } = require('../src/node-loaders');
 
 const templatesPath = 'tests/templates';
 
@@ -101,6 +101,68 @@ describe('loader', () => {
       const loader = new NodeResolveLoader();
       const tmplName = 'dummy-pkg/does-not-exist.html';
       assert.equal(loader.getSource(tmplName), null);
+    });
+  });
+
+  describe('DictLoader', () => {
+    it('should have default opts', () => {
+      const loader = new FunctionLoader(() => {});
+      assert.ok(loader instanceof FunctionLoader);
+      assert.equal(loader.noCache, false);
+    });
+
+    it('should emit a "load" event', (t, done) => {
+      function loaderFn (name) {
+        return `test-${name}`;
+      }
+
+      const loader = new FunctionLoader(loaderFn, { noCache: true });
+      const exptectSource = {
+        path: 'page.njk',
+        src: 'test-page.njk',
+        noCache: true
+      };
+
+      loader.on('load', function (name, source) {
+        assert.equal(name, 'page.njk');
+        assert.deepEqual(source, exptectSource);
+        done();
+      });
+
+      const source = loader.getSource('page.njk');
+      assert.deepEqual(source, exptectSource);
+    });
+
+    it('should render templates', () => {
+      function loaderFn (name) {
+        return '{{ foo }}';
+      }
+
+      const env = new Environment(new FunctionLoader(loaderFn));
+      const tmpl = env.getTemplate('page.njk');
+      assert.equal(tmpl.render({ foo: 'foo' }), 'foo');
+    });
+
+    it('should return null if loader returns null', () => {
+      function loaderFn () {
+        return null;
+      }
+
+      const loader = new FunctionLoader(loaderFn);
+      assert.equal(loader.getSource('missing'), null);
+    });
+
+    it('should return null if loader function errors', () => {
+      function loaderFn () {
+        throw new Error();
+      }
+
+      const loader = new FunctionLoader(loaderFn);
+      assert.equal(loader.getSource('missing'), null);
+    });
+
+    it('should throw if loader is not a function', () => {
+      assert.throws(() => new FunctionLoader('bad'), { name: 'TypeError' });
     });
   });
 });
