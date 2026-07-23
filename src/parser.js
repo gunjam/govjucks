@@ -1296,8 +1296,7 @@ class Parser extends Obj {
         // leading whitespace of the data. This is marked with
         // the `dropLeadingWhitespace` variable.
         if (this.dropLeadingWhitespace) {
-          // TODO: this could be optimized (don't use regex)
-          data = data.replace(/^\s*/, '');
+          data = data.trimStart();
           this.dropLeadingWhitespace = false;
         }
 
@@ -1311,8 +1310,7 @@ class Parser extends Obj {
           (nextToken.type === lexer.TOKEN_COMMENT &&
           nextVal.charAt(this.tokens.tags.COMMENT_START.length) ===
           '-'))) {
-          // TODO: this could be optimized (don't use regex)
-          data = data.replace(/\s*$/, '');
+          data = data.trimEnd();
         }
 
         buf.push(new nodes.Output(tok.lineno,
