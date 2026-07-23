@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const isPlainObj = require('is-plain-obj').default;
 const Loader = require('./loader');
 const { PrecompiledLoader } = require('./precompiled-loader.js');
 let chokidar;
@@ -159,10 +160,66 @@ class NodeResolveLoader extends Loader {
   }
 }
 
+/**
+ * Load templates from a plain object map of template names and source code
+ * strings.
+ *
+ * @example
+ * ```javascript
+ * const loader = new DictLoader({
+ *   "page.njk": "<h1>Hello {{ name }}!</h1>"
+ * });
+ * ```
+ */
+class DictLoader extends Loader {
+  #dict;
+  noCache;
+
+  /**
+   * @param {DictLoaderMap} [dict] Object map of template names and source code
+   * @param {DictLoaderOptions} [opts] Options
+   */
+  constructor (dict = {}, opts = {}) {
+    super();
+
+    if (
+      !isPlainObj(dict) ||
+      Object.values(dict).some(v => typeof v !== 'string')
+    ) {
+      throw new TypeError('Map must be a flat object with string values');
+    }
+
+    this.#dict = new Map(Object.entries(dict));
+    this.noCache = !!opts.noCache;
+  }
+
+  /**
+   * Get template source
+   * @param {string} name The template name
+   * @returns {TemplateSourceObject}
+   */
+  getSource (name) {
+    const src = this.#dict.get(name);
+    if (!src) {
+      return null;
+    }
+
+    const source = {
+      src,
+      path: name,
+      noCache: this.noCache
+    };
+
+    this.emit('load', name, source);
+    return source;
+  }
+}
+
 module.exports = {
   FileSystemLoader,
   PrecompiledLoader,
   NodeResolveLoader,
+  DictLoader,
 };
 
 /**
@@ -177,6 +234,17 @@ module.exports = {
  * @property {boolean} watch If `true`, the system will automatically update
  *   templates. To use watch, make sure optional dependency chokidar is
  *   installed. when they are changed on the filesystem
+ * @property {boolean} noCache If `true`, the system will avoid using a cache
+ *   and templates will be recompiled every single time
+ */
+
+/**
+ * @typedef {Record<string, string>} DictLoaderMap Object mapping template names
+ *   to their source.
+ */
+
+/**
+ * @typedef {object} DictLoaderOptions
  * @property {boolean} noCache If `true`, the system will avoid using a cache
  *   and templates will be recompiled every single time
  */

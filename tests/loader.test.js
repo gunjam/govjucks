@@ -3,7 +3,7 @@
 const assert = require('node:assert/strict');
 const { describe, it } = require('node:test');
 const { Environment } = require('../src/environment');
-const { FileSystemLoader, NodeResolveLoader } = require('../src/node-loaders');
+const { FileSystemLoader, NodeResolveLoader, DictLoader } = require('../src/node-loaders');
 
 const templatesPath = 'tests/templates';
 
@@ -101,6 +101,48 @@ describe('loader', () => {
       const loader = new NodeResolveLoader();
       const tmplName = 'dummy-pkg/does-not-exist.html';
       assert.equal(loader.getSource(tmplName), null);
+    });
+  });
+
+  describe('DictLoader', () => {
+    it('should have default opts', () => {
+      const loader = new DictLoader();
+      assert.ok(loader instanceof DictLoader);
+      assert.equal(loader.noCache, false);
+    });
+
+    it('should emit a "load" event', (t, done) => {
+      const loader = new DictLoader({ 'page.njk': 'test' }, { noCache: true });
+      const exptectSource = {
+        path: 'page.njk',
+        src: 'test',
+        noCache: true
+      };
+
+      loader.on('load', function (name, source) {
+        assert.equal(name, 'page.njk');
+        assert.deepEqual(source, exptectSource);
+        done();
+      });
+
+      const source = loader.getSource('page.njk');
+      assert.deepEqual(source, exptectSource);
+    });
+
+    it('should render templates', () => {
+      const env = new Environment(new DictLoader({ 'page.njk': '{{ foo }}' }));
+      const tmpl = env.getTemplate('page.njk');
+      assert.equal(tmpl.render({ foo: 'foo' }), 'foo');
+    });
+
+    it('should return null if no match', () => {
+      const loader = new DictLoader({});
+      const tmplName = 'dummy-pkg/does-not-exist.html';
+      assert.equal(loader.getSource(tmplName), null);
+    });
+
+    it('should throw on bad dict', () => {
+      assert.throws(() => new DictLoader({ 'page.njk': {} }), { name: 'TypeError' });
     });
   });
 });

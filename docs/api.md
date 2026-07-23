@@ -480,6 +480,27 @@ templates from the filesystem using node's
 **opts** is an object which takes the same properties as
 [`FileSystemLoader`](#filesystemloader).
 
+### DictLoader
+```js
+new DictLoader([dict], [opts])
+```
+
+The DictLoader allows you to simply load templates from a flat object of
+template names and source code strings. Useful for unit testing.
+
+**dict** is an object mapping template names to template source code.
+
+**opts** is an object with the following optional property:
+
+* **noCache** - if `true`, the system will avoid using a cache and templates
+  will be recompiled every single time
+
+```js
+const env = new govjucks.Environment(new govjucks.DictLoader({
+  'page.njk': '<h1>Hello {{ name }}</h1>'
+}));
+```
+
 ### WebLoader
 ```js
 new WebLoader([baseURL], [opts])
