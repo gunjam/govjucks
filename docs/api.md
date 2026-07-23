@@ -480,6 +480,29 @@ templates from the filesystem using node's
 **opts** is an object which takes the same properties as
 [`FileSystemLoader`](#filesystemloader).
 
+### FunctionLoader
+```js
+new FunctionLoader(loaderFunction, [opts])
+```
+
+A loader that uses a function to load the template. The function will receive
+the template name and must either return the source as a string or `null` if
+the template could not be loaded.
+
+**loaderFunction** a synchronous function that returns the template source
+
+**opts** is an object with the following optional property:
+
+* **noCache** - if `true`, the system will avoid using a cache and templates
+  will be recompiled every single time
+
+```js
+function loader (name) {
+  return getSource(name);
+}
+const env = new govjucks.Environment(new govjucks.FunctionLoader(loader));
+```
+
 ### WebLoader
 ```js
 new WebLoader([baseURL], [opts])

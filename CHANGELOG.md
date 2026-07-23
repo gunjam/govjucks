@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### New features
+
+* Add FunctionLoader template loader similar to [jinja FunctionLoader](https://jinja.palletsprojects.com/en/stable/api/#jinja2.FunctionLoader). [#35](https://github.com/gunjam/govjucks/pull/35) @gunjam
+
 ## v0.3.1
 
 Revert inline if change as it has a breaking effect on existing templates, will restore in a
