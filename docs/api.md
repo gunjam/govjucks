@@ -504,6 +504,98 @@ const env = new govjucks.Environment(new govjucks.DictLoader({
 }));
 ```
 
+### FunctionLoader
+```js
+new FunctionLoader(loaderFunction, [opts])
+```
+
+
+A loader that uses a function to load the template. The function will receive
+the template name (and optional callback function if the `async` option is
+`true`) and must either return the source as a string or an object containing
+the source as `src` the file path as `path`, and a function of `upToDateFunc`
+that returns `true` if the source is up-to-date, or `false` if the cached
+template should be removed and loaded again. If the template cannot be found
+the loader function must return `null`.
+
+For async loaders the source may be passed back as the second parameter of the
+callback function (the first is for any errors), or returned as a `Promise`.
+
+**loaderFunction** a synchronous function that returns the template source
+
+**opts** is an object with the following optional property:
+
+* **noCache** - if `true`, the system will avoid using a cache and templates
+  will be recompiled every single time
+
+* **async** - Set to `true` if the loader function is asynchronous 
+
+#### Simple example
+
+```js
+function loader (name) {
+  return '<h1>My Template</h1>';
+}
+const env = new govjucks.Environment(new govjucks.FunctionLoader(loader));
+```
+
+#### Returning source object
+
+```js
+function loader (name) {
+  return {
+    // Can just be the name param if you have no path
+    path: '/path/to/template.html',
+    src: '<h1>My Template</h1>',
+    upToDateFunc() {
+      // Determine if the template is up to date or needs to recompiled and
+      // removed from the cache.
+      return true;
+    }
+  }
+}
+const env = new govjucks.Environment(new govjucks.FunctionLoader(loader));
+```
+
+#### Asynchronous with callback
+
+```js
+function loader (name, cb) {
+  const path = resolve('/path', name);
+  getFile(path, (err, stringData) => {
+    // Errors are passed in the first argument, if there is no error use null.
+    // The second argument is the template source string or object.
+    // 
+    // If you have an error because a template could not be found, return `null`
+    // in both arguments.
+    if (err) return cb(err);
+    cb(null, stringData);
+  });
+}
+const env = new govjucks.Environment(new govjucks.FunctionLoader(loader, {
+  async: true
+}));
+```
+
+#### Asynchronous with promise
+
+```js
+async function loader (name) {
+  try {
+    const path = resolve('/path', name);
+    const stringData = await getFile(path);
+    return { path, src: stringData, upToDateFunc: () => true };
+  } catch {
+    // In this example we're assuming the error is due to the file not existing,
+    // so we're returning `null` as the template is missing.
+    return null;
+  }
+}
+const env = new govjucks.Environment(new govjucks.FunctionLoader(loader, {
+  async: true
+}));
+```
+
 ### WebLoader
 ```js
 new WebLoader([baseURL], [opts])

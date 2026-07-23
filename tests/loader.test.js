@@ -6,7 +6,7 @@ const { tmpdir } = require('node:os');
 const { before, after, describe, it } = require('node:test');
 const path = require('node:path');
 const { Environment } = require('../src/environment');
-const { FileSystemLoader, NodeResolveLoader, DictLoader } = require('../src/node-loaders');
+const { FileSystemLoader, NodeResolveLoader, DictLoader, FunctionLoader } = require('../src/node-loaders');
 
 const templatesPath = 'tests/templates';
 const tmpDir = tmpdir();
@@ -222,6 +222,312 @@ describe('loader', () => {
 
     it('should throw on bad dict', () => {
       assert.throws(() => new DictLoader({ 'page.njk': {} }), { name: 'TypeError' });
+    });
+  });
+
+  describe('FunctionLoader', () => {
+    it('should have default opts', () => {
+      const loader = new FunctionLoader(() => {});
+      assert.ok(loader instanceof FunctionLoader);
+      assert.equal(loader.noCache, false);
+    });
+
+    describe('returning string', () => {
+      it('should emit a "load" event', (t, done) => {
+        function loaderFn (name) {
+          return `<h1>Template ${name}</h1>`;
+        }
+
+        const loader = new FunctionLoader(loaderFn, { noCache: true });
+        const exptectSource = {
+          path: 'page.njk',
+          src: '<h1>Template page.njk</h1>',
+          noCache: true
+        };
+
+        loader.on('load', function (name, source) {
+          assert.equal(name, 'page.njk');
+          assert.deepEqual(source, exptectSource);
+          done();
+        });
+
+        const source = loader.getSource('page.njk');
+        assert.deepEqual(source, exptectSource);
+      });
+
+      it('should emit a "load" event - async callback', (t, done) => {
+        function loaderFn (name, cb) {
+          setImmediate(() => cb(null, `<h1>Template ${name}</h1>`));
+        }
+
+        const loader = new FunctionLoader(loaderFn, { async: true });
+        const exptectSource = {
+          path: 'page.njk',
+          src: '<h1>Template page.njk</h1>',
+          noCache: false
+        };
+
+        loader.on('load', function (name, source) {
+          assert.equal(name, 'page.njk');
+          assert.deepEqual(source, exptectSource);
+          done();
+        });
+
+        loader.getSource('page.njk', (_, source) => {
+          assert.deepEqual(source, exptectSource);
+        });
+      });
+
+      it('should emit a "load" event - async promise', (t, done) => {
+        async function loaderFn (name) {
+          return `<h1>Template ${name}</h1>`;
+        }
+
+        const loader = new FunctionLoader(loaderFn, { async: true });
+        const exptectSource = {
+          path: 'page.njk',
+          src: '<h1>Template page.njk</h1>',
+          noCache: false
+        };
+
+        loader.on('load', function (name, source) {
+          assert.equal(name, 'page.njk');
+          assert.deepEqual(source, exptectSource);
+          done();
+        });
+
+        loader.getSource('page.njk', (_, source) => {
+          assert.deepEqual(source, exptectSource);
+        });
+      });
+
+      it('should render templates', () => {
+        function loaderFn (name) {
+          return '{{ foo }}';
+        }
+
+        const env = new Environment(new FunctionLoader(loaderFn));
+        const tmpl = env.getTemplate('page.njk');
+        assert.equal(tmpl.render({ foo: 'foo' }), 'foo');
+      });
+    });
+
+    describe('returning object', () => {
+      it('should emit a "load" event', (t, done) => {
+        function loaderFn (name) {
+          return {
+            path: `dir/${name}`,
+            src: '<h1>Title</h1>',
+            upToDateFunc: () => true,
+          };
+        }
+
+        const loader = new FunctionLoader(loaderFn, { noCache: true });
+        const exptectSource = {
+          path: 'dir/page.njk',
+          src: '<h1>Title</h1>',
+          noCache: true
+        };
+
+        loader.on('load', function (name, source) {
+          assert.equal(name, 'page.njk');
+          assert.deepEqual(source, exptectSource);
+          done();
+        });
+
+        const source = loader.getSource('page.njk');
+        assert.deepEqual(source, exptectSource);
+      });
+
+      it('should emit a "load" event - async callback', (t, done) => {
+        function loaderFn (name, cb) {
+          setImmediate(() => cb(null, {
+            path: `dir/${name}`,
+            src: '<h1>Title</h1>',
+            upToDateFunc: () => true,
+          }));
+        }
+
+        const loader = new FunctionLoader(loaderFn, { async: true });
+        const exptectSource = {
+          path: 'dir/page.njk',
+          src: '<h1>Title</h1>',
+          noCache: false
+        };
+
+        loader.on('load', function (name, source) {
+          assert.equal(name, 'page.njk');
+          assert.deepEqual(source, exptectSource);
+          done();
+        });
+
+        loader.getSource('page.njk', (_, source) => {
+          assert.deepEqual(source, exptectSource);
+        });
+      });
+
+      it('should emit a "load" event - async promise', (t, done) => {
+        async function loaderFn (name) {
+          return {
+            path: `dir/${name}`,
+            src: '<h1>Title</h1>',
+            upToDateFunc: () => true,
+          };
+        }
+
+        const loader = new FunctionLoader(loaderFn, { async: true });
+        const exptectSource = {
+          path: 'dir/page.njk',
+          src: '<h1>Title</h1>',
+          noCache: false
+        };
+
+        loader.on('load', function (name, source) {
+          assert.equal(name, 'page.njk');
+          assert.deepEqual(source, exptectSource);
+          done();
+        });
+
+        loader.getSource('page.njk', (_, source) => {
+          assert.deepEqual(source, exptectSource);
+        });
+      });
+
+      it('should render templates', () => {
+        function loaderFn (name) {
+          return {
+            path: `dir/${name}`,
+            src: '{{ foo }}',
+            upToDateFunc: () => true,
+          };
+        }
+
+        const env = new Environment(new FunctionLoader(loaderFn));
+        const tmpl = env.getTemplate('page.njk');
+        assert.equal(tmpl.render({ foo: 'foo' }), 'foo');
+      });
+
+      it('should retain cached template when upToDateFunc returns true', () => {
+        let i = 0;
+        function loaderFn (name) {
+          const source = {
+            path: `dir/${name}`,
+            src: i === 0 ? 'Template' : 'Updated',
+            upToDateFunc: () => true,
+          };
+          i++;
+          return source;
+        }
+
+        const env = new Environment(new FunctionLoader(loaderFn));
+
+        {
+          const template = env.getTemplate('fake.njk');
+          assert.equal(template.render(), 'Template');
+        }
+        {
+          const template = env.getTemplate('fake.njk');
+          assert.equal(template.render(), 'Template');
+        }
+      });
+
+      it('should clear cached template when upToDateFunc returns false', () => {
+        let i = 0;
+        function loaderFn (name) {
+          const source = {
+            path: `dir/${name}`,
+            src: i === 0 ? 'Template' : 'Updated',
+            upToDateFunc: () => false,
+          };
+          i++;
+          return source;
+        }
+
+        const env = new Environment(new FunctionLoader(loaderFn));
+
+        {
+          const template = env.getTemplate('fake.njk');
+          assert.equal(template.render(), 'Template');
+        }
+        {
+          const template = env.getTemplate('fake.njk');
+          assert.equal(template.render(), 'Updated');
+        }
+      });
+    });
+
+    it('should return null if loader returns null', () => {
+      function loaderFn () {
+        return null;
+      }
+
+      const loader = new FunctionLoader(loaderFn);
+      assert.equal(loader.getSource('missing'), null);
+    });
+
+    it('should return null if loader returns null - async callback', (t, done) => {
+      function loaderFn (_, cb) {
+        return cb(null, null);
+      }
+
+      const loader = new FunctionLoader(loaderFn, { async: true });
+      loader.getSource('missing', (_, source) => {
+        assert.equal(source, null);
+        done();
+      });
+    });
+
+    it('should return null if loader returns null - async promise', (t, done) => {
+      async function loaderFn () {
+        return null;
+      }
+
+      const loader = new FunctionLoader(loaderFn, { async: true });
+      loader.getSource('missing', (_, source) => {
+        assert.equal(source, null);
+        done();
+      });
+    });
+
+    it('should throw if loader function errors', () => {
+      function loaderFn () {
+        throw new Error();
+      }
+
+      const loader = new FunctionLoader(loaderFn);
+      assert.throws(() => loader.getSource('missing'));
+    });
+
+    it('should return error in callback if loader function errors - async callback', (t, done) => {
+      const expectedError = new Error();
+
+      function loaderFn (_, cb) {
+        cb(expectedError);
+      }
+
+      const loader = new FunctionLoader(loaderFn, { async: true });
+      loader.getSource('missing', (err) => {
+        assert.equal(err, expectedError);
+        done();
+      });
+    });
+
+    it('should return error in callback if loader function errors - async promise', (t, done) => {
+      const expectedError = new Error();
+
+      async function loaderFn () {
+        throw expectedError;
+      }
+
+      const loader = new FunctionLoader(loaderFn, { async: true });
+      loader.getSource('missing', (err) => {
+        assert.equal(err, expectedError);
+        done();
+      });
+    });
+
+    it('should throw if loader is not a function', () => {
+      assert.throws(() => new FunctionLoader('bad'), { name: 'TypeError' });
     });
   });
 });
