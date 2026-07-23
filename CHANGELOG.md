@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### New features
+
+* Add DictLoader template loader similar to [jinja DictLoader](https://jinja.palletsprojects.com/en/stable/api/#jinja2.DictLoader). [#34](https://github.com/gunjam/govjucks/pull/34) @gunjam
+
 ## v0.3.1
 
 Revert inline if change as it has a breaking effect on existing templates, will restore in a
