@@ -8,11 +8,11 @@ const filters = require('./filters');
 const { FileSystemLoader, WebLoader, PrecompiledLoader } = require('./loaders');
 const tests = require('./tests');
 const globals = require('./globals');
-const { Obj, EmitterObj } = require('./object');
 const globalRuntime = require('./runtime');
 const { handleError, Frame } = globalRuntime;
 const expressApp = require('./express-app');
 const NullObject = require('./null-object');
+const { EventEmitter } = require('./loader');
 
 // If the user is using the async API, *always* call it
 // asynchronously even if the template was synchronous.
@@ -38,8 +38,10 @@ const noopTmplSrc = {
   }
 };
 
-class Environment extends EmitterObj {
-  init (loaders, opts) {
+class Environment extends EventEmitter {
+  constructor (loaders, opts) {
+    super();
+
     // The dev flag determines the trace that'll be shown on errors.
     // If set to true, returns the full trace from the error point,
     // otherwise will return trace starting from Template.render
@@ -83,7 +85,7 @@ class Environment extends EmitterObj {
       );
     }
 
-    this._initLoaders();
+    this.#initLoaders();
 
     this.globals = globals();
     this.filters = new NullObject();
@@ -101,7 +103,7 @@ class Environment extends EmitterObj {
     }
   }
 
-  _initLoaders () {
+  #initLoaders () {
     for (const loader of this.loaders) {
       // Caching and cache busting
       loader.cache = new Map();
@@ -345,8 +347,8 @@ class Environment extends EmitterObj {
   }
 }
 
-class Context extends Obj {
-  init (ctx, blocks, env) {
+class Context {
+  constructor (ctx, blocks, env) {
     blocks = NullObject.isNullObject(blocks)
       ? blocks
       : lib.extend(new NullObject(), blocks);
@@ -427,8 +429,8 @@ class Context extends Obj {
   }
 }
 
-class Template extends Obj {
-  init (src, env, path, eagerCompile, pathResolver) {
+class Template {
+  constructor (src, env, path, eagerCompile, pathResolver) {
     this.env = env ?? new Environment();
     this.pathResolver = pathResolver;
 
@@ -454,7 +456,7 @@ class Template extends Obj {
 
     if (eagerCompile) {
       try {
-        this._compile();
+        this.#compile();
       } catch (err) {
         throw lib._prettifyError(this.path, this.env.opts.dev, err);
       }
@@ -566,11 +568,11 @@ class Template extends Obj {
 
   compile () {
     if (!this.compiled) {
-      this._compile();
+      this.#compile();
     }
   }
 
-  _compile () {
+  #compile () {
     let props;
 
     if (this.tmplProps) {
@@ -588,12 +590,12 @@ class Template extends Obj {
       props = func();
     }
 
-    this.blocks = this._getBlocks(props);
+    this.blocks = this.#getBlocks(props);
     this.rootRenderFunc = props.root;
     this.compiled = true;
   }
 
-  _getBlocks (props) {
+  #getBlocks (props) {
     const blocks = new NullObject();
 
     for (const key in props) {

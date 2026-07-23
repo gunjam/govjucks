@@ -1,7 +1,6 @@
 'use strict';
 
 // A simple class system, more documentation to come
-const EventEmitter = require('node:events');
 const lib = require('./lib');
 
 function parentWrap (parent, prop) {
@@ -60,26 +59,4 @@ class Obj {
   }
 }
 
-class EmitterObj extends EventEmitter {
-  constructor (...args) {
-    super();
-    // Unfortunately necessary for backwards compatibility
-    this.init(...args);
-  }
-
-  init () {}
-
-  get typename () {
-    return this.constructor.name;
-  }
-
-  static extend (name, props) {
-    if (typeof name === 'object') {
-      props = name;
-      name = 'anonymous';
-    }
-    return extendClass(this, name, props);
-  }
-}
-
-module.exports = { Obj, EmitterObj };
+module.exports = { Obj };
