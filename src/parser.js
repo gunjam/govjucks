@@ -2,11 +2,10 @@
 
 const lexer = require('./lexer');
 const nodes = require('./nodes');
-const Obj = require('./object').Obj;
 const lib = require('./lib');
 
-class Parser extends Obj {
-  init (tokens) {
+class Parser {
+  constructor (tokens) {
     this.tokens = tokens;
     this.peeked = null;
     this.breakOnBlocks = null;
