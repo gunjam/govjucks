@@ -478,7 +478,10 @@ templates from the filesystem using node's
 [`require.resolve`](https://nodejs.org/api/modules.html#modules_all_together).
 
 **opts** is an object which takes the same properties as
-[`FileSystemLoader`](#filesystemloader).
+[`FileSystemLoader`](#filesystemloader). Plus one additional option:
+
+* **requirePaths** - an array of string paths to search for node_modules folders,
+  equivalent to [`require.resolve`'s paths option](https://nodejs.org/api/modules.html#requireresolverequest-options).
 
 ### WebLoader
 ```js
