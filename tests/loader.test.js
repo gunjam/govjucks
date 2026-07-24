@@ -1,11 +1,22 @@
 'use strict';
 
 const assert = require('node:assert/strict');
-const { describe, it } = require('node:test');
+const { mkdtempSync, cpSync, rmSync, writeFileSync } = require('node:fs');
+const { tmpdir } = require('node:os');
+const { before, after, describe, it } = require('node:test');
+const path = require('node:path');
 const { Environment } = require('../src/environment');
 const { FileSystemLoader, NodeResolveLoader } = require('../src/node-loaders');
 
 const templatesPath = 'tests/templates';
+const tmpDir = tmpdir();
+let tmp;
+
+before(() => {
+  tmp = mkdtempSync(path.join(tmpDir, 'loaders-'));
+});
+
+after(() => rmSync(tmp, { recursive: true }));
 
 describe('loader', () => {
   it('should allow a simple loader to be created', () => {
@@ -61,10 +72,50 @@ describe('loader', () => {
       const loader = new FileSystemLoader(templatesPath);
       loader.on('load', function (name, source) {
         assert.equal(name, 'simple-base.njk');
+        assert.deepEqual(source, {
+          src: '{% block test %}{% endblock test %}\n',
+          path: path.resolve(templatesPath, 'simple-base.njk'),
+          noCache: false
+        });
         done();
       });
 
       loader.getSource('simple-base.njk');
+    });
+
+    it('should emit an "update" event on file change in watch mode', (t, done) => {
+      const templatePath = path.join(tmp, 'fs-update.njk');
+      writeFileSync(templatePath, 'test');
+
+      const loader = new FileSystemLoader(tmp, { watch: true });
+      loader.on('update', function (path, fullPath) {
+        assert.equal(path, 'fs-update.njk');
+        assert.equal(fullPath, templatePath);
+        done();
+      });
+
+      // Get source so it's added to paths list
+      loader.getSource('fs-update.njk');
+
+      // Modify file
+      writeFileSync(templatePath, 'updated');
+      t.after(() => loader.stopWatching());
+    });
+
+    it('should load template from file system', (t) => {
+      const loader = new FileSystemLoader(templatesPath);
+      const source = loader.getSource('item.njk');
+      assert.deepEqual(source, {
+        src: 'showing {{ item }}',
+        path: path.resolve(templatesPath, 'item.njk'),
+        noCache: false
+      });
+    });
+
+    it('should render templates', () => {
+      const env = new Environment(new FileSystemLoader(templatesPath));
+      const tmpl = env.getTemplate('item.njk');
+      assert.equal(tmpl.render({ item: 'foo' }), 'showing foo');
     });
   });
 
@@ -79,10 +130,38 @@ describe('loader', () => {
       const loader = new NodeResolveLoader();
       loader.on('load', function (name, source) {
         assert.equal(name, 'dummy-pkg/simple-template.html');
+        assert.deepEqual(source, {
+          src: '{{ foo }}',
+          path: require.resolve('dummy-pkg/simple-template.html'),
+          noCache: false
+        });
         done();
       });
 
       loader.getSource('dummy-pkg/simple-template.html');
+    });
+
+    it('should emit an "update" event on file change in watch mode', (t, done) => {
+      const modules = path.join(tmp, 'node_modules');
+      const templatePath = path.join(modules, 'dummy-pkg', 'simple-template.html');
+      cpSync(path.join(__dirname, 'test-node-pkgs'), modules, { recursive: true });
+
+      const loader = new NodeResolveLoader({ watch: true, requirePaths: [modules] });
+      loader.on('update', function (path, fullPath) {
+        const expectedPath = require.resolve('dummy-pkg/simple-template.html', {
+          paths: [modules]
+        });
+        assert.equal(path, 'dummy-pkg/simple-template.html');
+        assert.equal(fullPath, expectedPath);
+        done();
+      });
+
+      // Get source so it's added to paths list
+      loader.getSource('dummy-pkg/simple-template.html');
+
+      // Modify file
+      writeFileSync(templatePath, 'updated');
+      t.after(() => loader.stopWatching());
     });
 
     it('should render templates', () => {

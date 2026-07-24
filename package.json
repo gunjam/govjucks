@@ -18,14 +18,6 @@
     "neostandard": "^0.12.2",
     "nunjucks": "^3.2.4"
   },
-  "peerDependencies": {
-    "chokidar": "^3.3.0"
-  },
-  "peerDependenciesMeta": {
-    "chokidar": {
-      "optional": true
-    }
-  },
   "engines": {
     "node": ">=20.19.0"
   },
