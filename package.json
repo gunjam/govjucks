@@ -9,13 +9,13 @@
   },
   "type": "commonjs",
   "devDependencies": {
-    "c8": "^11.0.0",
+    "c8": "^12.0.0",
     "connect": "^3.7.0",
     "eslint": "^9.39.3",
     "express": "5.x",
     "light-my-request": "^6.6.0",
     "mitata": "^1.0.34",
-    "neostandard": "^0.12.2",
+    "neostandard": "^0.13.0",
     "nunjucks": "^3.2.4"
   },
   "engines": {
