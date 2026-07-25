@@ -15,8 +15,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [22, 24]
+        os: [ubuntu-latest, macos-latest]
+        node-version: [22, 24, 26]
+        include:
+        - os: windows-latest
+          node_version: 22
+        - os: windows-latest
+          # use 24.15 to workaround https://github.com/nodejs/node/issues/63638
+          node_version: 24.15.0
 
     steps:
       - uses: actions/checkout@v4
