@@ -21,12 +21,6 @@ $ npm install govjucks
 
 Once installed, simply use `require('govjucks')` to load it.
 
-To use Nunjuck's built-in watch mode, Chokidar must be installed separately:
-
-```
-$ npm install govjucks chokidar
-```
-
 Govjucks supports all modern browsers and any version of Node.js
 [currently supported by the Node.js Foundation](https://github.com/nodejs/Release#release-schedule1).
 This includes the most recent version and all versions still in maintenance.
