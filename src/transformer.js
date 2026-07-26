@@ -202,11 +202,6 @@ function transform (ast, asyncFilters) {
   return cps(ast, asyncFilters || []);
 }
 
-// var parser = require('./parser');
-// var src = 'hello {% foo %}{% endfoo %} end';
-// var ast = transform(parser.parse(src, [new FooExtension()]), ['bar']);
-// nodes.printNodes(ast);
-
 module.exports = {
   transform
 };
