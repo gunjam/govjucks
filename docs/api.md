@@ -559,14 +559,16 @@ need to extend the `Loader` class. This gives you `emit` method that
 can fire events. You need to call it
 
 ```js
-const MyLoader = govjucks.Loader.extend({
-    init: function() {
+class MyLoader extends govjucks.Loader {
+    constructor(opts) {
+        super(opts);
+        
         // setup a process which watches templates here
         // and call `this.emit('update', name)` when a template
         // is changed
     },
 
-    getSource: function(name) {
+    getSource(name) {
         // load the template
     }
 });
@@ -584,10 +586,10 @@ Just add an `async: true` property to your loader and it will be used
 asynchronously.
 
 ```js
-const MyLoader = govjucks.Loader.extend({
+class MyLoader extends govjucks.Loader {
     async: true,
 
-    getSource: function(name, callback) {
+    getSource(name, callback) {
         // load the template
         // ...
         callback(err, res);
