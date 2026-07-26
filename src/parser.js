@@ -1352,20 +1352,6 @@ class Parser {
   }
 }
 
-// var util = require('util');
-
-// var l = lexer.lex('{%- if x -%}\n hello {% endif %}');
-// var t;
-// while((t = l.nextToken())) {
-//     console.log(util.inspect(t));
-// }
-
-// var p = new Parser(lexer.lex('hello {% filter title %}' +
-//                              'Hello madam how are you' +
-//                              '{% endfilter %}'));
-// var n = p.parseAsRoot();
-// nodes.printNodes(n);
-
 module.exports = {
   parse (src, extensions, opts) {
     const p = new Parser(lexer.lex(src, opts));
