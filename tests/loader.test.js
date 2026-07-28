@@ -6,7 +6,8 @@ const { tmpdir } = require('node:os');
 const { before, after, describe, it } = require('node:test');
 const path = require('node:path');
 const { Environment } = require('../src/environment');
-const { FileSystemLoader, NodeResolveLoader, PackageLoader, DictLoader, FunctionLoader } = require('../src/node-loaders');
+const Loader = require('../src/loader');
+const { FileSystemLoader, NodeResolveLoader, PackageLoader, DictLoader, FunctionLoader, PrefixLoader } = require('../src/node-loaders');
 
 const templatesPath = 'tests/templates';
 const tmpDir = tmpdir();
@@ -296,7 +297,198 @@ describe('loader', () => {
     });
 
     it('should throw on bad dict', () => {
-      assert.throws(() => new DictLoader({ 'page.njk': {} }), { name: 'TypeError' });
+      assert.throws(() => new DictLoader({ 'page.njk': {} }), {
+        name: 'TypeError',
+        message: 'Map must be a flat object with string values'
+      });
+    });
+  });
+
+  describe('PrefixLoader', () => {
+    it('should have default opts', () => {
+      const loader = new PrefixLoader();
+      assert.ok(loader instanceof PrefixLoader);
+      assert.equal(loader.async, false);
+    });
+
+    it('should set async to true if any loader is async', () => {
+      class AsyncLoader extends Loader {
+        async = true;
+        getSource () {}
+      }
+      const loader = new PrefixLoader({
+        async: new AsyncLoader(),
+        // Second loader being sync should not set `async` back to false
+        dict: new DictLoader()
+      });
+      assert.equal(loader.async, true);
+    });
+
+    it('should get source from the correct loader based on prefix', () => {
+      const loader = new PrefixLoader({
+        dict1: new DictLoader({
+          'page.njk': 'foo'
+        }),
+        dict2: new DictLoader({
+          'page.njk': 'bar'
+        })
+      });
+
+      {
+        const source = loader.getSource('dict1/page.njk');
+        assert.deepEqual(source, {
+          path: 'page.njk',
+          src: 'foo',
+          noCache: false
+        });
+      }
+      {
+        const source = loader.getSource('dict2/page.njk');
+        assert.deepEqual(source, {
+          path: 'page.njk',
+          src: 'bar',
+          noCache: false
+        });
+      }
+    });
+
+    it('should use custom delimiter', () => {
+      const dictLoader = new DictLoader({
+        'page.njk': 'foo'
+      });
+
+      const loader = new PrefixLoader({ dict1: dictLoader }, ':');
+      const source = loader.getSource('dict1:page.njk');
+      assert.deepEqual(source, {
+        path: 'page.njk',
+        src: 'foo',
+        noCache: false
+      });
+    });
+
+    it('should support async loaders', (t, done) => {
+      class AsyncLoader extends Loader {
+        async = true;
+
+        getSource (_, cb) {
+          cb(null, 'test');
+        }
+      }
+
+      const loader = new PrefixLoader({ async: new AsyncLoader() });
+      loader.getSource('async/page.njk', (_, source) => {
+        assert.equal(source, 'test');
+        done();
+      });
+    });
+
+    it('should support a mix of sync and async loaders', (t, done) => {
+      class AsyncLoader extends Loader {
+        async = true;
+
+        getSource (_, cb) {
+          cb(null, { src: 'foo' });
+        }
+      }
+
+      const loader = new PrefixLoader({
+        async: new AsyncLoader(),
+        sync: new DictLoader({ 'page.njk': 'bar' })
+      });
+
+      loader.getSource('async/page.njk', (_, async) => {
+        assert.equal(async.src, 'foo');
+
+        loader.getSource('sync/page.njk', (_, sync) => {
+          assert.equal(sync.src, 'bar');
+          done();
+        });
+      });
+    });
+
+    it('should pass sync errors to async callback when in async mode', (t, done) => {
+      class AsyncLoader extends Loader {
+        async = true;
+        getSource (_, cb) {
+          cb(null, { src: 'foo' });
+        }
+      }
+      class SyncLoader extends Loader {
+        getSource () {
+          throw new Error('sync error');
+        }
+      }
+
+      const loader = new PrefixLoader({
+        async: new AsyncLoader(),
+        sync: new SyncLoader()
+      });
+
+      loader.getSource('async/page.njk', (_, async) => {
+        assert.equal(async.src, 'foo');
+
+        loader.getSource('sync/page.njk', (err) => {
+          assert.equal(err.message, 'sync error');
+          done();
+        });
+      });
+    });
+
+    it('should render templates', () => {
+      const env = new Environment(
+        new PrefixLoader({
+          file: new FileSystemLoader(templatesPath),
+          dict: new DictLoader({ 'item.njk': 'dict {{ item }}' }),
+        })
+      );
+
+      // Dict load shouldn't be cached file load when template names are equal
+      assert.equal(env.render('file/item.njk', { item: 'foo' }), 'showing foo');
+      assert.equal(env.render('dict/item.njk', { item: 'foo' }), 'dict foo');
+    });
+
+    it('should return null if no prefixes match a loader', () => {
+      const loader = new PrefixLoader({});
+      const tmplName = 'dummy-prefix/does-not-exist.html';
+      assert.equal(loader.getSource(tmplName), null);
+    });
+
+    it('should pass through load and update events from loaders', (t, done) => {
+      class TestLoader extends Loader {
+        getSource () {
+          this.emit('load', 'loading', 'event');
+          this.emit('update', 'updating', 'event');
+          return 'template';
+        }
+      }
+
+      const loader = new PrefixLoader({ pre: new TestLoader() });
+      loader
+        .on('load', (arg1, arg2) => {
+          assert.equal(arg1, 'loading');
+          assert.equal(arg2, 'event');
+        })
+        .on('update', (arg1, arg2) => {
+          assert.equal(arg1, 'updating');
+          assert.equal(arg2, 'event');
+          done();
+        });
+
+      loader.getSource('pre/template.njk');
+    });
+
+    it('should throw on bad loader', () => {
+      assert.throws(() => new PrefixLoader({ prefix: {} }), {
+        name: 'TypeError',
+        message: 'All loaders must have a getSource() method'
+      });
+    });
+
+    it('should throw on bad delimiter', () => {
+      assert.throws(() => new PrefixLoader({}, 1), {
+        name: 'TypeError',
+        message: 'Delimiter must ba a string'
+      });
     });
   });
 

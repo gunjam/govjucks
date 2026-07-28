@@ -7,6 +7,7 @@
 * Add DictLoader template loader similar to [jinja DictLoader](https://jinja.palletsprojects.com/en/stable/api/#jinja2.DictLoader). [#34](https://github.com/gunjam/govjucks/pull/34) @gunjam
 * Add FunctionLoader template loader similar to [jinja FunctionLoader](https://jinja.palletsprojects.com/en/stable/api/#jinja2.FunctionLoader). [#35](https://github.com/gunjam/govjucks/pull/35) @gunjam
 * Add PackageLoader template loader similar to [jinja PackageLoader](https://jinja.palletsprojects.com/en/stable/api/#jinja2.PackageLoader). [#42](https://github.com/gunjam/govjucks/pull/42) @gunjam
+* Add PrefixLoader template loader similar to [jinja PrefixLoader](https://jinja.palletsprojects.com/en/stable/api/#jinja2.PrefixLoader). [#41](https://github.com/gunjam/govjucks/pull/41) @gunjam
 
 ## v0.3.1
 
