@@ -455,6 +455,88 @@ class FunctionLoader extends Loader {
   }
 }
 
+/**
+ * Use multiple loaders mapped to a tempalte path prefix. The prefix is delimited
+ * by a slash by default, but can be configured by passing a string to the
+ * `delimiter` parameter.
+ *
+ * @example
+ * ```javascript
+ * const loader = new PrefixLoader({
+ *   app1: new FileSystemLoader(['./some-app/views']),
+ *   app2: new FileSystemLoader(['./another-app/src/views'])
+ * });
+ *
+ * const app1Page = loader.getSource('app1/page.njk');
+ * const app2Page = loader.getSource('app2/page.njk');
+ * ```
+ */
+class PrefixLoader extends Loader {
+  #loaderMap = new Map();
+  #delimiter;
+  async = false;
+
+  /**
+   * @param {PrefixLoaderMap} [loaderMap] Object map of prefixes and loaders
+   * @param {string} [delimiter='/'] Prefix delimiter, default is `'/'`
+   */
+  constructor (loaderMap = {}, delimiter = '/') {
+    super();
+
+    if (!isPlainObj(loaderMap)) {
+      throw new TypeError('Map must be a plain object of prefixes and loaders');
+    }
+    if (typeof delimiter !== 'string') {
+      throw new TypeError('Delimiter must ba a string');
+    }
+
+    this.#delimiter = delimiter;
+
+    for (const prefix of Object.keys(loaderMap)) {
+      const loader = loaderMap[prefix];
+      if (typeof loader.getSource !== 'function') {
+        throw new TypeError('All loaders must have a getSource() method');
+      }
+      this.async ||= loader.async;
+      this.#loaderMap.set(prefix, loader);
+
+      // Pass through events to environment which will be listening on this
+      loader.on('load', (...args) => this.emit('load', ...args));
+      loader.on('update', (...args) => this.emit('update', ...args));
+    }
+  }
+
+  /**
+   * Get template source
+   * @param {string} prefixedName The template name
+   * @param {function} [cb] Asynchronous callback, required if one or more of
+   *    the loaders is asynchronous
+   * @returns {TemplateSourceObject}
+   */
+  getSource (prefixedName, cb) {
+    const [prefix, name] = prefixedName.split(this.#delimiter, 2);
+    const loader = this.#loaderMap.get(prefix);
+
+    if (!loader) {
+      if (!this.async) {
+        return null;
+      }
+      cb(null, null);
+    } else if (loader.async) {
+      loader.getSource(name, cb);
+    } else if (this.async) {
+      try {
+        const source = loader.getSource(name);
+        cb(null, source);
+      } catch (e) {
+        cb(e);
+      }
+    } else {
+      return loader.getSource(name);
+    }
+  }
+}
+
 module.exports = {
   FileSystemLoader,
   PrecompiledLoader,
@@ -462,6 +544,7 @@ module.exports = {
   PackageLoader,
   DictLoader,
   FunctionLoader,
+  PrefixLoader,
 };
 
 /**
@@ -527,3 +610,8 @@ module.exports = {
  */
 
 /** @typedef {(err: Error | null, src: string | FunctionLoaderSourceObject | null) => void} FunctionLoaderFunctionCallback */
+
+/**
+ * @typedef {Record<string, Loader>} PrefixLoaderMap Object mapping prefixes to
+ *   loaders names.
+ */

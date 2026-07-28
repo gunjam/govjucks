@@ -619,6 +619,29 @@ const env = new govjucks.Environment(new govjucks.FunctionLoader(loader, {
 }));
 ```
 
+### PrefixLoader
+```js
+new PrefixLoader([loaderMap], [delimiter])
+```
+
+Use multiple loaders mapped to a tempalte path prefix. The prefix is delimited
+by a slash by default, but can be configured by passing a string to the
+`delimiter` parameter.
+
+**loaderMap** is an object mapping prefixes to loaders.
+
+**delimiter** is a string used to delimit prefixes, defaults to `/`.
+
+```js
+const loader = new PrefixLoader({
+  app1: new FileSystemLoader(['./some-app/views']),
+  app2: new FileSystemLoader(['./another-app/src/views'])
+});
+
+const app1Page = loader.getSource('app1/page.njk');
+const app2Page = loader.getSource('app2/page.njk');
+```
+
 ### WebLoader
 ```js
 new WebLoader([baseURL], [opts])
