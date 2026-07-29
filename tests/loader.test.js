@@ -192,7 +192,7 @@ describe('loader', () => {
 
     it('should emit a "load" event', (t, done) => {
       const loader = new DictLoader({ 'page.njk': 'test' }, { noCache: true });
-      const exptectSource = {
+      const expectedSource = {
         path: 'page.njk',
         src: 'test',
         noCache: true
@@ -200,12 +200,12 @@ describe('loader', () => {
 
       loader.on('load', function (name, source) {
         assert.equal(name, 'page.njk');
-        assert.deepEqual(source, exptectSource);
+        assert.deepEqual(source, expectedSource);
         done();
       });
 
       const source = loader.getSource('page.njk');
-      assert.deepEqual(source, exptectSource);
+      assert.deepEqual(source, expectedSource);
     });
 
     it('should render templates', () => {
@@ -239,7 +239,7 @@ describe('loader', () => {
         }
 
         const loader = new FunctionLoader(loaderFn, { noCache: true });
-        const exptectSource = {
+        const expectedSource = {
           path: 'page.njk',
           src: '<h1>Template page.njk</h1>',
           noCache: true
@@ -247,12 +247,12 @@ describe('loader', () => {
 
         loader.on('load', function (name, source) {
           assert.equal(name, 'page.njk');
-          assert.deepEqual(source, exptectSource);
+          assert.deepEqual(source, expectedSource);
           done();
         });
 
         const source = loader.getSource('page.njk');
-        assert.deepEqual(source, exptectSource);
+        assert.deepEqual(source, expectedSource);
       });
 
       it('should emit a "load" event - async callback', (t, done) => {
@@ -261,7 +261,7 @@ describe('loader', () => {
         }
 
         const loader = new FunctionLoader(loaderFn, { async: true });
-        const exptectSource = {
+        const expectedSource = {
           path: 'page.njk',
           src: '<h1>Template page.njk</h1>',
           noCache: false
@@ -269,12 +269,12 @@ describe('loader', () => {
 
         loader.on('load', function (name, source) {
           assert.equal(name, 'page.njk');
-          assert.deepEqual(source, exptectSource);
+          assert.deepEqual(source, expectedSource);
           done();
         });
 
         loader.getSource('page.njk', (_, source) => {
-          assert.deepEqual(source, exptectSource);
+          assert.deepEqual(source, expectedSource);
         });
       });
 
@@ -284,7 +284,7 @@ describe('loader', () => {
         }
 
         const loader = new FunctionLoader(loaderFn, { async: true });
-        const exptectSource = {
+        const expectedSource = {
           path: 'page.njk',
           src: '<h1>Template page.njk</h1>',
           noCache: false
@@ -292,12 +292,12 @@ describe('loader', () => {
 
         loader.on('load', function (name, source) {
           assert.equal(name, 'page.njk');
-          assert.deepEqual(source, exptectSource);
+          assert.deepEqual(source, expectedSource);
           done();
         });
 
         loader.getSource('page.njk', (_, source) => {
-          assert.deepEqual(source, exptectSource);
+          assert.deepEqual(source, expectedSource);
         });
       });
 
@@ -323,7 +323,7 @@ describe('loader', () => {
         }
 
         const loader = new FunctionLoader(loaderFn, { noCache: true });
-        const exptectSource = {
+        const expectedSource = {
           path: 'dir/page.njk',
           src: '<h1>Title</h1>',
           noCache: true
@@ -331,12 +331,12 @@ describe('loader', () => {
 
         loader.on('load', function (name, source) {
           assert.equal(name, 'page.njk');
-          assert.deepEqual(source, exptectSource);
+          assert.deepEqual(source, expectedSource);
           done();
         });
 
         const source = loader.getSource('page.njk');
-        assert.deepEqual(source, exptectSource);
+        assert.deepEqual(source, expectedSource);
       });
 
       it('should emit a "load" event - async callback', (t, done) => {
@@ -349,7 +349,7 @@ describe('loader', () => {
         }
 
         const loader = new FunctionLoader(loaderFn, { async: true });
-        const exptectSource = {
+        const expectedSource = {
           path: 'dir/page.njk',
           src: '<h1>Title</h1>',
           noCache: false
@@ -357,12 +357,12 @@ describe('loader', () => {
 
         loader.on('load', function (name, source) {
           assert.equal(name, 'page.njk');
-          assert.deepEqual(source, exptectSource);
+          assert.deepEqual(source, expectedSource);
           done();
         });
 
         loader.getSource('page.njk', (_, source) => {
-          assert.deepEqual(source, exptectSource);
+          assert.deepEqual(source, expectedSource);
         });
       });
 
@@ -376,7 +376,7 @@ describe('loader', () => {
         }
 
         const loader = new FunctionLoader(loaderFn, { async: true });
-        const exptectSource = {
+        const expectedSource = {
           path: 'dir/page.njk',
           src: '<h1>Title</h1>',
           noCache: false
@@ -384,12 +384,12 @@ describe('loader', () => {
 
         loader.on('load', function (name, source) {
           assert.equal(name, 'page.njk');
-          assert.deepEqual(source, exptectSource);
+          assert.deepEqual(source, expectedSource);
           done();
         });
 
         loader.getSource('page.njk', (_, source) => {
-          assert.deepEqual(source, exptectSource);
+          assert.deepEqual(source, expectedSource);
         });
       });
 
