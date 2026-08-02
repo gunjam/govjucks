@@ -6,7 +6,7 @@ const { tmpdir } = require('node:os');
 const { before, after, describe, it } = require('node:test');
 const path = require('node:path');
 const { Environment } = require('../src/environment');
-const { FileSystemLoader, NodeResolveLoader, DictLoader, FunctionLoader } = require('../src/node-loaders');
+const { FileSystemLoader, NodeResolveLoader, PackageLoader, DictLoader, FunctionLoader } = require('../src/node-loaders');
 
 const templatesPath = 'tests/templates';
 const tmpDir = tmpdir();
@@ -180,6 +180,81 @@ describe('loader', () => {
       const loader = new NodeResolveLoader();
       const tmplName = 'dummy-pkg/does-not-exist.html';
       assert.equal(loader.getSource(tmplName), null);
+    });
+  });
+
+  describe('PackageLoader', () => {
+    it('should have default opts', () => {
+      const loader = new PackageLoader('dummy-pkg');
+      assert.ok(loader instanceof PackageLoader);
+      assert.ok(loader instanceof NodeResolveLoader);
+      assert.equal(loader.noCache, false);
+    });
+
+    it('should emit a "load" event', (t, done) => {
+      const loader = new PackageLoader('dummy-pkg');
+      loader.on('load', function (name, source) {
+        assert.equal(name, path.join('dummy-pkg', 'simple-template.html'));
+        assert.deepEqual(source, {
+          src: '{{ foo }}',
+          path: require.resolve('dummy-pkg/simple-template.html'),
+          noCache: false
+        });
+        done();
+      });
+
+      loader.getSource('simple-template.html');
+    });
+
+    it('should emit an "update" event on file change in watch mode', (t, done) => {
+      const modules = path.join(tmp, 'node_modules');
+      const templatePath = path.join(modules, 'dummy-pkg', 'simple-template.html');
+      cpSync(path.join(__dirname, 'test-node-pkgs'), modules, { recursive: true });
+
+      const loader = new PackageLoader('dummy-pkg', '/', { watch: true, requirePaths: [modules] });
+      loader.on('update', function (tmplPath, fullPath) {
+        const expectedPath = require.resolve('dummy-pkg/simple-template.html', {
+          paths: [modules]
+        });
+        assert.equal(tmplPath, path.join('dummy-pkg', 'simple-template.html'));
+        assert.equal(fullPath, expectedPath);
+        done();
+      });
+
+      // Get source so it's added to paths list
+      loader.getSource('simple-template.html');
+
+      // Modify file
+      writeFileSync(templatePath, 'updated');
+      t.after(() => loader.stopWatching());
+    });
+
+    it('should render templates', () => {
+      const env = new Environment(new PackageLoader('dummy-pkg'));
+      const tmpl = env.getTemplate('simple-template.html');
+      assert.equal(tmpl.render({ foo: 'foo' }), 'foo');
+    });
+
+    it('should support package sub paths', () => {
+      const env = new Environment(new PackageLoader('dummy-pkg', 'sub-path'));
+      const tmpl = env.getTemplate('nested-template.html');
+      assert.equal(tmpl.render({ foo: 'foo' }), 'foo');
+    });
+
+    it('should not allow directory traversal', () => {
+      const loader = new PackageLoader('dummy-pkg');
+      const dummyPkgPath = require.resolve('dummy-pkg/simple-template.html');
+      assert.equal(loader.getSource(dummyPkgPath), null);
+    });
+
+    it('should return null if no match', () => {
+      const loader = new PackageLoader('dummy-pkg');
+      assert.equal(loader.getSource('does-not-exist.html'), null);
+    });
+
+    it('should throw on missing package', () => {
+      assert.throws(() => new PackageLoader());
+      assert.throws(() => new PackageLoader('does-not-exist'));
     });
   });
 

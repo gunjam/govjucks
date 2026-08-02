@@ -224,6 +224,51 @@ class NodeResolveLoader extends Loader {
 }
 
 /**
+ * Loads templates from a specific node module using node's module resolution
+ * algorithm.
+ *
+ * @example
+ * ```javascript
+ * const loader = new PackageLoader('govuk-frontend', 'dist');
+ *
+ * // node_modules/govuk-frontend/dist/govuk/components/button/macro.njk
+ * loader.getSource('govuk/components/button/macro.njk');
+ * ```
+ */
+class PackageLoader extends NodeResolveLoader {
+  #packagePath;
+
+  /**
+   *
+   * @param {string} packageName Name of node module to load template from
+   * @param {string} [packagePath] Optional file path within module root
+   * @param {NodeResolveLoaderOptions} [opts] Loader options
+   */
+  constructor (packageName, packagePath = '/', opts = {}) {
+    super(opts);
+
+    try {
+      require.resolve(packageName);
+    } catch (err) {
+      throw new Error(`Failed to resolve package "${packageName}"`, {
+        cause: err
+      });
+    }
+
+    this.#packagePath = path.join(packageName, packagePath);
+  }
+
+  /**
+   * Get template source
+   * @param {string} name The template name
+   * @returns {TemplateSourceObject}
+   */
+  getSource (name) {
+    return super.getSource(path.join(this.#packagePath, name));
+  }
+}
+
+/**
  * Load templates from a plain object map of template names and source code
  * strings.
  *
@@ -414,6 +459,7 @@ module.exports = {
   FileSystemLoader,
   PrecompiledLoader,
   NodeResolveLoader,
+  PackageLoader,
   DictLoader,
   FunctionLoader,
 };
