@@ -132,7 +132,7 @@ class NodeResolveLoader extends Loader {
   #watching = false;
 
   /**
-   * @param {FileSystemLoaderOptions} opts Options
+   * @param {NodeResolveLoaderOptions} opts Options
    */
   constructor (opts = {}) {
     super();
@@ -427,10 +427,21 @@ module.exports = {
 
 /**
  * @typedef {object} FileSystemLoaderOptions
- * @property {boolean} watch If `true`, the system will automatically update
+ * @property {boolean} [watch] If `true`, the system will automatically update
  *   templates when they are changed on the filesystem
- * @property {boolean} noCache If `true`, the system will avoid using a cache
+ * @property {boolean} [noCache] If `true`, the system will avoid using a cache
  *   and templates will be recompiled every single time
+ */
+
+/**
+ * @typedef {object} NodeResolveOptions
+ * @property {string[]} [requirePaths] Paths to resolve node module locations
+ *   from, if set they are used over the default resolution paths
+ *   (eg: `node_modules`, etc).
+ */
+
+/**
+ * @typedef {FileSystemLoaderOptions & NodeResolveOptions} NodeResolveLoaderOptions
  */
 
 /**
