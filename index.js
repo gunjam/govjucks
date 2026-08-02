@@ -50,6 +50,7 @@ module.exports = {
   Loader,
   FileSystemLoader: loaders.FileSystemLoader,
   NodeResolveLoader: loaders.NodeResolveLoader,
+  PackageLoader: loaders.PackageLoader,
   PrecompiledLoader: loaders.PrecompiledLoader,
   DictLoader: loaders.DictLoader,
   FunctionLoader: loaders.FunctionLoader,

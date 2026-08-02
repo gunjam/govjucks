@@ -483,6 +483,29 @@ templates from the filesystem using node's
 * **requirePaths** - an array of string paths to search for node_modules folders,
   equivalent to [`require.resolve`'s paths option](https://nodejs.org/api/modules.html#requireresolverequest-options).
 
+```javascript
+const loader = new NodeResolveLoader();
+loader.getSource('govuk-frontend/dist/govuk/components/button/macro.njk');
+```
+
+### PackageLoader
+```js
+new PackageLoader([packageName], [path], [opts])
+```
+
+Similar to the [`NodeResolveLoader`](#noderesolveloader), except it will only
+load templates from a specific package.
+
+**opts** is an object which takes the same properties as
+[`NodeResolveLoader`](#noderesolveloader).
+
+```javascript
+const loader = new PackageLoader('govuk-frontend', 'dist');
+
+// ./node_modules/govuk-frontend/dist/govuk/components/button/macro.njk
+loader.getSource('govuk/components/button/macro.njk');
+```
+
 ### DictLoader
 ```js
 new DictLoader([dict], [opts])
