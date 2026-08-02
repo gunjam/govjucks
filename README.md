@@ -8,11 +8,6 @@ featured templating engine for javascript. It is heavily inspired by
 
 `npm install govjucks`
 
-To use the file watcher built-in to Govjucks, Chokidar must be installed
-separately.
-
-`npm install govjucks chokidar`
-
 ## Documentation
 
 * [Getting Started](docs/getting-started.md)
