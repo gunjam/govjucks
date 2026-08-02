@@ -421,8 +421,7 @@ module.exports = {
 /**
  * @typedef {object} FileSystemLoaderOptions
  * @property {boolean} watch If `true`, the system will automatically update
- *   templates. To use watch, make sure optional dependency chokidar is
- *   installed. when they are changed on the filesystem
+ *   templates when they are changed on the filesystem
  * @property {boolean} noCache If `true`, the system will avoid using a cache
  *   and templates will be recompiled every single time
  */
