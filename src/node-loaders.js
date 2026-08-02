@@ -55,6 +55,12 @@ class FileSystemLoader extends Loader {
       // Watch all the templates in the paths and fire an event when
       // they change
       for (const searchPath of this.searchPaths.filter(fs.existsSync)) {
+        // Since we are watching recursively, don't watch sub folders of folders
+        // we are already watching.
+        if (this.#watchers.some(p => searchPath.startsWith(p))) {
+          continue;
+        }
+
         const watcher = fs.watch(searchPath, { recursive: true });
         watcher.on('change', getWatchHandler(this, searchPath));
         watcher.on('error', (error) => {
