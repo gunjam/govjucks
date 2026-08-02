@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const isPlainObj = require('is-plain-obj').default;
 const Loader = require('./loader');
+const NullObject = require('./null-object.js');
 const { PrecompiledLoader } = require('./precompiled-loader.js');
 
 /**
@@ -38,7 +39,7 @@ class FileSystemLoader extends Loader {
   constructor (searchPaths, opts = {}) {
     super();
 
-    this.pathsToNames = {};
+    this.pathsToNames = new NullObject();
     this.noCache = !!opts.noCache;
 
     if (searchPaths) {
@@ -136,7 +137,7 @@ class NodeResolveLoader extends Loader {
   constructor (opts = {}) {
     super();
 
-    this.pathsToNames = {};
+    this.pathsToNames = new NullObject();
     this.noCache = !!opts.noCache;
     this.#requirePaths = Array.isArray(opts.requirePaths)
       ? opts.requirePaths
