@@ -9,6 +9,9 @@
 * Add PackageLoader template loader similar to [jinja PackageLoader](https://jinja.palletsprojects.com/en/stable/api/#jinja2.PackageLoader). [#42](https://github.com/gunjam/govjucks/pull/42) @gunjam
 * Add PrefixLoader template loader similar to [jinja PrefixLoader](https://jinja.palletsprojects.com/en/stable/api/#jinja2.PrefixLoader). [#41](https://github.com/gunjam/govjucks/pull/41) @gunjam
 
+### Fixes
+* Only allow templates to be loaded from configured file paths and below, not outside it. [#48](https://github.com/gunjam/govjucks/pull/48) @gunjam
+
 ## v0.3.1
 
 Revert inline if change as it has a breaking effect on existing templates, will restore in a

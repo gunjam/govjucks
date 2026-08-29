@@ -97,7 +97,7 @@ class FileSystemLoader extends Loader {
 
       // Only allow the current directory and anything
       // underneath it to be searched
-      if (p.indexOf(basePath) === 0 && fs.existsSync(p)) {
+      if ((p === basePath || p.startsWith(basePath + path.sep)) && fs.existsSync(p)) {
         fullpath = p;
         break;
       }
