@@ -1,7 +1,8 @@
 'use strict';
 
-const ObjProto = Object.prototype;
+const NullObject = require('./null-object.js');
 
+const ObjProto = Object.prototype;
 const escapeRegExp = /["&'<>\\]/g;
 
 /**
@@ -274,15 +275,16 @@ function getAttrGetter (attribute) {
 module.exports.getAttrGetter = getAttrGetter;
 
 function groupBy (obj, val, throwOnUndefined) {
-  const result = {};
+  const result = new NullObject();
   const iterator = isFunction(val) ? val : getAttrGetter(val);
-  for (let i = 0; i < obj.length; i++) {
+  for (let i = 0, len = obj.length; i < len; i++) {
     const value = obj[i];
     const key = iterator(value, i);
     if (key === undefined && throwOnUndefined === true) {
       throw new TypeError(`groupby: attribute "${val}" resolved to undefined`);
     }
-    (result[key] || (result[key] = [])).push(value);
+    result[key] ??= [];
+    result[key].push(value);
   }
   return result;
 }
@@ -444,7 +446,8 @@ module.exports.indexOf = indexOf;
  * @returns {object}
  */
 function extend (obj1, obj2) {
-  return Object.assign(obj1 ?? {}, obj2);
+  obj1 ??= new NullObject();
+  return Object.assign(obj1, obj2);
 }
 
 module.exports._assign = module.exports.extend = extend;

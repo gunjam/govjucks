@@ -62,7 +62,7 @@ class Frame {
 
     for (let i = 0; i < last; i++) {
       const id = parts[i];
-      obj[id] ??= {};
+      obj[id] ??= new NullObject();
       obj = obj[id];
     }
 

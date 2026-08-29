@@ -11,12 +11,12 @@ const lexer = require('./src/lexer');
 const runtime = require('./src/runtime');
 const nodes = require('./src/nodes');
 const installJinjaCompat = require('./src/jinja-compat');
+const NullObject = require('./src/null-object');
 
 // A single instance of an environment, since this is so commonly used
 let e;
 
-function configure (templatesPath, opts) {
-  opts = opts || {};
+function configure (templatesPath, opts = new NullObject()) {
   if (lib.isObject(templatesPath)) {
     opts = templatesPath;
     templatesPath = null;
