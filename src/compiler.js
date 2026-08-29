@@ -5,6 +5,7 @@ const transformer = require('./transformer');
 const nodes = require('./nodes');
 const { TemplateError } = require('./lib');
 const { Frame } = require('./runtime');
+const NullObject = require('./null-object');
 
 // These are all the same for now, but shouldn't be passed straight
 // through
@@ -1496,7 +1497,7 @@ module.exports = {
    * @param {object} opts
    * @param {function} [pathResolver]
    */
-  compile: function compile (src, asyncFilters, extensions, name, opts = {}, pathResolver) {
+  compile: function compile (src, asyncFilters, extensions, name, opts = new NullObject(), pathResolver) {
     const c = new Compiler(name, opts.throwOnUndefined, pathResolver);
 
     // Run the extension preprocessors against the source.

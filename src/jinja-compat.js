@@ -1,3 +1,5 @@
+const NullObject = require('./null-object');
+
 function installCompat () {
   'use strict';
 
@@ -284,7 +286,7 @@ function installCompat () {
     if (arguments.length === 4) {
       return sliceLookup.apply(this, arguments);
     }
-    obj = obj || {};
+    obj ??= new NullObject();
 
     // If the object is an object, return any of the methods that Python would
     // otherwise provide.
