@@ -73,6 +73,18 @@ describe('compiler', () => {
     finish(done);
   });
 
+  it('context cannot pollute template context', (t, done) => {
+    const env = new Environment();
+    const ctx = JSON.parse('{ "__proto__": { "allow": true } }');
+    const result = env.renderString(
+      '{% if allow %}yes{% else %}no{% endif %}',
+      ctx
+    );
+
+    equal(result, 'no');
+    finish(done);
+  });
+
   it('should fail silently on undefined values', (t, done) => {
     equal('{{ foo }}', '');
     equal('{{ foo.bar }}', '');
