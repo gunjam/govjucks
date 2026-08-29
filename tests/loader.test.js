@@ -113,6 +113,12 @@ describe('loader', () => {
       });
     });
 
+    it('should not load templates from outside configured path', () => {
+      const loader = new FileSystemLoader(templatesPath);
+      const src = loader.getSource('../templates-secret/secret.njk');
+      assert.equal(src, null);
+    });
+
     it('should render templates', () => {
       const env = new Environment(new FileSystemLoader(templatesPath));
       const tmpl = env.getTemplate('item.njk');
