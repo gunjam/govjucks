@@ -1062,15 +1062,15 @@ Sort a dict and yield (key, value) pairs:
 
 ```jinja
 {% set items = {
-    'e': 1,
-    'd': 2,
-    'c': 3,
-    'a': 4,
-    'f': 5,
-    'b': 6
+  'e': 1,
+  'd': 2,
+  'c': 3,
+  'a': 4,
+  'f': 5,
+  'b': 6
 } %}
 {% for item in items | dictsort %}
-    {{ item[0] }}
+  {{ item[0] }}
 {% endfor %}
 ```
 
@@ -1079,6 +1079,64 @@ Sort a dict and yield (key, value) pairs:
 ```jinja
 a b c d e f
 ```
+
+Sort case-sensitive
+
+```jinja
+{% set items = {
+  'e': 3,
+  'a': 1,
+  'A': 2,
+} %}
+{% for item in items | dictsort(true) %}
+  {{ item[0] }}
+{% endfor %}
+```
+
+**Output**
+
+```jinja
+A a e
+```
+
+Sort by value
+
+```jinja
+{% set items = {
+  'e': 3,
+  'a': 1,
+  'A': 2,
+} %}
+{% for item in items | dictsort(false, 'value') %}
+  {{ item[0] }}
+{% endfor %}
+```
+
+**Output**
+
+```jinja
+a A e
+```
+
+Reverse sort
+
+```jinja
+{% set items = {
+  'e': 3,
+  'a': 1,
+  'c': 2,
+} %}
+{% for item in items | dictsort(false, 'key', true) %}
+  {{ item[0] }}
+{% endfor %}
+```
+
+**Output**
+
+```jinja
+e c a
+```
+
 ### dump
 
 Call [`JSON.stringify`](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) on an object and dump the result into the

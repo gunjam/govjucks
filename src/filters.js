@@ -118,16 +118,25 @@ module.exports['default'] = default_;
 /**
  * Sort a dict and yield (key, value) pairs.
  * @param {object} val
- * @param {boolean} caseSensitive
- * @param {'key'|'value'} [by]
+ * @param {boolean} [caseSensitive=false]
+ * @param {'key'|'value'} [by='key']
+ * @param {boolean} [reverse=false]
  */
-function dictsort (val, caseSensitive, by) {
+function dictsort (val, caseSensitive = false, by = 'key', reverse = false) {
   if (!lib.isObject(val)) {
     throw new lib.TemplateError('dictsort filter: val must be an object');
   }
 
+  const kwargs = arguments[arguments.length - 1];
+  if (r.isKeywordArgs(kwargs)) {
+    caseSensitive = kwargs.case_sensitive ?? caseSensitive;
+    by = kwargs.by ?? by;
+    reverse = kwargs.reverse ?? reverse;
+  }
+
   let si;
-  if (by === undefined || by === 'key') {
+
+  if (by === 'key') {
     si = 0;
   } else if (by === 'value') {
     si = 1;
@@ -154,6 +163,7 @@ function dictsort (val, caseSensitive, by) {
     return a > b ? 1 : (a === b ? 0 : -1);
   });
 
+  if (reverse) array.reverse();
   return array;
 }
 
