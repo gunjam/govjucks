@@ -8,6 +8,7 @@
 * Add FunctionLoader template loader similar to [jinja FunctionLoader](https://jinja.palletsprojects.com/en/stable/api/#jinja2.FunctionLoader). [#35](https://github.com/gunjam/govjucks/pull/35) @gunjam
 * Add PackageLoader template loader similar to [jinja PackageLoader](https://jinja.palletsprojects.com/en/stable/api/#jinja2.PackageLoader). [#42](https://github.com/gunjam/govjucks/pull/42) @gunjam
 * Add PrefixLoader template loader similar to [jinja PrefixLoader](https://jinja.palletsprojects.com/en/stable/api/#jinja2.PrefixLoader). [#41](https://github.com/gunjam/govjucks/pull/41) @gunjam
+* Add reverse parameter and keyword arg support to dictsort filter [#41](https://github.com/gunjam/govjucks/pull/49) @gunjam
 
 ### Fixes
 * Only allow templates to be loaded from configured file paths and below, not outside it. [#48](https://github.com/gunjam/govjucks/pull/48) @gunjam

@@ -185,8 +185,8 @@ describe('filter', () => {
   it('dictsort', (t, done) => {
     // no real foolproof way to test that a js obj has been transformed
     // from unsorted -> sorted, as its enumeration ordering is undefined
-    // and might fluke being sorted originally .. lets just init with some jumbled
-    // keys
+    // and might fluke being sorted originally .. lets just init with some
+    // jumbled keys
 
     // no params - should be case insensitive, by key
     equal(
@@ -215,6 +215,16 @@ describe('filter', () => {
         }
       },
       'ABC,ABc,Abc,abc,');
+    equal(
+      '{% for item in items | dictsort(case_sensitive=true) %}{{ item[0] }},{% endfor %}', {
+        items: {
+          ABC: 6,
+          ABc: 5,
+          Abc: 1,
+          abc: 2
+        }
+      },
+      'ABC,ABc,Abc,abc,');
 
     // use values for sort
     equal(
@@ -227,6 +237,38 @@ describe('filter', () => {
         }
       },
       'cdba');
+    equal(
+      '{% for item in items | dictsort(by="value") %}{{ item[0] }}{% endfor %}', {
+        items: {
+          a: 6,
+          b: 5,
+          c: 1,
+          d: 2
+        }
+      },
+      'cdba');
+
+    // reverse
+    equal(
+      '{% for item in items | dictsort(false, "value", true) %}{{ item[0] }}{% endfor %}', {
+        items: {
+          a: 6,
+          b: 5,
+          c: 1,
+          d: 2
+        }
+      },
+      'abdc');
+    equal(
+      '{% for item in items | dictsort(reverse=true) %}{{ item[0] }}{% endfor %}', {
+        items: {
+          a: 6,
+          b: 5,
+          c: 1,
+          d: 2
+        }
+      },
+      'dcba');
 
     finish(done);
   });
