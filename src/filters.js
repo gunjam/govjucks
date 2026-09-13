@@ -1,6 +1,7 @@
 'use strict';
 
 const lib = require('./lib');
+const striptags = require('./striptags.js');
 const r = require('./runtime');
 const { format } = require('node:util');
 
@@ -756,13 +757,6 @@ function string (obj) {
 
 module.exports.string = string;
 
-const tags = /<\/?[a-z][a-z0-9]*\b[^>]*>|<!--[\s\S]*?-->/gi;
-const nlSpaces = /^ +| +$/gm;
-const adjSpaces = / +/g;
-const lineBreaks = /\r\n/g;
-const abnormalBr = /\n\n\n+/g;
-const spaces = /\s+/gi;
-
 /**
  * Analog of jinja's {@link http://jinja.pocoo.org/docs/templates/#striptags|striptags}.
  * If `preserve_linebreaks` is false (default), strips SGML/XML tags and
@@ -772,24 +766,13 @@ const spaces = /\s+/gi;
  * @param {boolean} [preserveLinebreaks=false]
  * @returns {string|SafeString}
  */
-function striptags (input, preserveLinebreaks) {
+function striptagsFilter (input, preserveLinebreaks = false) {
   input = normalize(input, '');
-  preserveLinebreaks = preserveLinebreaks || false;
-  const trimmedInput = trim(input.replace(tags, ''));
-  let res = '';
-  if (preserveLinebreaks) {
-    res = trimmedInput
-      .replace(nlSpaces, '') // remove leading and trailing spaces
-      .replace(adjSpaces, ' ') // squash adjacent spaces
-      .replace(lineBreaks, '\n') // normalize linebreaks (CRLF -> LF)
-      .replace(abnormalBr, '\n\n'); // squash abnormal adjacent linebreaks
-  } else {
-    res = trimmedInput.replace(spaces, ' ');
-  }
+  const res = striptags(input, preserveLinebreaks);
   return r.copySafeness(input, res);
 }
 
-module.exports.striptags = striptags;
+module.exports.striptags = striptagsFilter;
 
 /**
  * Make the first letter of the string uppercase.
