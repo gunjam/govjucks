@@ -11,6 +11,7 @@
 
 ### Fixes
 * Only allow templates to be loaded from configured file paths and below, not outside it. [#48](https://github.com/gunjam/govjucks/pull/48) @gunjam
+* striptags filter now correctly handles `>` in tag attributes and other edge cases. [#50](https://github.com/gunjam/govjucks/pull/50) @gunjam
 
 ## v0.3.1
 
