@@ -1200,9 +1200,53 @@ describe('filter', () => {
     equal('{{ html | striptags }}',
       {
         html: '  <p>an  \n <a href="#">example</a> link</p>\n<p>to a webpage</p> ' +
-          '<!-- <p>and some comments</p> -->'
+          '<!-- <p>and some comments</p> -->  '
       },
       'an example link to a webpage');
+
+    // Immediate space after "<" is not a valid tag, don't strip
+    equal('{{ html | striptags }}', {
+      html: 'example text < p> < div>'
+    }, 'example text &lt; p&gt; &lt; div&gt;');
+
+    // Still collapse spaces
+    equal('{{ html | striptags }}', {
+      html: 'example text <  p> <  div>'
+    }, 'example text &lt; p&gt; &lt; div&gt;');
+
+    // Copy safeness
+    equal('{{ html | safe |striptags }}', {
+      html: 'example text <  p> <  div>'
+    }, 'example text < p> < div>');
+
+    // Quotes in attribute quotes
+    equal('{{ html | striptags }}', {
+      html: '<span class="foo \'bar\'">example</span> text '
+    }, 'example text');
+
+    // Collapse spaces across tags
+    equal('{{ html | striptags }}', {
+      html: '<a href=""> example <strong> text</strong> </a>'
+    }, 'example text');
+
+    // Closing chevron in attribute quotes
+    equal('{{ html | striptags }}', {
+      html: '<span class=">">example</span> text'
+    }, 'example text');
+
+    // Exclamation mark in attribute quotes (no comment start)
+    equal('{{ html | striptags }}', {
+      html: '<p style="color: red !important">test</p>'
+    }, 'test');
+
+    // Comment edge cases
+    equal('{{ html | striptags }}', {
+      html: '<p <!-- comment in tag -->test</p>'
+    }, 'test');
+    equal('{{ html | striptags }}', {
+      html: ' <!-- -- -- > <!-- --> test <!-- -- - --> '
+    }, 'test');
+
     equal('{{ undefined | striptags }}', '');
     equal('{{ null | striptags }}', '');
     equal('{{ nothing | striptags }}', '');
