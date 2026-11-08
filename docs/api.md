@@ -624,7 +624,7 @@ const env = new govjucks.Environment(new govjucks.FunctionLoader(loader, {
 new PrefixLoader([loaderMap], [delimiter])
 ```
 
-Use multiple loaders mapped to a tempalte path prefix. The prefix is delimited
+Use multiple loaders mapped to a template path prefix. The prefix is delimited
 by a slash by default, but can be configured by passing a string to the
 `delimiter` parameter.
 
