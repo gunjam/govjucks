@@ -1,6 +1,66 @@
 # Changelog
 
-## Unreleased
+## v0.4.0
+
+This release includes bug fixes and refactors, notably the removal of Chokidar
+as a peer dependency as all template watch functionality was rewritten to use
+the built in NodeJS file watch library. This means there is no longer a
+sub-dependency on an old version of braces, which had a CVE.
+
+There's also new features, as 4 new loaders have been added (similar to those
+found in Jinja):
+
+### Dictloader
+
+Use the [DictLoader](docs/api.md#dictloader) to load templates from an object of
+name keys and source values:
+
+```javascript
+const env = new govjucks.Environment(new govjucks.DictLoader({
+  'page.njk': '<h1>Hello {{ name }}</h1>'
+}));
+```
+
+### FunctionLoader
+
+The [FunctionLoader](docs/api.md#functionloader) uses a custom function to
+return template source for a template name:
+
+```javascript
+function loader (name) {
+  // Any logic you like to get template source!
+  return '<h1>My Template</h1>';
+}
+const env = new govjucks.Environment(new govjucks.FunctionLoader(loader));
+```
+
+### PackageLoader
+
+The [PackageLoader](docs/api.md#packageloader) is similar to the
+NodeResolveLoader, except it will only load templates from a specific package:
+
+```javascript
+const loader = new govjucks.PackageLoader('govuk-frontend', 'dist');
+
+// ./node_modules/govuk-frontend/dist/govuk/components/button/macro.njk
+loader.getSource('govuk/components/button/macro.njk');
+```
+
+### PrefixLoader
+
+Use the [PrefixLoader](docs/api.md#prefixloader) to assign a prefix to other
+loaders, this allows you to use multiple loaders which may contain templates
+with the same name made distinct by the configured prefix. For example:
+
+```javascript
+const loader = new PrefixLoader({
+  app1: new FileSystemLoader(['./some-app/views']),
+  app2: new FileSystemLoader(['./another-app/src/views'])
+});
+
+const app1Page = loader.getSource('app1/page.njk');
+const app2Page = loader.getSource('app2/page.njk');
+```
 
 ### New features
 
